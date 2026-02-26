@@ -1,0 +1,44 @@
+import express from "express";
+import userController from "../controllers/UserController.js";
+import roleController from "../controllers/RoleController.js";
+import authController from "../controllers/AuthController.js";
+import lokasiController from "../controllers/LokasiController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
+
+const router = express.Router();
+
+// ========================
+// AUTH ROUTES
+// ========================
+router.post("/login", (req, res) => authController.login(req, res));
+router.get("/me", authMiddleware, (req, res) => authController.getProfile(req, res));
+router.put("/me", authMiddleware, (req, res) => authController.updateProfile(req, res));
+
+// ========================
+// USER ROUTES
+// ========================
+router.get("/users", (req, res) => userController.index(req, res));
+router.get("/users/:id", (req, res) => userController.show(req, res));
+router.post("/users", (req, res) => userController.store(req, res));
+router.put("/users/:id", (req, res) => userController.update(req, res));
+router.delete("/users/:id", (req, res) => userController.destroy(req, res));
+
+// ========================
+// ROLE ROUTES
+// ========================
+router.get("/roles", (req, res) => roleController.index(req, res));
+router.get("/roles/:id", (req, res) => roleController.show(req, res));
+router.post("/roles", (req, res) => roleController.store(req, res));
+router.put("/roles/:id", (req, res) => roleController.update(req, res));
+router.delete("/roles/:id", (req, res) => roleController.destroy(req, res));
+
+// ========================
+// LOKASI ROUTES
+// ========================
+router.get("/lokasi", (req, res) => lokasiController.index(req, res));
+router.get("/lokasi/:id", (req, res) => lokasiController.show(req, res));
+router.post("/lokasi", (req, res) => lokasiController.store(req, res));
+router.put("/lokasi/:id", (req, res) => lokasiController.update(req, res));
+router.delete("/lokasi/:id", (req, res) => lokasiController.destroy(req, res));
+
+export default router;

@@ -3,6 +3,8 @@ import userController from "../controllers/UserController.js";
 import roleController from "../controllers/RoleController.js";
 import authController from "../controllers/AuthController.js";
 import lokasiController from "../controllers/LokasiController.js";
+import jabatanController from "../controllers/JabatanController.js";
+import kunjunganController from "../controllers/KunjunganController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -40,5 +42,23 @@ router.get("/lokasi/:id", (req, res) => lokasiController.show(req, res));
 router.post("/lokasi", (req, res) => lokasiController.store(req, res));
 router.put("/lokasi/:id", (req, res) => lokasiController.update(req, res));
 router.delete("/lokasi/:id", (req, res) => lokasiController.destroy(req, res));
+
+// ========================
+// JABATAN ROUTES
+// ========================
+router.get("/jabatans", (req, res) => jabatanController.index(req, res));
+router.get("/jabatans/:id", (req, res) => jabatanController.show(req, res));
+router.post("/jabatans", (req, res) => jabatanController.store(req, res));
+router.put("/jabatans/:id", (req, res) => jabatanController.update(req, res));
+router.delete("/jabatans/:id", (req, res) => jabatanController.destroy(req, res));
+
+// ========================
+// KUNJUNGAN ROUTES
+// ========================
+router.get("/kunjungan", (req, res) => kunjunganController.index(req, res));
+router.get("/kunjungan/:id", (req, res) => kunjunganController.show(req, res));
+router.post("/kunjungan", (req, res) => kunjunganController.store(req, res));
+router.put("/kunjungan/:id", (req, res) => kunjunganController.update(req, res));
+router.delete("/kunjungan/:id", (req, res) => kunjunganController.destroy(req, res));
 
 export default router;

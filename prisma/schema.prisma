@@ -188,6 +188,9 @@ model kunjungans {
   status         String?
   created_at     DateTime? @db.Timestamp(0)
   updated_at     DateTime? @db.Timestamp(0)
+  users          users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "kunjungans_user_id_foreign")
+
+  @@index([user_id], map: "kunjungans_user_id_foreign")
 }
 
 model laporan_kerjas {
@@ -787,4 +790,5 @@ model users {
   pegawai_keluars                    pegawai_keluars[]
   pengajuan_keuangans                pengajuan_keuangans[]
   target_kinerja_teams               target_kinerja_teams[]
+  kunjungans                         kunjungans[]
 }

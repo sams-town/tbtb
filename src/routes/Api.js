@@ -122,10 +122,12 @@ router.delete("/notifications/:id", (req, res) => notificationController.destroy
 // ========================
 // ABSENSI ROUTES
 // ========================
+const absensiUpload = createUploadMiddleware("absensi", "absensi");
 router.get("/absensi", (req, res) => absensiController.index(req, res));
 router.get("/absensi/:id", (req, res) => absensiController.show(req, res));
-router.post("/absensi", (req, res) => absensiController.store(req, res));
-router.put("/absensi/:id", (req, res) => absensiController.update(req, res));
+router.post("/absensi", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.store(req, res));
+router.put("/absensi/:id", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.update(req, res));
+router.post("/absensi/:id", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.update(req, res)); // Fallback for forms that use POST
 router.delete("/absensi/:id", (req, res) => absensiController.destroy(req, res));
 
 // ========================

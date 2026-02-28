@@ -22,7 +22,17 @@ class AbsensiController {
 
     async store(req, res) {
         try {
-            const data = await absensiService.create(req.body);
+            const payload = { ...req.body };
+            if (req.files) {
+                if (req.files.foto_jam_absen && req.files.foto_jam_absen.length > 0) {
+                    payload.foto_jam_absen = `/uploads/absensi/${req.files.foto_jam_absen[0].filename}`;
+                }
+                if (req.files.foto_jam_pulang && req.files.foto_jam_pulang.length > 0) {
+                    payload.foto_jam_pulang = `/uploads/absensi/${req.files.foto_jam_pulang[0].filename}`;
+                }
+            }
+
+            const data = await absensiService.create(payload);
             return res.status(201).json({ success: true, message: "Absensi berhasil dibuat", data });
         } catch (error) {
             return res.status(500).json({ success: false, message: "Gagal membuat absensi", error: error.message });
@@ -31,7 +41,19 @@ class AbsensiController {
 
     async update(req, res) {
         try {
-            const data = await absensiService.update(req.params.id, req.body);
+            // Check if req.body is defined, if not fallback to empty object
+            const payload = req.body ? { ...req.body } : {};
+
+            if (req.files) {
+                if (req.files.foto_jam_absen && req.files.foto_jam_absen.length > 0) {
+                    payload.foto_jam_absen = `/uploads/absensi/${req.files.foto_jam_absen[0].filename}`;
+                }
+                if (req.files.foto_jam_pulang && req.files.foto_jam_pulang.length > 0) {
+                    payload.foto_jam_pulang = `/uploads/absensi/${req.files.foto_jam_pulang[0].filename}`;
+                }
+            }
+
+            const data = await absensiService.update(req.params.id, payload);
             if (!data) return res.status(404).json({ success: false, message: "Absensi tidak ditemukan" });
             return res.status(200).json({ success: true, message: "Absensi berhasil diupdate", data });
         } catch (error) {

@@ -49,3 +49,25 @@ export function createUploadMiddleware(subfolder = "profile", prefix = "file", a
 
 // Default untuk backward compatibility
 export const upload = createUploadMiddleware("profile", "profile");
+
+export function saveBase64Image(base64String, subfolder, prefix) {
+    if (!base64String || typeof base64String !== 'string' || !base64String.startsWith("data:image")) return base64String;
+
+    const matches = base64String.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) return base64String;
+
+    const extension = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    const filename = `${prefix}-base64-${Date.now()}.${extension}`;
+    const uploadDir = path.join(__dirname, "../../public/uploads", subfolder);
+
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const fullPath = path.join(uploadDir, filename);
+    fs.writeFileSync(fullPath, buffer);
+    return `/uploads/${subfolder}/${filename}`;
+}

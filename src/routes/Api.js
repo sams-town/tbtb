@@ -12,6 +12,8 @@ import cutiController from "../controllers/CutiController.js";
 import notificationController from "../controllers/NotificationController.js";
 import absensiController from "../controllers/AbsensiController.js";
 import dinasLuarController from "../controllers/DinasLuarController.js";
+import statusPajakController from "../controllers/StatusPajakController.js";
+import mappingShiftController from "../controllers/MappingShiftController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -136,7 +138,28 @@ router.delete("/absensi/:id", (req, res) => absensiController.destroy(req, res))
 router.get("/dinas-luar", (req, res) => dinasLuarController.index(req, res));
 router.get("/dinas-luar/:id", (req, res) => dinasLuarController.show(req, res));
 router.post("/dinas-luar", (req, res) => dinasLuarController.store(req, res));
+router.post("/dinas-luar/bulk", (req, res) => dinasLuarController.bulkStore(req, res));
+router.put("/dinas-luar/bulk", (req, res) => dinasLuarController.bulkUpdate(req, res));
+router.delete("/dinas-luar/bulk", (req, res) => dinasLuarController.bulkDestroy(req, res));
 router.put("/dinas-luar/:id", (req, res) => dinasLuarController.update(req, res));
 router.delete("/dinas-luar/:id", (req, res) => dinasLuarController.destroy(req, res));
+
+// ========================
+// STATUS PAJAK ROUTES
+// ========================
+router.get("/status-pajak", (req, res) => statusPajakController.index(req, res));
+router.get("/status-pajak/:id", (req, res) => statusPajakController.show(req, res));
+router.post("/status-pajak", (req, res) => statusPajakController.store(req, res));
+router.put("/status-pajak/:id", (req, res) => statusPajakController.update(req, res));
+router.delete("/status-pajak/:id", (req, res) => statusPajakController.destroy(req, res));
+
+// ========================
+// MAPPING SHIFT ROUTES
+// ========================
+router.get("/mapping-shifts", (req, res) => mappingShiftController.index(req, res));
+router.get("/mapping-shifts/:id", (req, res) => mappingShiftController.show(req, res));
+router.post("/mapping-shifts/bulk", (req, res) => mappingShiftController.bulkStore(req, res));
+router.put("/mapping-shifts/bulk", (req, res) => mappingShiftController.bulkUpdate(req, res));
+router.delete("/mapping-shifts/bulk", (req, res) => mappingShiftController.bulkDestroy(req, res));
 
 export default router;

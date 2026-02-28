@@ -2,7 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -188,9 +187,6 @@ model kunjungans {
   status         String?
   created_at     DateTime? @db.Timestamp(0)
   updated_at     DateTime? @db.Timestamp(0)
-  users          users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "kunjungans_user_id_foreign")
-
-  @@index([user_id], map: "kunjungans_user_id_foreign")
 }
 
 model laporan_kerjas {
@@ -256,7 +252,7 @@ model lokasis {
   approved_by                      BigInt?   @db.UnsignedBigInt
   created_at                       DateTime? @db.Timestamp(0)
   updated_at                       DateTime? @db.Timestamp(0)
-  user_lokasis                     users[]                @relation("users_lokasi")
+  user_lokasis                     users[]   @relation("users_lokasi")
   users_lokasis_approved_byTousers users?    @relation("lokasis_approved_byTousers", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lokasis_approved_by_foreign")
   users_lokasis_created_byTousers  users?    @relation("lokasis_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lokasis_created_by_foreign")
 
@@ -294,9 +290,13 @@ model mapping_shifts {
   approved_by          BigInt?   @db.UnsignedBigInt
   created_at           DateTime? @db.Timestamp(0)
   updated_at           DateTime? @db.Timestamp(0)
-  users                users?    @relation(fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mapping_shifts_approved_by_foreign")
+  approved_by_user     users?    @relation("ApprovedBy", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mapping_shifts_approved_by_foreign")
+  users                users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mapping_shifts_user_id_foreign")
+  shifts               shifts?   @relation(fields: [shift_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([user_id], map: "mapping_shifts_user_id_foreign")
   @@index([approved_by], map: "mapping_shifts_approved_by_foreign")
+  @@index([shift_id], map: "mapping_shifts_shift_id_foreign")
 }
 
 model migrations {
@@ -633,14 +633,15 @@ model settings {
 }
 
 model shifts {
-  id                    BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id                    BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
   nama_shift            String
   jam_masuk             String
   jam_keluar            String
   jam_mulai_istirahat   String?
   jam_selesai_istirahat String?
-  created_at            DateTime? @db.Timestamp(0)
-  updated_at            DateTime? @db.Timestamp(0)
+  created_at            DateTime?        @db.Timestamp(0)
+  updated_at            DateTime?        @db.Timestamp(0)
+  mapping_shifts        mapping_shifts[]
 }
 
 model sips {
@@ -659,7 +660,7 @@ model status_pajaks {
   ptkp       BigInt?
   created_at DateTime? @db.Timestamp(0)
   updated_at DateTime? @db.Timestamp(0)
-  users      users[]
+  users      users[]   @relation("users_status_pajak")
 }
 
 model status_ptkps {
@@ -780,15 +781,15 @@ model users {
   updated_at                         DateTime?              @db.Timestamp(0)
   jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lokasi                             lokasis?               @relation("users_lokasi", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  status_pajak                       status_pajaks?         @relation(fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status_pajak                       status_pajaks?         @relation("users_status_pajak", fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mapping_shifts                     mapping_shifts[]
   cutis                              cutis[]
   managed_jabatans                   jabatans[]             @relation("jabatans_manager")
   lemburs                            lemburs[]
   lokasis_lokasis_approved_byTousers lokasis[]              @relation("lokasis_approved_byTousers")
   lokasis_lokasis_created_byTousers  lokasis[]              @relation("lokasis_created_byTousers")
-  mapping_shifts                     mapping_shifts[]
+  approved_mapping_shifts            mapping_shifts[]       @relation("ApprovedBy")
   pegawai_keluars                    pegawai_keluars[]
   pengajuan_keuangans                pengajuan_keuangans[]
   target_kinerja_teams               target_kinerja_teams[]
-  kunjungans                         kunjungans[]
 }

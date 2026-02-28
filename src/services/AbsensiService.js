@@ -3,18 +3,26 @@ import prisma from "../config/prisma.js";
 class AbsensiService {
     async getAll(query = {}) {
         const search = query.search || "";
-        const where = search ? {
-            OR: [
-                { status_absen: { contains: search } },
-                { keterangan_masuk: { contains: search } },
-                { keterangan_pulang: { contains: search } },
-            ]
-        } : {};
+        const where = {
+            ... (search ? {
+                OR: [
+                    { status_absen: { contains: search } },
+                    { keterangan_masuk: { contains: search } },
+                    { keterangan_pulang: { contains: search } },
+                ]
+            } : {})
+        };
+        if (query.user_id) where.user_id = BigInt(query.user_id);
         const data = await prisma.mapping_shifts.findMany({
             where,
             orderBy: { id: "desc" },
             include: {
-                users: true
+                users: {
+                    include: {
+                        lokasi: true
+                    }
+                },
+                shifts: true
             }
         });
         return { data: this.serializeList(data) };
@@ -24,7 +32,12 @@ class AbsensiService {
         const record = await prisma.mapping_shifts.findUnique({
             where: { id: BigInt(id) },
             include: {
-                users: true
+                users: {
+                    include: {
+                        lokasi: true
+                    }
+                },
+                shifts: true
             }
         });
         if (!record) return null;
@@ -48,12 +61,18 @@ class AbsensiService {
         const existing = await prisma.mapping_shifts.findUnique({ where: { id: BigInt(id) } });
         if (!existing) return null;
 
-        const updateData = { ...data };
-        if (updateData.user_id !== undefined) updateData.user_id = updateData.user_id ? BigInt(updateData.user_id) : null;
-        if (updateData.shift_id !== undefined) updateData.shift_id = updateData.shift_id ? BigInt(updateData.shift_id) : null;
-        if (updateData.approved_by !== undefined) updateData.approved_by = updateData.approved_by ? BigInt(updateData.approved_by) : null;
-        if (updateData.tanggal) {
-            updateData.tanggal = new Date(updateData.tanggal);
+        const updateData = {};
+        for (const [key, value] of Object.entries(data)) {
+            // Filter invalid keys if there's any JSON empty brace issue or _method spoofing
+            if (key === "{}" || key === "_method") continue;
+
+            if (["user_id", "shift_id", "approved_by"].includes(key)) {
+                updateData[key] = value ? BigInt(value) : null;
+            } else if (key === "tanggal") {
+                updateData[key] = new Date(value);
+            } else {
+                updateData[key] = value;
+            }
         }
 
         const record = await prisma.mapping_shifts.update({ where: { id: BigInt(id) }, data: updateData });
@@ -74,6 +93,12 @@ class AbsensiService {
                 serialized[key] = value.toString();
             } else if (value instanceof Date) {
                 serialized[key] = value.toISOString();
+            } else if (key === 'foto_jam_absen' && value) {
+                const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+                serialized[key] = value.startsWith('http') ? value : (value.startsWith('/') ? `${baseUrl}${value}` : `${baseUrl}/${value}`);
+            } else if (key === 'foto_jam_pulang' && value) {
+                const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+                serialized[key] = value.startsWith('http') ? value : (value.startsWith('/') ? `${baseUrl}${value}` : `${baseUrl}/${value}`);
             } else if (value && typeof value === "object" && !Array.isArray(value)) {
                 serialized[key] = this.serialize(value);
             } else {

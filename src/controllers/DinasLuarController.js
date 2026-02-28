@@ -29,6 +29,64 @@ class DinasLuarController {
         }
     }
 
+    async bulkStore(req, res) {
+        try {
+            const { user_id, shift_id, start_date, end_date } = req.body;
+
+            if (!user_id || !shift_id || !start_date || !end_date) {
+                return res.status(400).json({
+                    success: false,
+                    message: "user_id, shift_id, start_date, dan end_date wajib diisi"
+                });
+            }
+
+            const result = await dinasLuarService.bulkCreateRange(req.body);
+
+            return res.status(201).json({
+                success: true,
+                message: "Dinas luar berhasil dibuat untuk rentang tanggal tersebut",
+                ...result
+            });
+        } catch (error) {
+            console.error("DinasLuarController.bulkStore error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Gagal membuat dinas luar",
+                error: error.message
+            });
+        }
+    }
+
+    async bulkUpdate(req, res) {
+        try {
+            const { user_id, start_date, end_date, shift_id } = req.body;
+            if (!user_id || !start_date || !end_date || !shift_id) {
+                return res.status(400).json({ success: false, message: "user_id, start_date, end_date, dan shift_id wajib diisi" });
+            }
+
+            const result = await dinasLuarService.bulkUpdateRange(req.body);
+            return res.status(200).json({ success: true, message: `${result.count} data dinas luar berhasil diupdate`, ...result });
+        } catch (error) {
+            console.error("DinasLuarController.bulkUpdate error:", error);
+            return res.status(500).json({ success: false, message: "Gagal mengupdate massal dinas luar", error: error.message });
+        }
+    }
+
+    async bulkDestroy(req, res) {
+        try {
+            const { user_id, start_date, end_date } = req.body;
+            if (!user_id || !start_date || !end_date) {
+                return res.status(400).json({ success: false, message: "user_id, start_date, dan end_date wajib diisi" });
+            }
+
+            const result = await dinasLuarService.bulkDeleteRange(req.body);
+            return res.status(200).json({ success: true, message: `${result.count} data dinas luar berhasil dihapus`, ...result });
+        } catch (error) {
+            console.error("DinasLuarController.bulkDestroy error:", error);
+            return res.status(500).json({ success: false, message: "Gagal menghapus massal dinas luar", error: error.message });
+        }
+    }
+
     async update(req, res) {
         try {
             const data = await dinasLuarService.update(req.params.id, req.body);

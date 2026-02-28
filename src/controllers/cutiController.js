@@ -22,21 +22,25 @@ class CutiController {
 
     async store(req, res) {
         try {
-            const userId = req.user && req.user.id ? req.user.id : req.body.user_id;
-            
-            // Handle file upload
+            const roles = (req.user && req.user.roles) || [];
+            const canActOnBehalf = Array.isArray(roles) && roles.some(r => String(r).toLowerCase() === "admin" || String(r).toLowerCase() === "manager");
+            let effectiveUserId = req.user && req.user.id ? req.user.id : req.body.user_id;
+            if (canActOnBehalf && req.body.user_id && /^\d+$/.test(String(req.body.user_id))) {
+                effectiveUserId = req.body.user_id;
+            }
+
             let fotoCuti = null;
             if (req.file) {
                 const baseUrl = `${req.protocol}://${req.get("host")}`;
                 fotoCuti = `${baseUrl}/uploads/cuti/${req.file.filename}`;
             }
-            
-            const payload = { 
-                ...req.body, 
-                user_id: userId,
-                foto_cuti: fotoCuti
+
+            const payload = {
+                ...req.body,
+                user_id: effectiveUserId,
+                foto_cuti: fotoCuti,
             };
-            
+
             const cuti = await cutiService.create(payload);
             return res.status(201).json({ success: true, message: "Cuti berhasil dibuat", data: cuti });
         } catch (error) {

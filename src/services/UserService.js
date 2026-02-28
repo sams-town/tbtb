@@ -33,19 +33,70 @@ class UserService {
             prisma.users.count({ where }),
         ]);
 
-        // Ambil roles untuk semua users
         const userIds = data.map((u) => u.id);
         const userRoles = await prisma.model_has_roles.findMany({
             where: { model_id: { in: userIds } },
             include: { roles: true },
         });
 
-        // Map roles ke masing-masing user
+        const cutiRecords = await prisma.cutis.findMany({
+            where: { user_id: { in: userIds }, status_cuti: "APPROVED" },
+            select: { user_id: true, tanggal: true, nama_cuti: true },
+        });
+        const usedMap = {};
+        for (const r of cutiRecords) {
+            const uid = r.user_id;
+            const label = (r.nama_cuti || "").toLowerCase();
+            let type = "lainnya";
+            if (label.includes("cuti")) type = "cuti";
+            else if (label.includes("telat")) type = "telat";
+            else if (label.includes("pulang")) type = "pulang_cepat";
+            const t = r.tanggal || "";
+            let amount = 1;
+            if (type === "cuti") {
+                if (t.includes(" - ")) {
+                    const [start, end] = t.split(" - ");
+                    const s = new Date(start);
+                    const e = new Date(end);
+                    const diff = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+                    amount = diff > 0 ? diff : 0;
+                } else if (!t) {
+                    amount = 0;
+                }
+            }
+            usedMap[uid] = usedMap[uid] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            usedMap[uid][type] += amount;
+        }
+
         const dataWithRoles = data.map((user) => {
             const roles = userRoles
                 .filter((ur) => ur.model_id === user.id)
                 .map((ur) => ur.roles.name);
-            return { ...this.serialize(user), roles };
+            const totalCuti = Number(user.izin_cuti || 0n);
+            const totalTelat = Number(user.izin_telat || 0n);
+            const totalPulangCepat = Number(user.izin_pulang_cepat || 0n);
+            const totalLainnya = Number(user.izin_lainnya || 0n);
+            const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            const sisaCuti = Math.max(totalCuti - used.cuti, 0);
+            const sisaTelat = Math.max(totalTelat - used.telat, 0);
+            const sisaPulangCepat = Math.max(totalPulangCepat - used.pulang_cepat, 0);
+            const sisaLainnya = Math.max(totalLainnya - used.lainnya, 0);
+            return {
+                ...this.serialize(user),
+                roles,
+                izin_cuti_total: String(totalCuti),
+                izin_cuti_terpakai: String(used.cuti),
+                izin_cuti_sisa: String(sisaCuti),
+                izin_telat_total: String(totalTelat),
+                izin_telat_terpakai: String(used.telat),
+                izin_telat_sisa: String(sisaTelat),
+                izin_pulang_cepat_total: String(totalPulangCepat),
+                izin_pulang_cepat_terpakai: String(used.pulang_cepat),
+                izin_pulang_cepat_sisa: String(sisaPulangCepat),
+                izin_lainnya_total: String(totalLainnya),
+                izin_lainnya_terpakai: String(used.lainnya),
+                izin_lainnya_sisa: String(sisaLainnya),
+            };
         });
 
         return {
@@ -70,15 +121,63 @@ class UserService {
 
         if (!user) return null;
 
-        // Ambil roles user
         const userRoles = await prisma.model_has_roles.findMany({
             where: { model_id: BigInt(id) },
             include: { roles: true },
         });
-
         const roles = userRoles.map((ur) => ur.roles.name);
 
-        return { ...this.serialize(user), roles };
+        const cutiList = await prisma.cutis.findMany({
+            where: { user_id: BigInt(id), status_cuti: "APPROVED" },
+            select: { tanggal: true, nama_cuti: true },
+        });
+        let used = { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+        for (const r of cutiList) {
+            const label = (r.nama_cuti || "").toLowerCase();
+            let type = "lainnya";
+            if (label.includes("cuti")) type = "cuti";
+            else if (label.includes("telat")) type = "telat";
+            else if (label.includes("pulang")) type = "pulang_cepat";
+            const t = r.tanggal || "";
+            let amount = 1;
+            if (type === "cuti") {
+                if (t.includes(" - ")) {
+                    const [start, end] = t.split(" - ");
+                    const s = new Date(start);
+                    const e = new Date(end);
+                    const diff = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+                    amount = diff > 0 ? diff : 0;
+                } else if (!t) {
+                    amount = 0;
+                }
+            }
+            used[type] += amount;
+        }
+        const totalCuti = Number(user.izin_cuti || 0n);
+        const totalTelat = Number(user.izin_telat || 0n);
+        const totalPulangCepat = Number(user.izin_pulang_cepat || 0n);
+        const totalLainnya = Number(user.izin_lainnya || 0n);
+        const sisaCuti = Math.max(totalCuti - used.cuti, 0);
+        const sisaTelat = Math.max(totalTelat - used.telat, 0);
+        const sisaPulangCepat = Math.max(totalPulangCepat - used.pulang_cepat, 0);
+        const sisaLainnya = Math.max(totalLainnya - used.lainnya, 0);
+
+        return {
+            ...this.serialize(user),
+            roles,
+            izin_cuti_total: String(totalCuti),
+            izin_cuti_terpakai: String(used.cuti),
+            izin_cuti_sisa: String(sisaCuti),
+            izin_telat_total: String(totalTelat),
+            izin_telat_terpakai: String(used.telat),
+            izin_telat_sisa: String(sisaTelat),
+            izin_pulang_cepat_total: String(totalPulangCepat),
+            izin_pulang_cepat_terpakai: String(used.pulang_cepat),
+            izin_pulang_cepat_sisa: String(sisaPulangCepat),
+            izin_lainnya_total: String(totalLainnya),
+            izin_lainnya_terpakai: String(used.lainnya),
+            izin_lainnya_sisa: String(sisaLainnya),
+        };
     }
 
     /**

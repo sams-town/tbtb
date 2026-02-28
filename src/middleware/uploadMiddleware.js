@@ -12,10 +12,12 @@ const __dirname = path.dirname(__filename);
  * @param {string} prefix - prefix nama file (profile, kontrak, dsb)
  * @param {string[]} allowedMimes - array MIME type yang diizinkan
  * @param {number} maxSize - ukuran maksimal file (byte)
+ * @param {boolean} useUploads - jika true, simpan di public/uploads, jika false di public/
  * @returns {multer.Multer} - instance multer
  */
-export function createUploadMiddleware(subfolder = "profile", prefix = "file", allowedMimes = ["image/jpeg", "image/png", "image/jpg"], maxSize = 2 * 1024 * 1024) {
-    const uploadDir = path.join(__dirname, "../../public/uploads", subfolder);
+export function createUploadMiddleware(subfolder = "profile", prefix = "file", allowedMimes = ["image/jpeg", "image/png", "image/jpg"], maxSize = 2 * 1024 * 1024, useUploads = true) {
+    const baseDir = useUploads ? "../../public/uploads" : "../../public";
+    const uploadDir = path.join(__dirname, baseDir, subfolder);
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -50,7 +52,7 @@ export function createUploadMiddleware(subfolder = "profile", prefix = "file", a
 // Default untuk backward compatibility
 export const upload = createUploadMiddleware("profile", "profile");
 
-export function saveBase64Image(base64String, subfolder, prefix) {
+export function saveBase64Image(base64String, subfolder, prefix, useUploads = true) {
     if (!base64String || typeof base64String !== 'string' || !base64String.startsWith("data:image")) return base64String;
 
     const matches = base64String.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
@@ -61,7 +63,8 @@ export function saveBase64Image(base64String, subfolder, prefix) {
     const buffer = Buffer.from(base64Data, 'base64');
 
     const filename = `${prefix}-base64-${Date.now()}.${extension}`;
-    const uploadDir = path.join(__dirname, "../../public/uploads", subfolder);
+    const baseDir = useUploads ? "../../public/uploads" : "../../public";
+    const uploadDir = path.join(__dirname, baseDir, subfolder);
 
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
@@ -69,5 +72,5 @@ export function saveBase64Image(base64String, subfolder, prefix) {
 
     const fullPath = path.join(uploadDir, filename);
     fs.writeFileSync(fullPath, buffer);
-    return `/uploads/${subfolder}/${filename}`;
+    return useUploads ? `/uploads/${subfolder}/${filename}` : `/${subfolder}/${filename}`;
 }

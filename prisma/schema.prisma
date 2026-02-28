@@ -235,8 +235,12 @@ model lemburs {
   approved_by     BigInt?   @db.UnsignedBigInt
   created_at      DateTime? @db.Timestamp(0)
   updated_at      DateTime? @db.Timestamp(0)
-  users           users?    @relation(fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_approved_by_foreign")
+  karyawan        users     @relation("KaryawanLembur", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_user_id_foreign")
+  lokasi          lokasis   @relation("LokasiLembur", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_lokasi_id_foreign")
+  approver        users?    @relation("ApproverLembur", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_approved_by_foreign")
 
+  @@index([user_id], map: "lemburs_user_id_foreign")
+  @@index([lokasi_id], map: "lemburs_lokasi_id_foreign")
   @@index([approved_by], map: "lemburs_approved_by_foreign")
 }
 
@@ -255,6 +259,7 @@ model lokasis {
   user_lokasis                     users[]   @relation("users_lokasi")
   users_lokasis_approved_byTousers users?    @relation("lokasis_approved_byTousers", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lokasis_approved_by_foreign")
   users_lokasis_created_byTousers  users?    @relation("lokasis_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lokasis_created_by_foreign")
+  lemburs                          lemburs[] @relation("LokasiLembur")
 
   @@index([approved_by], map: "lokasis_approved_by_foreign")
   @@index([created_by], map: "lokasis_created_by_foreign")
@@ -785,7 +790,8 @@ model users {
   mapping_shifts                     mapping_shifts[]
   cutis                              cutis[]
   managed_jabatans                   jabatans[]             @relation("jabatans_manager")
-  lemburs                            lemburs[]
+  lemburs                            lemburs[]              @relation("KaryawanLembur")
+  approved_lemburs                   lemburs[]              @relation("ApproverLembur")
   lokasis_lokasis_approved_byTousers lokasis[]              @relation("lokasis_approved_byTousers")
   lokasis_lokasis_created_byTousers  lokasis[]              @relation("lokasis_created_byTousers")
   approved_mapping_shifts            mapping_shifts[]       @relation("ApprovedBy")

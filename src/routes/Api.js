@@ -15,6 +15,7 @@ import dinasLuarController from "../controllers/DinasLuarController.js";
 import statusPajakController from "../controllers/StatusPajakController.js";
 import mappingShiftController from "../controllers/MappingShiftController.js";
 import lemburController from "../controllers/LemburController.js";
+import inventoryController from "../controllers/InventoryController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -180,5 +181,14 @@ router.post("/lemburs/:id", lemburUpload.fields([{ name: "foto_jam_masuk", maxCo
 router.put("/lemburs/:id/approve", upload.none(), (req, res) => lemburController.approve(req, res));
 router.post("/lemburs/:id/approve", upload.none(), (req, res) => lemburController.approve(req, res)); // Fallback
 router.delete("/lemburs/:id", (req, res) => lemburController.destroy(req, res));
+
+// ========================
+// INVENTORY ROUTES
+// ========================
+router.get("/inventories", (req, res) => inventoryController.index(req, res));
+router.get("/inventories/:id", (req, res) => inventoryController.show(req, res));
+router.post("/inventories", (req, res) => inventoryController.store(req, res));
+router.put("/inventories/:id", (req, res) => inventoryController.update(req, res));
+router.delete("/inventories/:id", (req, res) => inventoryController.destroy(req, res));
 
 export default router;

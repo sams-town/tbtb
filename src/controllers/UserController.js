@@ -64,7 +64,14 @@ class UserController {
                 });
             }
 
-            const user = await userService.create(req.body);
+            // Attach path foto jika ada
+            const data = { ...req.body };
+            if (req.file) {
+                // Simpan nama file hasil upload dari diskStorage
+                data.foto_karyawan = req.file.filename;
+            }
+
+            const user = await userService.create(data);
 
             return res.status(201).json({
                 success: true,
@@ -86,7 +93,13 @@ class UserController {
      */
     async update(req, res) {
         try {
-            const user = await userService.update(req.params.id, req.body);
+            const data = { ...req.body };
+            if (req.file) {
+                // Simpan nama file hasil upload dari diskStorage
+                data.foto_karyawan = req.file.filename;
+            }
+
+            const user = await userService.update(req.params.id, data);
 
             if (!user) {
                 return res.status(404).json({

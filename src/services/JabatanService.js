@@ -19,6 +19,9 @@ class JabatanService {
             include: {
                 users: { // manager relation
                     select: { id: true, name: true, email: true }
+                },
+                user_jabatans: {
+                    select: { id: true, name: true, email: true }
                 }
             }
         });
@@ -36,6 +39,9 @@ class JabatanService {
             where: { id: BigInt(id) },
             include: {
                 users: { // manager relation
+                    select: { id: true, name: true, email: true }
+                },
+                user_jabatans: {
                     select: { id: true, name: true, email: true }
                 }
             }
@@ -62,6 +68,9 @@ class JabatanService {
             data: payload,
             include: {
                 users: {
+                    select: { id: true, name: true, email: true }
+                },
+                user_jabatans: {
                     select: { id: true, name: true, email: true }
                 }
             }
@@ -92,6 +101,9 @@ class JabatanService {
             include: {
                 users: {
                     select: { id: true, name: true, email: true }
+                },
+                user_jabatans: {
+                    select: { id: true, name: true, email: true }
                 }
             }
         });
@@ -120,26 +132,20 @@ class JabatanService {
      * Serialize a single jabatan — convert BigInt to string for JSON
      */
     serialize(jabatan) {
-        const serialized = {};
-        for (const [key, value] of Object.entries(jabatan)) {
-            if (typeof value === "bigint") {
-                serialized[key] = value.toString();
-            } else if (value && typeof value === 'object' && value.id !== undefined && typeof value.id === 'bigint') {
-                // To handle nested users object BigInt ID
-                const nested = {};
-                for (const [k, v] of Object.entries(value)) {
-                    if (typeof v === "bigint") {
-                        nested[k] = v.toString();
-                    } else {
-                        nested[k] = v;
-                    }
-                }
-                serialized[key] = nested;
-            } else {
-                serialized[key] = value;
-            }
-        }
-        return serialized;
+        return {
+            id: typeof jabatan.id === "bigint" ? jabatan.id.toString() : jabatan.id,
+            nama_jabatan: jabatan.nama_jabatan,
+            manager: jabatan.manager !== undefined && jabatan.manager !== null ? jabatan.manager.toString() : null,
+            manager_name: jabatan.users ? jabatan.users.name : null,
+            manager_email: jabatan.users ? jabatan.users.email : null,
+            created_at: jabatan.created_at,
+            updated_at: jabatan.updated_at,
+            users: Array.isArray(jabatan.user_jabatans) ? jabatan.user_jabatans.map((u) => ({
+                id: typeof u.id === "bigint" ? u.id.toString() : u.id,
+                name: u.name,
+                email: u.email,
+            })) : [],
+        };
     }
 
     /**

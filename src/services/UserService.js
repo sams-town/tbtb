@@ -84,12 +84,51 @@ class UserService {
     /**
      * Create a new user
      */
+    /**
+  * Create a new user
+  */
     async create(data) {
+        // Pisahkan roles dari data user (sama seperti di update)
+        const { roles, jabatan, lokasi, status_pajak, ...userData } = data;
+
+        // Hash password jika ada
+        if (userData.password) {
+            userData.password = await bcrypt.hash(userData.password, 10);
+        }
+
         const user = await prisma.users.create({
-            data: this.sanitizeInput(data),
+            data: this.sanitizeInput(userData),
         });
 
-        return this.serialize(user);
+        // Assign roles jika dikirim
+        let roleList = [];
+        if (roles) {
+            if (typeof roles === "string") {
+                try { roleList = JSON.parse(roles); } // jika berupa '["admin"]'
+                catch { roleList = roles.split(",").map(r => r.trim()); } // jika berupa "admin,user"
+            } else if (Array.isArray(roles)) {
+                roleList = roles;
+            }
+        }
+
+        if (roleList.length > 0) {
+            const roleRecords = await prisma.roles.findMany({
+                where: { name: { in: roleList } },
+            });
+
+            if (roleRecords.length > 0) {
+                await prisma.model_has_roles.createMany({
+                    data: roleRecords.map((role) => ({
+                        role_id: role.id,
+                        model_type: "App\\Models\\User",
+                        model_id: user.id,
+                    })),
+                });
+            }
+        }
+
+        // Return data lengkap dengan roles
+        return this.getById(user.id.toString());
     }
 
     /**
@@ -116,27 +155,38 @@ class UserService {
         });
 
         // Sync roles jika dikirim
-        // roles bisa berupa array nama role: ["admin", "pegawai"]
-        if (roles && Array.isArray(roles)) {
+        let roleList = [];
+        if (roles) {
+            if (typeof roles === "string") {
+                try { roleList = JSON.parse(roles); } // jika berupa '["admin"]'
+                catch { roleList = roles.split(",").map(r => r.trim()); } // jika berupa "admin,user"
+            } else if (Array.isArray(roles)) {
+                roleList = roles;
+            }
+        }
+
+        if (roleList.length > 0 || roles !== undefined) {
             // Hapus roles lama
             await prisma.model_has_roles.deleteMany({
                 where: { model_id: BigInt(id) },
             });
 
-            // Cari role_id berdasarkan nama
-            const roleRecords = await prisma.roles.findMany({
-                where: { name: { in: roles } },
-            });
-
-            // Insert roles baru
-            if (roleRecords.length > 0) {
-                await prisma.model_has_roles.createMany({
-                    data: roleRecords.map((role) => ({
-                        role_id: role.id,
-                        model_type: "App\\Models\\User",
-                        model_id: BigInt(id),
-                    })),
+            if (roleList.length > 0) {
+                // Cari role_id berdasarkan nama
+                const roleRecords = await prisma.roles.findMany({
+                    where: { name: { in: roleList } },
                 });
+
+                // Insert roles baru
+                if (roleRecords.length > 0) {
+                    await prisma.model_has_roles.createMany({
+                        data: roleRecords.map((role) => ({
+                            role_id: role.id,
+                            model_type: "App\\Models\\User",
+                            model_id: BigInt(id),
+                        })),
+                    });
+                }
             }
         }
 

@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
  * @param {boolean} useUploads - jika true, simpan di public/uploads, jika false di public/
  * @returns {multer.Multer} - instance multer
  */
-export function createUploadMiddleware(subfolder = "profile", prefix = "file", allowedMimes = ["image/jpeg", "image/png", "image/jpg"], maxSize = 2 * 1024 * 1024, useUploads = true) {
+export function createUploadMiddleware(subfolder = "profile", prefix = "file", allowedMimes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"], maxSize = 5 * 1024 * 1024, useUploads = true) {
     const baseDir = useUploads ? "../../public/uploads" : "../../public";
     const uploadDir = path.join(__dirname, baseDir, subfolder);
     if (!fs.existsSync(uploadDir)) {

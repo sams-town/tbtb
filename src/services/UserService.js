@@ -25,8 +25,8 @@ class UserService {
         const [data, total] = await Promise.all([
             prisma.users.findMany({
                 where,
-                skip,
-                take: limit,
+                // skip,
+                // take: limit,
                 orderBy: { id: "desc" },
                 include: { jabatan: true, lokasi: true, status_pajak: true },
             }),

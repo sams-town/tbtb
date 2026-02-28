@@ -16,6 +16,7 @@ import statusPajakController from "../controllers/StatusPajakController.js";
 import mappingShiftController from "../controllers/MappingShiftController.js";
 import lemburController from "../controllers/LemburController.js";
 import inventoryController from "../controllers/InventoryController.js";
+import fileController from "../controllers/FileController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -190,5 +191,27 @@ router.get("/inventories/:id", (req, res) => inventoryController.show(req, res))
 router.post("/inventories", (req, res) => inventoryController.store(req, res));
 router.put("/inventories/:id", (req, res) => inventoryController.update(req, res));
 router.delete("/inventories/:id", (req, res) => inventoryController.destroy(req, res));
+
+// ========================
+// DOCUMENT ROUTES
+// ========================
+const documentUpload = createUploadMiddleware(
+    "dokumen_pegawai",
+    "doc",
+    [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    ],
+    10 * 1024 * 1024 // Max 10MB
+);
+router.get("/documents", (req, res) => fileController.index(req, res));
+router.post("/documents", documentUpload.single("file"), (req, res) => fileController.store(req, res));
+router.put("/documents/:id", documentUpload.single("file"), (req, res) => fileController.update(req, res));
+router.delete("/documents/:id", (req, res) => fileController.destroy(req, res));
 
 export default router;

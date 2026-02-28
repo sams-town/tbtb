@@ -17,6 +17,7 @@ import mappingShiftController from "../controllers/MappingShiftController.js";
 import lemburController from "../controllers/LemburController.js";
 import inventoryController from "../controllers/InventoryController.js";
 import fileController from "../controllers/FileController.js";
+import settingController from "../controllers/SettingController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -213,5 +214,15 @@ router.get("/documents", (req, res) => fileController.index(req, res));
 router.post("/documents", documentUpload.single("file"), (req, res) => fileController.store(req, res));
 router.put("/documents/:id", documentUpload.single("file"), (req, res) => fileController.update(req, res));
 router.delete("/documents/:id", (req, res) => fileController.destroy(req, res));
+
+// ========================
+// SETTING ROUTES
+// ========================
+const settingUpload = createUploadMiddleware("logos", "logo");
+router.get("/settings", (req, res) => settingController.index(req, res));
+router.get("/settings/:id", (req, res) => settingController.show(req, res));
+router.post("/settings", settingUpload.single("logo"), (req, res) => settingController.store(req, res));
+router.put("/settings/:id", settingUpload.single("logo"), (req, res) => settingController.update(req, res));
+router.delete("/settings/:id", (req, res) => settingController.destroy(req, res));
 
 export default router;

@@ -9,6 +9,9 @@ import shiftController from "../controllers/ShiftController.js";
 import kontrakController from "../controllers/KontrakController.js";
 import pegawaiKeluarController from "../controllers/PegawaiKeluarController.js";
 import cutiController from "../controllers/CutiController.js";
+import notificationController from "../controllers/NotificationController.js";
+import absensiController from "../controllers/AbsensiController.js";
+import dinasLuarController from "../controllers/DinasLuarController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -105,5 +108,33 @@ router.post("/pegawai-keluar", (req, res) => pegawaiKeluarController.store(req, 
 router.put("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.update(req, res));
 router.put("/pegawai-keluar/:id/approve", upload.none(), (req, res) => pegawaiKeluarController.approve(req, res));
 router.delete("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.destroy(req, res));
+
+// ========================
+// NOTIFICATIONS ROUTES
+// ========================
+router.get("/notifications", (req, res) => notificationController.index(req, res));
+router.get("/notifications/:id", (req, res) => notificationController.show(req, res));
+router.post("/notifications", (req, res) => notificationController.store(req, res));
+router.put("/notifications/:id", (req, res) => notificationController.update(req, res));
+router.put("/notifications/:id/read", (req, res) => notificationController.markRead(req, res));
+router.delete("/notifications/:id", (req, res) => notificationController.destroy(req, res));
+
+// ========================
+// ABSENSI ROUTES
+// ========================
+router.get("/absensi", (req, res) => absensiController.index(req, res));
+router.get("/absensi/:id", (req, res) => absensiController.show(req, res));
+router.post("/absensi", (req, res) => absensiController.store(req, res));
+router.put("/absensi/:id", (req, res) => absensiController.update(req, res));
+router.delete("/absensi/:id", (req, res) => absensiController.destroy(req, res));
+
+// ========================
+// DINAS LUAR ROUTES
+// ========================
+router.get("/dinas-luar", (req, res) => dinasLuarController.index(req, res));
+router.get("/dinas-luar/:id", (req, res) => dinasLuarController.show(req, res));
+router.post("/dinas-luar", (req, res) => dinasLuarController.store(req, res));
+router.put("/dinas-luar/:id", (req, res) => dinasLuarController.update(req, res));
+router.delete("/dinas-luar/:id", (req, res) => dinasLuarController.destroy(req, res));
 
 export default router;

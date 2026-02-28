@@ -8,8 +8,9 @@ import kunjunganController from "../controllers/KunjunganController.js";
 import shiftController from "../controllers/ShiftController.js";
 import kontrakController from "../controllers/KontrakController.js";
 import pegawaiKeluarController from "../controllers/PegawaiKeluarController.js";
+import cutiController from "../controllers/CutiController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
-import { upload } from "../middleware/uploadMiddleware.js";
+import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
 
 // ========================
@@ -41,9 +42,11 @@ router.delete("/roles/:id", (req, res) => roleController.destroy(req, res));
 // LOKASI ROUTES
 // ========================
 router.get("/lokasi", (req, res) => lokasiController.index(req, res));
+router.get("/lokasi/pending", (req, res) => lokasiController.pending(req, res));
 router.get("/lokasi/:id", (req, res) => lokasiController.show(req, res));
-router.post("/lokasi", (req, res) => lokasiController.store(req, res));
+router.post("/lokasi", authMiddleware, (req, res) => lokasiController.store(req, res));
 router.put("/lokasi/:id", (req, res) => lokasiController.update(req, res));
+router.put("/lokasi/:id/approve", upload.none(), (req, res) => lokasiController.approve(req, res));
 router.delete("/lokasi/:id", (req, res) => lokasiController.destroy(req, res));
 
 // ========================
@@ -74,6 +77,17 @@ router.put("/shifts/:id", (req, res) => shiftController.update(req, res));
 router.delete("/shifts/:id", (req, res) => shiftController.destroy(req, res));
 
 // ========================
+// CUTI ROUTES
+// ========================
+router.get("/cutis", (req, res) => cutiController.index(req, res));
+router.get("/cutis/:id", (req, res) => cutiController.show(req, res));
+const cutiUpload = createUploadMiddleware("cuti", "cuti");
+router.post("/cutis", authMiddleware, cutiUpload.single("foto_cuti"), (req, res) => cutiController.store(req, res));
+router.put("/cutis/:id", cutiUpload.single("foto_cuti"), (req, res) => cutiController.update(req, res));
+router.put("/cutis/:id/approve", upload.none(), (req, res) => cutiController.approve(req, res));
+router.delete("/cutis/:id", (req, res) => cutiController.destroy(req, res));
+
+// ========================
 // KONTRAK ROUTES
 // ========================
 router.get("/kontraks", (req, res) => kontrakController.index(req, res));
@@ -89,7 +103,7 @@ router.get("/pegawai-keluar", (req, res) => pegawaiKeluarController.index(req, r
 router.get("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.show(req, res));
 router.post("/pegawai-keluar", (req, res) => pegawaiKeluarController.store(req, res));
 router.put("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.update(req, res));
-router.put("/pegawai-keluar/:id/approve", (req, res) => pegawaiKeluarController.approve(req, res));
+router.put("/pegawai-keluar/:id/approve", upload.none(), (req, res) => pegawaiKeluarController.approve(req, res));
 router.delete("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.destroy(req, res));
 
 export default router;

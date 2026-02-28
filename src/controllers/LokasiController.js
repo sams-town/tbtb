@@ -64,7 +64,9 @@ class LokasiController {
                 });
             }
 
-            const lokasi = await lokasiService.create(req.body);
+            const createdBy = req.user && req.user.id ? req.user.id : req.body.created_by;
+            const payload = { ...req.body, created_by: createdBy };
+            const lokasi = await lokasiService.create(payload);
 
             return res.status(201).json({
                 success: true,
@@ -135,6 +137,40 @@ class LokasiController {
                 message: "Gagal menghapus lokasi",
                 error: error.message,
             });
+        }
+    }
+
+    async pending(req, res) {
+        try {
+            const result = await lokasiService.getPending(req.query);
+            return res.status(200).json({
+                success: true,
+                message: "Data lokasi pending berhasil diambil",
+                ...result,
+            });
+        } catch (error) {
+            console.error("LokasiController.pending error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Gagal mengambil data lokasi pending",
+                error: error.message,
+            });
+        }
+    }
+
+    async approve(req, res) {
+        try {
+            const { approved_by } = req.body || {};
+            if (!approved_by) {
+                return res.status(400).json({ success: false, message: "Field 'approved_by' wajib diisi" });
+            }
+            const lokasi = await lokasiService.approve(req.params.id, { approved_by });
+            if (!lokasi) {
+                return res.status(404).json({ success: false, message: "Lokasi tidak ditemukan" });
+            }
+            return res.status(200).json({ success: true, message: "Lokasi berhasil di-approve", data: lokasi });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal meng-approve lokasi", error: error.message });
         }
     }
 }

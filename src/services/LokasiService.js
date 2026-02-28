@@ -13,8 +13,9 @@ class LokasiService {
                     { nama_lokasi: { contains: search } },
                     { keterangan: { contains: search } },
                 ],
+                status: { not: "PENDING" },
             }
-            : {};
+            : { status: { not: "PENDING" } };
 
         const data = await prisma.lokasis.findMany({
             where,
@@ -59,8 +60,9 @@ class LokasiService {
      * Create a new lokasi
      */
     async create(data) {
+        const now = new Date();
         const lokasi = await prisma.lokasis.create({
-            data: this.sanitizeInput(data),
+            data: { ...this.sanitizeInput(data), status: "PENDING", created_at: now, updated_at: now },
         });
 
         return this.serialize(lokasi);
@@ -156,6 +158,57 @@ class LokasiService {
      */
     serializeList(list) {
         return list.map((item) => this.serialize(item));
+    }
+
+    async getPending(query = {}) {
+        const search = query.search || "";
+        const whereBase = { status: "PENDING" };
+        const where = search
+            ? {
+                ...whereBase,
+                OR: [
+                    { nama_lokasi: { contains: search } },
+                    { keterangan: { contains: search } },
+                ],
+            }
+            : whereBase;
+
+        const data = await prisma.lokasis.findMany({
+            where,
+            orderBy: { id: "asc" },
+            include: {
+                users_lokasis_created_byTousers: { select: { id: true, name: true } },
+                users_lokasis_approved_byTousers: { select: { id: true, name: true } },
+            },
+        });
+
+        return { data: this.serializeList(data) };
+    }
+
+    async approve(id, body = {}) {
+        const existing = await prisma.lokasis.findUnique({ where: { id: BigInt(id) } });
+        if (!existing) return null;
+
+        let approvedBy = null;
+        if (body.approved_by !== undefined && body.approved_by !== null) {
+            const val = String(body.approved_by).trim();
+            if (val !== "" && /^\d+$/.test(val)) {
+                approvedBy = BigInt(val);
+            } else {
+                throw new Error("approved_by harus berupa angka");
+            }
+        }
+
+        const lokasi = await prisma.lokasis.update({
+            where: { id: BigInt(id) },
+            data: { approved_by: approvedBy, status: "APPROVED" },
+            include: {
+                users_lokasis_created_byTousers: { select: { id: true, name: true } },
+                users_lokasis_approved_byTousers: { select: { id: true, name: true } },
+            },
+        });
+
+        return this.serialize(lokasi);
     }
 }
 

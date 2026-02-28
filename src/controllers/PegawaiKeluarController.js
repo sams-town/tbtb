@@ -126,15 +126,16 @@ class PegawaiKeluarController {
 
     async approve(req, res) {
         try {
-            if (!req.body.approved_by) {
+            const { approved_by, notes } = req.body || {};
+            if (!approved_by) {
                 return res.status(400).json({
                     success: false,
                     message: "Field 'approved_by' wajib diisi",
                 });
             }
             const data = await pegawaiKeluarService.approve(req.params.id, {
-                approved_by: req.body.approved_by,
-                notes: req.body.notes,
+                approved_by,
+                notes,
             });
             if (!data) {
                 return res.status(404).json({

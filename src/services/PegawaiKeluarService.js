@@ -19,7 +19,17 @@ class PegawaiKeluarService {
                 users: { select: { id: true, name: true, email: true } }
             }
         });
-        return { data: this.serializeList(data) };
+        const ids = Array.from(new Set(data.map(d => d.user_id).filter(Boolean)));
+        let usersMap = {};
+        if (ids.length) {
+            const users = await prisma.users.findMany({
+                where: { id: { in: ids } },
+                select: { id: true, name: true, email: true, foto_karyawan: true }
+            });
+            usersMap = Object.fromEntries(users.map(u => [u.id, u]));
+        }
+        const enriched = data.map(d => ({ ...d, user: usersMap[d.user_id] || null }));
+        return { data: this.serializeList(enriched) };
     }
 
     async getById(id) {
@@ -30,7 +40,14 @@ class PegawaiKeluarService {
             }
         });
         if (!record) return null;
-        return this.serialize(record);
+        let userInfo = null;
+        if (record.user_id) {
+            userInfo = await prisma.users.findUnique({
+                where: { id: record.user_id },
+                select: { id: true, name: true, email: true, foto_karyawan: true }
+            });
+        }
+        return this.serialize({ ...record, user: userInfo });
     }
 
     async create(data) {
@@ -41,10 +58,10 @@ class PegawaiKeluarService {
         if (data.alasan !== undefined) payload.alasan = data.alasan;
         if (data.pegawai_keluar_file_path !== undefined) payload.pegawai_keluar_file_path = data.pegawai_keluar_file_path;
         if (data.pegawai_keluar_file_name !== undefined) payload.pegawai_keluar_file_name = data.pegawai_keluar_file_name;
-        if (data.approved_by) payload.approved_by = BigInt(data.approved_by);
-        if (data.tanggal_approval) payload.tanggal_approval = new Date(data.tanggal_approval);
+        payload.approved_by = null;
+        payload.tanggal_approval = null;
         if (data.notes !== undefined) payload.notes = data.notes;
-        if (data.status !== undefined) payload.status = data.status;
+        payload.status = "PENDING";
 
         const record = await prisma.pegawai_keluars.create({ data: payload });
         return this.serialize(record);
@@ -81,13 +98,22 @@ class PegawaiKeluarService {
         });
         if (!existing) return null;
 
-        const approverId = data.approved_by;
         const notes = data.notes;
+
+        let approvedBy = null;
+        if (data.approved_by !== undefined && data.approved_by !== null) {
+            const val = String(data.approved_by).trim();
+            if (val !== "" && /^\d+$/.test(val)) {
+                approvedBy = BigInt(val);
+            } else {
+                throw new Error("approved_by harus berupa angka");
+            }
+        }
 
         const record = await prisma.pegawai_keluars.update({
             where: { id: BigInt(id) },
             data: {
-                approved_by: approverId ? BigInt(approverId) : null,
+                approved_by: approvedBy,
                 tanggal_approval: new Date(),
                 status: "APPROVED",
                 notes: notes !== undefined ? notes : existing.notes,
@@ -96,6 +122,15 @@ class PegawaiKeluarService {
                 users: { select: { id: true, name: true, email: true } }
             }
         });
+
+        await prisma.kontraks.updateMany({
+            where: { user_id: existing.user_id },
+            data: {
+                tanggal_selesai: new Date(),
+                keterangan: "TERMINATED",
+            },
+        });
+
         return this.serialize(record);
     }
 

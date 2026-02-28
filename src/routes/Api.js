@@ -6,6 +6,8 @@ import lokasiController from "../controllers/LokasiController.js";
 import jabatanController from "../controllers/JabatanController.js";
 import kunjunganController from "../controllers/KunjunganController.js";
 import shiftController from "../controllers/ShiftController.js";
+import kontrakController from "../controllers/KontrakController.js";
+import pegawaiKeluarController from "../controllers/PegawaiKeluarController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -70,5 +72,24 @@ router.get("/shifts/:id", (req, res) => shiftController.show(req, res));
 router.post("/shifts", (req, res) => shiftController.store(req, res));
 router.put("/shifts/:id", (req, res) => shiftController.update(req, res));
 router.delete("/shifts/:id", (req, res) => shiftController.destroy(req, res));
+
+// ========================
+// KONTRAK ROUTES
+// ========================
+router.get("/kontraks", (req, res) => kontrakController.index(req, res));
+router.get("/kontraks/:id", (req, res) => kontrakController.show(req, res));
+router.post("/kontraks", (req, res) => kontrakController.store(req, res));
+router.put("/kontraks/:id", (req, res) => kontrakController.update(req, res));
+router.delete("/kontraks/:id", (req, res) => kontrakController.destroy(req, res));
+
+// ========================
+// PEGAWAI KELUAR ROUTES
+// ========================
+router.get("/pegawai-keluar", (req, res) => pegawaiKeluarController.index(req, res));
+router.get("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.show(req, res));
+router.post("/pegawai-keluar", (req, res) => pegawaiKeluarController.store(req, res));
+router.put("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.update(req, res));
+router.put("/pegawai-keluar/:id/approve", (req, res) => pegawaiKeluarController.approve(req, res));
+router.delete("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.destroy(req, res));
 
 export default router;

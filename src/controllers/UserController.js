@@ -65,10 +65,11 @@ class UserController {
             }
 
             // Attach path foto jika ada
+            const baseUrl = `${req.protocol}://${req.get("host")}`;
             const data = { ...req.body };
             if (req.file) {
-                // Simpan nama file hasil upload dari diskStorage
-                data.foto_karyawan = req.file.filename;
+                // Simpan URL lengkap foto karyawan
+                data.foto_karyawan = `${baseUrl}/uploads/profile/${req.file.filename}`;
             }
 
             const user = await userService.create(data);
@@ -93,10 +94,11 @@ class UserController {
      */
     async update(req, res) {
         try {
+            const baseUrl = `${req.protocol}://${req.get("host")}`;
             const data = { ...req.body };
             if (req.file) {
-                // Simpan nama file hasil upload dari diskStorage
-                data.foto_karyawan = req.file.filename;
+                // Simpan URL lengkap foto karyawan
+                data.foto_karyawan = `${baseUrl}/uploads/profile/${req.file.filename}`;
             }
 
             const user = await userService.update(req.params.id, data);

@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve folder public/uploads agar bisa diakses public via url /uploads/...
 app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
 app.use("/lemburs", express.static(path.join(__dirname, "../public/lemburs")));
+app.use("/beritas", express.static(path.join(__dirname, "../public/beritas")));
 
 app.use("/api", apiRoutes);
 

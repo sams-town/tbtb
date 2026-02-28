@@ -18,6 +18,7 @@ import lemburController from "../controllers/LemburController.js";
 import inventoryController from "../controllers/InventoryController.js";
 import fileController from "../controllers/FileController.js";
 import settingController from "../controllers/SettingController.js";
+import beritaController from "../controllers/BeritaController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -224,5 +225,15 @@ router.get("/settings/:id", (req, res) => settingController.show(req, res));
 router.post("/settings", settingUpload.single("logo"), (req, res) => settingController.store(req, res));
 router.put("/settings/:id", settingUpload.single("logo"), (req, res) => settingController.update(req, res));
 router.delete("/settings/:id", (req, res) => settingController.destroy(req, res));
+
+// ========================
+// BERITA ROUTES
+// ========================
+const beritaUpload = createUploadMiddleware("beritas", "file", ["image/jpeg", "image/png", "image/jpg", "application/pdf"], 5 * 1024 * 1024, false);
+router.get("/beritas", (req, res) => beritaController.index(req, res));
+router.get("/beritas/:id", (req, res) => beritaController.show(req, res));
+router.post("/beritas", beritaUpload.single("gambar"), (req, res) => beritaController.store(req, res));
+router.put("/beritas/:id", beritaUpload.single("gambar"), (req, res) => beritaController.update(req, res));
+router.delete("/beritas/:id", (req, res) => beritaController.destroy(req, res));
 
 export default router;

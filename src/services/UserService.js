@@ -293,6 +293,14 @@ class UserService {
         return this.getById(id);
     }
 
+    async updateFaceRecognition(id, photoPath) {
+        const user = await prisma.users.update({
+            where: { id: BigInt(id) },
+            data: { foto_face_recognition: photoPath },
+        });
+        return this.serialize(user);
+    }
+
     /**
      * Delete user by ID
      */

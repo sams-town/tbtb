@@ -94,12 +94,13 @@ class DinasLuarService {
         return this.serialize(record);
     }
 
-    async update(id, data) {
+    async update(id, data = {}) {
         const existing = await prisma.dinas_luars.findUnique({ where: { id: BigInt(id) } });
         if (!existing) return null;
 
         const updateData = {};
-        for (const [key, value] of Object.entries(data)) {
+        const payload = data || {};
+        for (const [key, value] of Object.entries(payload)) {
             // Filter invalid keys if there's any JSON empty brace issue or _method spoofing
             if (key === "{}" || key === "_method" || key === "keterangan") continue;
 

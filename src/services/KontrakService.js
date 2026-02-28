@@ -3,19 +3,28 @@ import prisma from "../config/prisma.js";
 class KontrakService {
     async getAll(query = {}) {
         const search = query.search || "";
-        const where = search
-            ? {
+        const where = {
+            ... (search ? {
                 OR: [
                     { jenis_kontrak: { contains: search } },
                     { keterangan: { contains: search } },
                 ],
-            }
-            : {};
+            } : {})
+        };
+        if (query.user_id) where.user_id = BigInt(query.user_id);
         const data = await prisma.kontraks.findMany({
             where,
             orderBy: { id: "desc" },
         });
         return { data: this.serializeList(data) };
+    }
+
+    async getByUserId(userId) {
+        const contracts = await prisma.kontraks.findMany({
+            where: { user_id: BigInt(userId) },
+            orderBy: { id: "desc" },
+        });
+        return this.serializeList(contracts);
     }
 
     async getById(id) {

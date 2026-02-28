@@ -89,10 +89,24 @@ class DinasLuarController {
 
     async update(req, res) {
         try {
-            const data = await dinasLuarService.update(req.params.id, req.body);
+            const baseUrl = `${req.protocol}://${req.get("host")}`;
+            const payload = { ...req.body };
+
+            // Handle Multipart Files if they exist
+            if (req.files) {
+                if (req.files.foto_jam_absen) {
+                    payload.foto_jam_absen = `${baseUrl}/uploads/dinasluar/${req.files.foto_jam_absen[0].filename}`;
+                }
+                if (req.files.foto_jam_pulang) {
+                    payload.foto_jam_pulang = `${baseUrl}/uploads/dinasluar/${req.files.foto_jam_pulang[0].filename}`;
+                }
+            }
+
+            const data = await dinasLuarService.update(req.params.id, payload);
             if (!data) return res.status(404).json({ success: false, message: "Dinas luar tidak ditemukan" });
             return res.status(200).json({ success: true, message: "Dinas luar berhasil diupdate", data });
         } catch (error) {
+            console.error("DinasLuarController.update error:", error);
             return res.status(500).json({ success: false, message: "Gagal mengupdate dinas luar", error: error.message });
         }
     }

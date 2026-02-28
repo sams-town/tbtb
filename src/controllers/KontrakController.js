@@ -27,6 +27,24 @@ class KontrakController {
         }
     }
 
+    async showByUserId(req, res) {
+        try {
+            const data = await kontrakService.getByUserId(req.params.userId);
+            return res.status(200).json({
+                success: true,
+                message: "Data kontrak berhasil diambil",
+                data,
+            });
+        } catch (error) {
+            console.error("KontrakController.showByUserId error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Gagal mengambil data kontrak",
+                error: error.message,
+            });
+        }
+    }
+
     async show(req, res) {
         try {
             const data = await kontrakService.getById(req.params.id);

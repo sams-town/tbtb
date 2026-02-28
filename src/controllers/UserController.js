@@ -126,6 +126,57 @@ class UserController {
     }
 
     /**
+     * POST /api/users/face-recognition
+     */
+    async faceRecognition(req, res) {
+        try {
+            const baseUrl = `${req.protocol}://${req.get("host")}`;
+            let photoPath = null;
+            let userId = req.params.id || req.body.user_id;
+
+            // 1. Handle Multipart File Upload
+            if (req.file) {
+                photoPath = `${baseUrl}/uploads/profile/${req.file.filename}`;
+            }
+            // 2. Handle Base64 via JSON Body
+            else if (req.body.foto_face_recognition && req.body.foto_face_recognition.startsWith("data:image")) {
+                const { saveBase64Image } = await import("../middleware/uploadMiddleware.js");
+                const savedPath = saveBase64Image(req.body.foto_face_recognition, "profile", "face");
+                photoPath = `${baseUrl}${savedPath}`;
+            }
+
+            if (!photoPath) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Foto face recognition (file atau base64) wajib diupload",
+                });
+            }
+
+            if (!userId) {
+                return res.status(400).json({
+                    success: false,
+                    message: "user_id wajib disertakan dalam body atau URL parameter",
+                });
+            }
+
+            const user = await userService.updateFaceRecognition(userId, photoPath);
+
+            return res.status(200).json({
+                success: true,
+                message: "Foto face recognition berhasil diperbarui",
+                data: user,
+            });
+        } catch (error) {
+            console.error("UserController.faceRecognition error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Gagal memperbarui face recognition",
+                error: error.message,
+            });
+        }
+    }
+
+    /**
      * DELETE /api/users/:id
      */
     async destroy(req, res) {

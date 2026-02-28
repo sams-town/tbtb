@@ -54,6 +54,7 @@ class LemburController {
      */
     async store(req, res) {
         try {
+            const baseUrl = `${req.protocol}://${req.get("host")}`;
             const payload = { ...req.body };
 
             if (req.files) {
@@ -72,7 +73,7 @@ class LemburController {
                 });
             }
 
-            const data = await lemburService.create(payload);
+            const data = await lemburService.create(payload, baseUrl);
             return res.status(201).json({
                 success: true,
                 message: "Data lembur berhasil dibuat",
@@ -93,6 +94,7 @@ class LemburController {
      */
     async update(req, res) {
         try {
+            const baseUrl = `${req.protocol}://${req.get("host")}`;
             const payload = { ...req.body };
 
             if (req.files) {
@@ -104,7 +106,7 @@ class LemburController {
                 }
             }
 
-            const data = await lemburService.update(req.params.id, payload);
+            const data = await lemburService.update(req.params.id, payload, baseUrl);
             if (!data) {
                 return res.status(404).json({
                     success: false,

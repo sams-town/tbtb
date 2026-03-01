@@ -20,6 +20,10 @@ import fileController from "../controllers/FileController.js";
 import settingController from "../controllers/SettingController.js";
 import beritaController from "../controllers/BeritaController.js";
 import penugasanController from "../controllers/PenugasanController.js";
+import rapatController from "../controllers/RapatController.js";
+import jenisKinerjaController from "../controllers/JenisKinerjaController.js";
+import laporanKinerjaController from "../controllers/LaporanKinerjaController.js";
+import kinerjaPegawaiController from "../controllers/KinerjaPegawaiController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -246,5 +250,33 @@ router.get("/penugasans/:id", (req, res) => penugasanController.show(req, res));
 router.post("/penugasans", (req, res) => penugasanController.store(req, res));
 router.put("/penugasans/:id", (req, res) => penugasanController.update(req, res));
 router.delete("/penugasans/:id", (req, res) => penugasanController.destroy(req, res));
+
+// ========================
+// RAPAT ROUTES
+// ========================
+router.get("/rapats", (req, res) => rapatController.index(req, res));
+router.get("/rapats/:id", (req, res) => rapatController.show(req, res));
+router.post("/rapats", (req, res) => rapatController.store(req, res));
+router.put("/rapats/:id", (req, res) => rapatController.update(req, res));
+router.delete("/rapats/:id", (req, res) => rapatController.destroy(req, res));
+
+// ========================
+// JENIS KINERJA ROUTES
+// ========================
+router.get("/jenis-kinerjas", (req, res) => jenisKinerjaController.index(req, res));
+router.get("/jenis-kinerjas/:id", (req, res) => jenisKinerjaController.show(req, res));
+router.post("/jenis-kinerjas", (req, res) => jenisKinerjaController.store(req, res));
+router.put("/jenis-kinerjas/:id", (req, res) => jenisKinerjaController.update(req, res));
+router.delete("/jenis-kinerjas/:id", (req, res) => jenisKinerjaController.destroy(req, res));
+
+// ========================
+// LAPORAN KINERJA ROUTES
+// ========================
+router.get("/laporan-kinerjas", (req, res) => laporanKinerjaController.index(req, res));
+
+// ========================
+// KINERJA PEGAWAI (SUMMARY) ROUTES
+// ========================
+router.get("/kinerja-pegawais", (req, res) => kinerjaPegawaiController.index(req, res));
 
 export default router;

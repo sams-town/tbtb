@@ -362,5 +362,8 @@ router.get("/pajak-report", (req, res) => pajakController.index(req, res));
 // ========================
 router.get("/payrolls", (req, res) => payrollController.index(req, res));
 router.get("/payrolls/:id", (req, res) => payrollController.show(req, res));
+router.post("/payrolls/generate-all", (req, res) => payrollController.generateAll(req, res));
+router.put("/payrolls/:id", (req, res) => payrollController.update(req, res));
+router.delete("/payrolls/:id", (req, res) => payrollController.destroy(req, res));
 
 export default router;

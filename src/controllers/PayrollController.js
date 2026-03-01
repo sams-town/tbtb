@@ -28,6 +28,39 @@ class PayrollController {
             });
         }
     }
+
+    async update(req, res) {
+        try {
+            const result = await PayrollService.update(req.params.id, req.body);
+            res.json(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                success: false,
+                message: "Gagal memperbarui data payroll",
+                error: error.message
+            });
+        }
+    }
+
+    async destroy(req, res) {
+        try {
+            const ok = await PayrollService.delete(req.params.id);
+            return res.status(200).json({ success: true, message: "Payroll berhasil dihapus" });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal menghapus payroll", error: error.message });
+        }
+    }
+
+    async generateAll(req, res) {
+        try {
+            const { bulan, tahun, tanggal_mulai, tanggal_akhir } = req.body;
+            const result = await PayrollService.generateAll(bulan, tahun, tanggal_mulai, tanggal_akhir);
+            return res.status(200).json(result);
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal men-generate payroll", error: error.message });
+        }
+    }
 }
 
 export default new PayrollController();

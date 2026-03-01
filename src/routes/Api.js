@@ -26,6 +26,7 @@ import laporanKinerjaController from "../controllers/LaporanKinerjaController.js
 import kinerjaPegawaiController from "../controllers/KinerjaPegawaiController.js";
 import laporanKerjaController from "../controllers/LaporanKerjaController.js";
 import kategoriReimbursementController from "../controllers/KategoriReimbursementController.js";
+import reimbursementController from "../controllers/ReimbursementController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -293,5 +294,16 @@ router.get("/kategori-reimbursement", (req, res) => kategoriReimbursementControl
 router.post("/kategori-reimbursement", (req, res) => kategoriReimbursementController.store(req, res));
 router.put("/kategori-reimbursement/:id", (req, res) => kategoriReimbursementController.update(req, res));
 router.delete("/kategori-reimbursement/:id", (req, res) => kategoriReimbursementController.destroy(req, res));
+
+// ========================
+// REIMBURSEMENT ROUTES
+// ========================
+const reimbursementUpload = createUploadMiddleware("reimbursement", "reimb");
+router.get("/reimbursements", (req, res) => reimbursementController.index(req, res));
+router.get("/reimbursements/:id", (req, res) => reimbursementController.show(req, res));
+router.post("/reimbursements", reimbursementUpload.single("file"), (req, res) => reimbursementController.store(req, res));
+router.put("/reimbursements/:id", reimbursementUpload.single("file"), (req, res) => reimbursementController.update(req, res));
+router.post("/reimbursements/:id", reimbursementUpload.single("file"), (req, res) => reimbursementController.update(req, res)); // Fallback
+router.delete("/reimbursements/:id", (req, res) => reimbursementController.destroy(req, res));
 
 export default router;

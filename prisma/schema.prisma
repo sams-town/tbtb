@@ -147,12 +147,13 @@ model kasbons {
 }
 
 model kategoris {
-  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  name       String
-  jumlah     BigInt?
-  active     Int?
-  created_at DateTime? @db.Timestamp(0)
-  updated_at DateTime? @db.Timestamp(0)
+  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  name           String
+  jumlah         BigInt?
+  active         Int?
+  created_at     DateTime?        @db.Timestamp(0)
+  updated_at     DateTime?        @db.Timestamp(0)
+  reimbursements reimbursements[]
 }
 
 model kontraks {
@@ -563,29 +564,40 @@ model rapats {
 }
 
 model reimbursements {
-  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id     BigInt    @db.UnsignedBigInt
-  kategori_id BigInt    @db.UnsignedBigInt
-  tanggal     DateTime? @db.Date
-  event       String?   @db.Text
-  status      String?
-  jumlah      BigInt?
-  qty         Int?
-  total       BigInt?
-  sisa        BigInt?
-  file_path   String?
-  file_name   String?
-  created_at  DateTime? @db.Timestamp(0)
-  updated_at  DateTime? @db.Timestamp(0)
+  id                   BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id              BigInt?                @db.UnsignedBigInt
+  kategori_id          BigInt?                @db.UnsignedBigInt
+  tanggal              DateTime?              @db.Date
+  event                String?                @db.Text
+  status               String?
+  jumlah               BigInt?
+  qty                  Int?
+  total                BigInt?
+  sisa                 BigInt?
+  file_path            String?
+  file_name            String?
+  created_at           DateTime?              @db.Timestamp(0)
+  updated_at           DateTime?              @db.Timestamp(0)
+  user                 users?                 @relation("users_reimbursements", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  kategori             kategoris?             @relation(fields: [kategori_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reimbursements_items reimbursements_items[]
+
+  @@index([user_id], map: "reimbursements_user_id_fkey")
+  @@index([kategori_id], map: "reimbursements_kategori_id_fkey")
 }
 
 model reimbursements_items {
-  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  reimbursement_id BigInt    @db.UnsignedBigInt
-  user_id          BigInt?   @db.UnsignedBigInt
+  id               BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
+  reimbursement_id BigInt         @db.UnsignedBigInt
+  user_id          BigInt?        @db.UnsignedBigInt
   fee              BigInt?
-  created_at       DateTime? @db.Timestamp(0)
-  updated_at       DateTime? @db.Timestamp(0)
+  created_at       DateTime?      @db.Timestamp(0)
+  updated_at       DateTime?      @db.Timestamp(0)
+  reimbursements   reimbursements @relation(fields: [reimbursement_id], references: [id], onDelete: Cascade)
+  user             users?         @relation("users_reimbursements_items", fields: [user_id], references: [id])
+
+  @@index([reimbursement_id], map: "reimbursements_items_reimbursement_id_fkey")
+  @@index([user_id], map: "reimbursements_items_user_id_fkey")
 }
 
 model reset_cutis {
@@ -798,5 +810,7 @@ model users {
   approved_mapping_shifts            mapping_shifts[]       @relation("ApprovedBy")
   pegawai_keluars                    pegawai_keluars[]
   pengajuan_keuangans                pengajuan_keuangans[]
+  reimbursements                     reimbursements[]       @relation("users_reimbursements")
+  reimbursements_items               reimbursements_items[] @relation("users_reimbursements_items")
   target_kinerja_teams               target_kinerja_teams[]
 }

@@ -12,7 +12,13 @@ class AbsensiService {
                 ]
             } : {})
         };
-        if (query.user_id) where.user_id = BigInt(query.user_id);
+        if (query.user_id && query.user_id !== "undefined") where.user_id = BigInt(query.user_id);
+        if (query.start_date && query.end_date) {
+            where.tanggal = {
+                gte: new Date(query.start_date),
+                lte: new Date(query.end_date)
+            };
+        }
         const data = await prisma.mapping_shifts.findMany({
             where,
             orderBy: { id: "desc" },
@@ -106,6 +112,77 @@ class AbsensiService {
             }
         }
         return serialized;
+    }
+
+    async getRecap(startDate, endDate) {
+        const users = await prisma.users.findMany({
+            select: {
+                id: true,
+                name: true,
+                foto_karyawan: true
+            }
+        });
+
+        const where = {};
+        if (startDate && endDate) {
+            where.tanggal = {
+                gte: new Date(startDate),
+                lte: new Date(endDate)
+            };
+        }
+
+        const attendance = await prisma.mapping_shifts.findMany({
+            where,
+            include: { shifts: true }
+        });
+
+        const result = users.map(user => {
+            const userAttendance = attendance.filter(a => a.user_id === user.id);
+
+            const stats = {
+                total_cuti: 0,
+                total_izin_masuk: 0,
+                total_sakit: 0,
+                total_izin_pulang_cepat: 0,
+                total_hadir: 0,
+                total_alfa: 0,
+                total_libur: 0,
+                total_telat: 0,
+                total_pulang_cepat: 0,
+                total_lembur_minutes: 0
+            };
+
+            userAttendance.forEach(a => {
+                if (a.status_absen === 'Cuti') stats.total_cuti++;
+                else if (a.status_absen === 'Izin') stats.total_izin_masuk++;
+                else if (a.status_absen === 'Sakit') stats.total_sakit++;
+                else if (a.status_absen === 'Masuk' || a.status_absen === 'Pulang') stats.total_hadir++;
+                else if (a.status_absen === 'Alfa') stats.total_alfa++;
+                else if (a.status_absen === 'Libur') stats.total_libur++;
+
+                if (a.telat) stats.total_telat += parseInt(a.telat);
+                if (a.pulang_cepat) stats.total_pulang_cepat += parseInt(a.pulang_cepat);
+
+                // Simplified overtime calculation if available in status/description or separate table
+                // For now following the fields we see in the UI mockup requirements
+            });
+
+            const totalPossibleDays = stats.total_hadir + stats.total_alfa + stats.total_izin_masuk + stats.total_sakit + stats.total_cuti;
+            const presencePercentage = totalPossibleDays > 0 ? Math.round((stats.total_hadir / totalPossibleDays) * 100) : 0;
+
+            return {
+                user_id: user.id.toString(),
+                user: {
+                    name: user.name,
+                    foto_karyawan: user.foto_karyawan
+                },
+                ...stats,
+                total_lembur: "0 Jam 0 Menit", // Placeholder for actual calculation
+                persentase_kehadiran: presencePercentage
+            };
+        });
+
+        return result;
     }
 
     serializeList(items) {

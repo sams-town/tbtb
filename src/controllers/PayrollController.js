@@ -52,6 +52,16 @@ class PayrollController {
         }
     }
 
+    async generate(req, res) {
+        try {
+            const { user_id, bulan, tahun, tanggal_mulai, tanggal_akhir } = req.body;
+            const result = await PayrollService.generate(user_id, bulan, tahun, tanggal_mulai, tanggal_akhir);
+            return res.status(200).json(result);
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal men-generate payroll", error: error.message });
+        }
+    }
+
     async generateAll(req, res) {
         try {
             const { bulan, tahun, tanggal_mulai, tanggal_akhir } = req.body;

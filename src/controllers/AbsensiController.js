@@ -70,6 +70,17 @@ class AbsensiController {
             return res.status(500).json({ success: false, message: "Gagal menghapus absensi", error: error.message });
         }
     }
+
+    async recap(req, res) {
+        try {
+            const { start_date, end_date } = req.query;
+            const result = await absensiService.getRecap(start_date, end_date);
+            return res.status(200).json({ success: true, message: "Data rekap berhasil diambil", data: result });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ success: false, message: "Gagal mengambil data rekap", error: error.message });
+        }
+    }
 }
 
 export default new AbsensiController();

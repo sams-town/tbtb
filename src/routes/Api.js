@@ -150,6 +150,7 @@ router.delete("/notifications/:id", (req, res) => notificationController.destroy
 // ========================
 const absensiUpload = createUploadMiddleware("absensi", "absensi");
 router.get("/absensi", (req, res) => absensiController.index(req, res));
+router.get("/absensi/recap", (req, res) => absensiController.recap(req, res));
 router.get("/absensi/:id", (req, res) => absensiController.show(req, res));
 router.post("/absensi", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.store(req, res));
 router.put("/absensi/:id", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.update(req, res));
@@ -362,6 +363,7 @@ router.get("/pajak-report", (req, res) => pajakController.index(req, res));
 // ========================
 router.get("/payrolls", (req, res) => payrollController.index(req, res));
 router.get("/payrolls/:id", (req, res) => payrollController.show(req, res));
+router.post("/payrolls/generate", (req, res) => payrollController.generate(req, res));
 router.post("/payrolls/generate-all", (req, res) => payrollController.generateAll(req, res));
 router.put("/payrolls/:id", (req, res) => payrollController.update(req, res));
 router.delete("/payrolls/:id", (req, res) => payrollController.destroy(req, res));

@@ -235,6 +235,125 @@ class PayrollService {
             data: results
         };
     }
+    async generate(userId, bulan, tahun, tanggalMulai, tanggalAkhir) {
+        if (!userId || userId === "undefined") throw new Error("User ID tidak valid");
+        const user = await prisma.users.findUnique({
+            where: { id: BigInt(userId) },
+            include: { jabatan: true }
+        });
+
+        if (!user) throw new Error("User tidak ditemukan");
+
+        const existing = await prisma.payrolls.findFirst({
+            where: {
+                user_id: user.id,
+                bulan,
+                tahun
+            }
+        });
+
+        if (existing) {
+            return {
+                success: true,
+                message: "Payroll sudah ada",
+                data: this.serialize(existing)
+            };
+        }
+
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const monthIndex = monthNames.indexOf(bulan);
+        const startDateArr = tanggalMulai ? new Date(tanggalMulai) : new Date(parseInt(tahun), monthIndex, 1);
+        const endDateArr = tanggalAkhir ? new Date(tanggalAkhir) : new Date(parseInt(tahun), monthIndex + 1, 0);
+
+        // Get attendance recap for this specific user
+        const absensiService = (await import("./AbsensiService.js")).default;
+        const recap = await absensiService.getRecap(startDateArr, endDateArr);
+        const userRecap = recap.find(r => r.user_id === userId.toString());
+
+        const noGaji = `GJ/${String(Date.now()).slice(-6)}`; // Simplified unique generator
+
+        const gajiPokok = user.gaji_pokok || 0n;
+        const tMakan = user.tunjangan_makan || 0n;
+        const tTransport = user.tunjangan_transport || 0n;
+        const tBpjsKes = user.tunjangan_bpjs_kesehatan || 0n;
+        const tBpjsKet = user.tunjangan_bpjs_ketenagakerjaan || 0n;
+        const pBpjsKes = user.potongan_bpjs_kesehatan || 0n;
+        const pBpjsKet = user.potongan_bpjs_ketenagakerjaan || 0n;
+
+        // Calculate based on attendance
+        const hadir = userRecap ? userRecap.total_hadir : 0;
+        const mangkir = userRecap ? userRecap.total_alfa : 0;
+        const telat = userRecap ? userRecap.total_telat : 0;
+
+        // Nominal calculations (examples)
+        const uangMangkir = 50000n; // Example nominal
+        const totalMangkir = BigInt(mangkir) * uangMangkir;
+        const uangTerlambat = 1000n; // Rp 1.000 / menit
+        const totalTerlambat = BigInt(telat) * uangTerlambat;
+
+        const totalPenjumlahan = gajiPokok + (tMakan * BigInt(hadir)) + (tTransport * BigInt(hadir)) + tBpjsKes + tBpjsKet;
+        const totalPengurangan = pBpjsKes + pBpjsKet + totalMangkir + totalTerlambat;
+        const grandTotal = totalPenjumlahan - totalPengurangan;
+
+        const newPayroll = await prisma.payrolls.create({
+            data: {
+                user_id: user.id,
+                tanggal_mulai: startDateArr,
+                tanggal_akhir: endDateArr,
+                bulan,
+                tahun,
+                persentase_kehadiran: `${userRecap ? userRecap.persentase_kehadiran : 0}%`,
+                no_gaji: noGaji,
+                gaji_pokok: gajiPokok,
+                total_reimbursement: 0n,
+                jumlah_tunjangan_transport: BigInt(hadir),
+                uang_tunjangan_transport: tTransport,
+                total_tunjangan_transport: tTransport * BigInt(hadir),
+                jumlah_tunjangan_makan: BigInt(hadir),
+                uang_tunjangan_makan: tMakan,
+                total_tunjangan_makan: tMakan * BigInt(hadir),
+                total_tunjangan_bpjs_kesehatan: tBpjsKes,
+                total_tunjangan_bpjs_ketenagakerjaan: tBpjsKet,
+                total_potongan_bpjs_kesehatan: pBpjsKes,
+                total_potongan_bpjs_ketenagakerjaan: pBpjsKet,
+                jumlah_mangkir: BigInt(mangkir),
+                uang_mangkir: uangMangkir,
+                total_mangkir: totalMangkir,
+                jumlah_lembur: 0n,
+                uang_lembur: 0n,
+                total_lembur: 0n,
+                jumlah_izin: 0n,
+                uang_izin: 0n,
+                total_izin: 0n,
+                bonus_pribadi: user.bonus_pribadi || 0n,
+                bonus_team: user.bonus_team || 0n,
+                bonus_jackpot: user.bonus_jackpot || 0n,
+                jumlah_terlambat: BigInt(telat),
+                uang_terlambat: uangTerlambat,
+                total_terlambat: totalTerlambat,
+                jumlah_kehadiran: BigInt(hadir),
+                uang_kehadiran: 0n, // Example bonus
+                total_kehadiran: 0n,
+                saldo_kasbon: user.saldo_kasbon || 0n,
+                bayar_kasbon: 0n,
+                jumlah_thr: 0n,
+                uang_thr: 0n,
+                total_thr: 0n,
+                loss: 0n,
+                total_penjumlahan: totalPenjumlahan,
+                total_pengurangan: totalPengurangan,
+                grand_total: grandTotal,
+                created_at: new Date(),
+                updated_at: new Date()
+            }
+        });
+
+        return {
+            success: true,
+            message: "Payroll berhasil di-generate",
+            data: this.serialize(newPayroll)
+        };
+    }
 }
 
 export default new PayrollService();

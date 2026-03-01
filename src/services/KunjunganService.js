@@ -20,15 +20,12 @@ class KunjunganService {
         const data = await prisma.kunjungans.findMany({
             where,
             orderBy: { id: "desc" },
-            include: {
-                users: {
-                    select: { id: true, name: true, email: true }
-                }
-            }
         });
 
+        const withUsers = await this._attachUsers(data);
+
         return {
-            data: this.serializeList(data),
+            data: this.serializeList(withUsers),
         };
     }
 
@@ -38,16 +35,12 @@ class KunjunganService {
     async getById(id) {
         const kunjungan = await prisma.kunjungans.findUnique({
             where: { id: BigInt(id) },
-            include: {
-                users: {
-                    select: { id: true, name: true, email: true }
-                }
-            }
         });
 
         if (!kunjungan) return null;
 
-        return this.serialize(kunjungan);
+        const withUser = await this._attachUsers(kunjungan);
+        return this.serialize(withUser);
     }
 
     /**
@@ -62,14 +55,10 @@ class KunjunganService {
 
         const kunjungan = await prisma.kunjungans.create({
             data: payload,
-            include: {
-                users: {
-                    select: { id: true, name: true, email: true }
-                }
-            }
         });
 
-        return this.serialize(kunjungan);
+        const withUser = await this._attachUsers(kunjungan);
+        return this.serialize(withUser);
     }
 
     /**
@@ -91,14 +80,10 @@ class KunjunganService {
         const kunjungan = await prisma.kunjungans.update({
             where: { id: BigInt(id) },
             data: updateData,
-            include: {
-                users: {
-                    select: { id: true, name: true, email: true }
-                }
-            }
         });
 
-        return this.serialize(kunjungan);
+        const withUser = await this._attachUsers(kunjungan);
+        return this.serialize(withUser);
     }
 
     /**
@@ -116,6 +101,35 @@ class KunjunganService {
         });
 
         return true;
+    }
+
+    /**
+     * Helper Method: Attach users manually 
+     */
+    async _attachUsers(kunjungans) {
+        if (!kunjungans) return kunjungans;
+        const isArray = Array.isArray(kunjungans);
+        const data = isArray ? kunjungans : [kunjungans];
+
+        const userIds = [...new Set(data.map(k => k.user_id).filter(id => id != null))];
+        if (userIds.length > 0) {
+            const users = await prisma.users.findMany({
+                where: { id: { in: userIds } },
+                select: { id: true, name: true, email: true }
+            });
+            const userMap = users.reduce((acc, u) => {
+                acc[u.id.toString()] = u;
+                return acc;
+            }, {});
+
+            for (const item of data) {
+                if (item.user_id) {
+                    item.users = userMap[item.user_id.toString()] || null;
+                }
+            }
+        }
+
+        return isArray ? data : data[0];
     }
 
     /**

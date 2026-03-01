@@ -19,6 +19,7 @@ import inventoryController from "../controllers/InventoryController.js";
 import fileController from "../controllers/FileController.js";
 import settingController from "../controllers/SettingController.js";
 import beritaController from "../controllers/BeritaController.js";
+import penugasanController from "../controllers/PenugasanController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -73,10 +74,11 @@ router.delete("/jabatans/:id", (req, res) => jabatanController.destroy(req, res)
 // ========================
 // KUNJUNGAN ROUTES
 // ========================
+const kunjunganUpload = createUploadMiddleware("kunjungans", "kunjungan");
 router.get("/kunjungan", (req, res) => kunjunganController.index(req, res));
 router.get("/kunjungan/:id", (req, res) => kunjunganController.show(req, res));
-router.post("/kunjungan", (req, res) => kunjunganController.store(req, res));
-router.put("/kunjungan/:id", (req, res) => kunjunganController.update(req, res));
+router.post("/kunjungan", kunjunganUpload.single("foto"), (req, res) => kunjunganController.store(req, res));
+router.put("/kunjungan/:id", kunjunganUpload.single("foto"), (req, res) => kunjunganController.update(req, res));
 router.delete("/kunjungan/:id", (req, res) => kunjunganController.destroy(req, res));
 
 // ========================
@@ -235,5 +237,14 @@ router.get("/beritas/:id", (req, res) => beritaController.show(req, res));
 router.post("/beritas", beritaUpload.single("gambar"), (req, res) => beritaController.store(req, res));
 router.put("/beritas/:id", beritaUpload.single("gambar"), (req, res) => beritaController.update(req, res));
 router.delete("/beritas/:id", (req, res) => beritaController.destroy(req, res));
+
+// ========================
+// PENUGASAN ROUTES
+// ========================
+router.get("/penugasans", (req, res) => penugasanController.index(req, res));
+router.get("/penugasans/:id", (req, res) => penugasanController.show(req, res));
+router.post("/penugasans", (req, res) => penugasanController.store(req, res));
+router.put("/penugasans/:id", (req, res) => penugasanController.update(req, res));
+router.delete("/penugasans/:id", (req, res) => penugasanController.destroy(req, res));
 
 export default router;

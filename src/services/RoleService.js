@@ -32,47 +32,114 @@ class RoleService {
     async getById(id) {
         const role = await prisma.roles.findUnique({
             where: { id: BigInt(id) },
+            include: {
+                role_has_permissions: {
+                    include: {
+                        permissions: true
+                    }
+                }
+            }
         });
 
         if (!role) return null;
 
-        return this.serialize(role);
+        const serialized = this.serialize(role);
+
+        // Extract permission names into an array
+        if (role.role_has_permissions) {
+            serialized.permissions = role.role_has_permissions.map(rhp => rhp.permissions.name);
+            delete serialized.role_has_permissions;
+        }
+
+        return serialized;
     }
 
     /**
      * Create a new role
      */
     async create(data) {
-        const role = await prisma.roles.create({
-            data: {
-                name: data.name,
-                guard_name: data.guard_name || "web",
-            },
-        });
+        return await prisma.$transaction(async (tx) => {
+            const role = await tx.roles.create({
+                data: {
+                    name: data.name,
+                    guard_name: data.guard_name || "web",
+                },
+            });
 
-        return this.serialize(role);
+            if (data.permissions && Array.isArray(data.permissions) && data.permissions.length > 0) {
+                const existingPerms = await tx.permissions.findMany({
+                    where: {
+                        name: { in: data.permissions },
+                        guard_name: data.guard_name || "web"
+                    },
+                    select: { id: true }
+                });
+
+                if (existingPerms.length > 0) {
+                    const rolePermissionsPivot = existingPerms.map((perm) => ({
+                        role_id: role.id,
+                        permission_id: perm.id
+                    }));
+
+                    await tx.role_has_permissions.createMany({
+                        data: rolePermissionsPivot
+                    });
+                }
+            }
+
+            return this.serialize(role);
+        });
     }
 
     /**
      * Update role by ID
      */
     async update(id, data) {
-        const existing = await prisma.roles.findUnique({
-            where: { id: BigInt(id) },
+        return await prisma.$transaction(async (tx) => {
+            const existing = await tx.roles.findUnique({
+                where: { id: BigInt(id) },
+            });
+
+            if (!existing) return null;
+
+            const updateData = {};
+            if (data.name !== undefined) updateData.name = data.name;
+            if (data.guard_name !== undefined) updateData.guard_name = data.guard_name;
+
+            const role = await tx.roles.update({
+                where: { id: BigInt(id) },
+                data: updateData,
+            });
+
+            if (data.permissions && Array.isArray(data.permissions)) {
+                // Delete existing permissions for this role
+                await tx.role_has_permissions.deleteMany({
+                    where: { role_id: role.id }
+                });
+
+                if (data.permissions.length > 0) {
+                    const existingPerms = await tx.permissions.findMany({
+                        where: {
+                            name: { in: data.permissions },
+                            guard_name: updateData.guard_name || existing.guard_name
+                        },
+                        select: { id: true }
+                    });
+
+                    if (existingPerms.length > 0) {
+                        const newPivots = existingPerms.map((p) => ({
+                            role_id: role.id,
+                            permission_id: p.id
+                        }));
+                        await tx.role_has_permissions.createMany({
+                            data: newPivots
+                        });
+                    }
+                }
+            }
+
+            return this.serialize(role);
         });
-
-        if (!existing) return null;
-
-        const updateData = {};
-        if (data.name !== undefined) updateData.name = data.name;
-        if (data.guard_name !== undefined) updateData.guard_name = data.guard_name;
-
-        const role = await prisma.roles.update({
-            where: { id: BigInt(id) },
-            data: updateData,
-        });
-
-        return this.serialize(role);
     }
 
     /**

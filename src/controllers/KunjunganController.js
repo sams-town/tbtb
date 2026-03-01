@@ -64,6 +64,17 @@ class KunjunganController {
                 });
             }
 
+            // Map frontend fields to database schema for Visit In
+            if (req.file) {
+                const baseUrl = `${req.protocol}://${req.get("host")}`;
+                req.body.foto_in = `${baseUrl}/uploads/kunjungans/${req.file.filename}`;
+            }
+
+            if (req.body.keterangan !== undefined) {
+                req.body.keterangan_in = req.body.keterangan;
+                delete req.body.keterangan; // Hapus biar Prisma tidak error Schema
+            }
+
             const kunjungan = await kunjunganService.create(req.body);
 
             return res.status(201).json({
@@ -86,6 +97,19 @@ class KunjunganController {
      */
     async update(req, res) {
         try {
+            // Map frontend fields to database schema for Visit Out (Or Edit)
+            if (req.file) {
+                // Determine if this is an update for 'foto_out' (Visit Out) or general edit. 
+                // Assuming default is visit_out if file uploaded during update.
+                const baseUrl = `${req.protocol}://${req.get("host")}`;
+                req.body.foto_out = `${baseUrl}/uploads/kunjungans/${req.file.filename}`;
+            }
+
+            if (req.body.keterangan !== undefined) {
+                req.body.keterangan_out = req.body.keterangan;
+                delete req.body.keterangan; // Hapus biar Prisma tidak error Schema
+            }
+
             const kunjungan = await kunjunganService.update(req.params.id, req.body);
 
             if (!kunjungan) {

@@ -498,6 +498,7 @@ model penugasans {
   tanggal         DateTime? @db.Date
   judul           String?
   rincian         String?   @db.Text
+  progress        String?
   status          String?
   created_at      DateTime? @db.Timestamp(0)
   updated_at      DateTime? @db.Timestamp(0)

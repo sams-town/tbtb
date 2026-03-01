@@ -27,6 +27,11 @@ import kinerjaPegawaiController from "../controllers/KinerjaPegawaiController.js
 import laporanKerjaController from "../controllers/LaporanKerjaController.js";
 import kategoriReimbursementController from "../controllers/KategoriReimbursementController.js";
 import reimbursementController from "../controllers/ReimbursementController.js";
+import targetDetailController from "../controllers/TargetDetailController.js";
+import targetMasterController from "../controllers/TargetMasterController.js";
+import targetKinerjaController from "../controllers/TargetKinerjaController.js";
+import pengajuanKeuanganController from "../controllers/PengajuanKeuanganController.js";
+import kasbonController from "../controllers/KasbonController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -305,5 +310,44 @@ router.post("/reimbursements", reimbursementUpload.single("file"), (req, res) =>
 router.put("/reimbursements/:id", reimbursementUpload.single("file"), (req, res) => reimbursementController.update(req, res));
 router.post("/reimbursements/:id", reimbursementUpload.single("file"), (req, res) => reimbursementController.update(req, res)); // Fallback
 router.delete("/reimbursements/:id", (req, res) => reimbursementController.destroy(req, res));
+
+// ========================
+// TARGET DETAIL ROUTES
+// ========================
+router.get("/target-detail", (req, res) => targetDetailController.index(req, res));
+// Add specific route to get employees for dropdown if needed, though usually users is enough
+router.get("/target-detail/:id", (req, res) => targetDetailController.show(req, res));
+router.post("/target-detail", (req, res) => targetDetailController.store(req, res));
+router.put("/target-detail/:id", (req, res) => targetDetailController.update(req, res));
+router.delete("/target-detail/:id", (req, res) => targetDetailController.destroy(req, res));
+
+// ========================
+// TARGET MASTER ROUTES
+// ========================
+router.get("/target-master", (req, res) => targetMasterController.index(req, res));
+router.get("/target-master/:id", (req, res) => targetMasterController.show(req, res));
+router.post("/target-master", (req, res) => targetMasterController.store(req, res));
+router.put("/target-master/:id", (req, res) => targetMasterController.update(req, res));
+router.delete("/target-master/:id", (req, res) => targetMasterController.destroy(req, res));
+
+// ========================
+// PENGAJUAN KEUANGAN ROUTES
+// ========================
+const pengajuanUpload = createUploadMiddleware("pengajuan_keuangan", "pk", ["application/pdf", "image/jpeg", "image/png", "image/jpg"], 10 * 1024 * 1024, false);
+router.get("/pengajuan-keuangan", (req, res) => pengajuanKeuanganController.index(req, res));
+router.get("/pengajuan-keuangan/:id", (req, res) => pengajuanKeuanganController.show(req, res));
+router.post("/pengajuan-keuangan", pengajuanUpload.fields([{ name: "pk_document", maxCount: 1 }, { name: "nota", maxCount: 1 }]), (req, res) => pengajuanKeuanganController.store(req, res));
+router.put("/pengajuan-keuangan/:id", pengajuanUpload.fields([{ name: "pk_document", maxCount: 1 }, { name: "nota", maxCount: 1 }]), (req, res) => pengajuanKeuanganController.update(req, res));
+router.post("/pengajuan-keuangan/:id", pengajuanUpload.fields([{ name: "pk_document", maxCount: 1 }, { name: "nota", maxCount: 1 }]), (req, res) => pengajuanKeuanganController.update(req, res)); // Fallback
+router.delete("/pengajuan-keuangan/:id", (req, res) => pengajuanKeuanganController.destroy(req, res));
+
+// ========================
+// KASBON ROUTES
+// ========================
+router.get("/kasbons", (req, res) => kasbonController.index(req, res));
+router.get("/kasbons/:id", (req, res) => kasbonController.show(req, res));
+router.post("/kasbons", (req, res) => kasbonController.store(req, res));
+router.put("/kasbons/:id", (req, res) => kasbonController.update(req, res));
+router.delete("/kasbons/:id", (req, res) => kasbonController.destroy(req, res));
 
 export default router;

@@ -24,6 +24,8 @@ import rapatController from "../controllers/RapatController.js";
 import jenisKinerjaController from "../controllers/JenisKinerjaController.js";
 import laporanKinerjaController from "../controllers/LaporanKinerjaController.js";
 import kinerjaPegawaiController from "../controllers/KinerjaPegawaiController.js";
+import laporanKerjaController from "../controllers/LaporanKerjaController.js";
+import kategoriReimbursementController from "../controllers/KategoriReimbursementController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -278,5 +280,18 @@ router.get("/laporan-kinerjas", (req, res) => laporanKinerjaController.index(req
 // KINERJA PEGAWAI (SUMMARY) ROUTES
 // ========================
 router.get("/kinerja-pegawais", (req, res) => kinerjaPegawaiController.index(req, res));
+
+// ========================
+// LAPORAN KERJA ROUTES
+// ========================
+router.get("/laporan-kerjas", (req, res) => laporanKerjaController.index(req, res));
+
+// ========================
+// KATEGORI REIMBURSEMENT ROUTES
+// ========================
+router.get("/kategori-reimbursement", (req, res) => kategoriReimbursementController.index(req, res));
+router.post("/kategori-reimbursement", (req, res) => kategoriReimbursementController.store(req, res));
+router.put("/kategori-reimbursement/:id", (req, res) => kategoriReimbursementController.update(req, res));
+router.delete("/kategori-reimbursement/:id", (req, res) => kategoriReimbursementController.destroy(req, res));
 
 export default router;

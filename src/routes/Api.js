@@ -33,7 +33,8 @@ import targetKinerjaController from "../controllers/TargetKinerjaController.js";
 import pengajuanKeuanganController from "../controllers/PengajuanKeuanganController.js";
 import kasbonController from "../controllers/KasbonController.js";
 import pajakController from "../controllers/PajakController.js";
-import payrollController from "../controllers/PayrollController.js";
+import payrollController from '../controllers/PayrollController.js';
+import dashboardController from '../controllers/DashboardController.js';
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -367,5 +368,10 @@ router.post("/payrolls/generate", (req, res) => payrollController.generate(req, 
 router.post("/payrolls/generate-all", (req, res) => payrollController.generateAll(req, res));
 router.put("/payrolls/:id", (req, res) => payrollController.update(req, res));
 router.delete("/payrolls/:id", (req, res) => payrollController.destroy(req, res));
+
+// ========================
+// DASHBOARD ROUTES
+// ========================
+router.get("/dashboard/stats", (req, res) => dashboardController.index(req, res));
 
 export default router;

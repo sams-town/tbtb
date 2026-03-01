@@ -32,6 +32,8 @@ import targetMasterController from "../controllers/TargetMasterController.js";
 import targetKinerjaController from "../controllers/TargetKinerjaController.js";
 import pengajuanKeuanganController from "../controllers/PengajuanKeuanganController.js";
 import kasbonController from "../controllers/KasbonController.js";
+import pajakController from "../controllers/PajakController.js";
+import payrollController from "../controllers/PayrollController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -349,5 +351,16 @@ router.get("/kasbons/:id", (req, res) => kasbonController.show(req, res));
 router.post("/kasbons", (req, res) => kasbonController.store(req, res));
 router.put("/kasbons/:id", (req, res) => kasbonController.update(req, res));
 router.delete("/kasbons/:id", (req, res) => kasbonController.destroy(req, res));
+
+// ========================
+// PAJAK REPORT ROUTES
+// ========================
+router.get("/pajak-report", (req, res) => pajakController.index(req, res));
+
+// ========================
+// PAYROLL ROUTES
+// ========================
+router.get("/payrolls", (req, res) => payrollController.index(req, res));
+router.get("/payrolls/:id", (req, res) => payrollController.show(req, res));
 
 export default router;

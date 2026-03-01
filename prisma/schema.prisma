@@ -433,6 +433,9 @@ model payrolls {
   grand_total                          BigInt
   created_at                           DateTime? @db.Timestamp(0)
   updated_at                           DateTime? @db.Timestamp(0)
+  user                                 users     @relation("users_payrolls", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
 }
 
 model pegawai_keluars {
@@ -824,4 +827,5 @@ model users {
   reimbursements_items               reimbursements_items[] @relation("users_reimbursements_items")
   target_kinerja_teams               target_kinerja_teams[]
   kasbons                            kasbons[]
+  payrolls                           payrolls[]               @relation("users_payrolls")
 }

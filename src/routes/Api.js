@@ -8,7 +8,7 @@ import kunjunganController from "../controllers/KunjunganController.js";
 import shiftController from "../controllers/ShiftController.js";
 import kontrakController from "../controllers/KontrakController.js";
 import pegawaiKeluarController from "../controllers/PegawaiKeluarController.js";
-import cutiController from "../controllers/CutiController.js";
+import cutiController from "../controllers/cutiController.js";
 import notificationController from "../controllers/NotificationController.js";
 import absensiController from "../controllers/AbsensiController.js";
 import dinasLuarController from "../controllers/DinasLuarController.js";

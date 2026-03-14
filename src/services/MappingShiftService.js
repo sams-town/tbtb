@@ -108,17 +108,18 @@ class MappingShiftService {
     }
 
     serialize(record) {
-        const serialized = {};
-        for (const [key, value] of Object.entries(record)) {
-            if (typeof value === "bigint") {
-                serialized[key] = value.toString();
-            } else if (value instanceof Date) {
-                serialized[key] = value.toISOString();
-            } else {
-                serialized[key] = value;
+        if (record === null || record === undefined) return record;
+        if (typeof record === "bigint") return record.toString();
+        if (record instanceof Date) return record.toISOString();
+        if (Array.isArray(record)) return record.map(i => this.serialize(i));
+        if (typeof record === "object") {
+            const serialized = {};
+            for (const [key, value] of Object.entries(record)) {
+                serialized[key] = this.serialize(value);
             }
+            return serialized;
         }
-        return serialized;
+        return record;
     }
 
     serializeList(items) {

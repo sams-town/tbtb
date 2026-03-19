@@ -12,7 +12,16 @@ class MappingShiftController {
 
     async show(req, res) {
         try {
-            const data = await mappingShiftService.getById(req.params.id);
+            const data = await mappingShiftService.getWhere({ id: BigInt(req.params.id) });
+            if (!data) return res.status(404).json({ success: false, message: "Mapping shift tidak ditemukan" });
+            return res.status(200).json({ success: true, message: "Data mapping shift berhasil diambil", data });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal mengambil data mapping shift", error: error.message });
+        }
+    }
+     async showUser(req, res) {
+        try {
+            const data = await mappingShiftService.getWhere({ user_id: BigInt(req.params.id) });
             if (!data) return res.status(404).json({ success: false, message: "Mapping shift tidak ditemukan" });
             return res.status(200).json({ success: true, message: "Data mapping shift berhasil diambil", data });
         } catch (error) {

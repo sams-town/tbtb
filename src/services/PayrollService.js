@@ -76,6 +76,37 @@ class PayrollService {
         };
     }
 
+    getWhere(conditions) {
+        const self = this;
+        return {
+            async first() {
+                const item = await prisma.payrolls.findFirst({
+                    where: conditions,
+                    include: {
+                        user: {
+                            include: {
+                                jabatan: true
+                            }
+                        }
+                    }
+                });
+
+                if (!item) {
+                    return {
+                        success: false,
+                        message: "Data payroll tidak ditemukan"
+                    };
+                }
+
+                return {
+                    success: true,
+                    message: "Berhasil mengambil detail payroll",
+                    data: self.serialize(item)
+                };
+            }
+        };
+    }
+
     async update(id, data) {
         // Convert numeric fields to BigInt if they exist
         const numericFields = [

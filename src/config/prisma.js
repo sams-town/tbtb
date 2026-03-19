@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+// Force restart after prisma generate
 
 const prisma = new PrismaClient({
     datasources: {

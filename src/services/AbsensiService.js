@@ -50,6 +50,55 @@ class AbsensiService {
         return this.serialize(record);
     }
 
+     async getByIdUsers(id) {
+        const record = await prisma.mapping_shifts.findFirst({
+            where: { user_id: BigInt(id) },
+            include: {
+                users: {
+                    include: {
+                        lokasi: true
+                    }
+                },
+                shifts: true
+            },
+            orderBy: { id: "desc" },
+        });
+        if (!record) return null;
+        return this.serialize(record);
+    }
+
+    async getByIdUsersHistory(id, tanggal_mulai, tanggal_akhir) {
+        const start = new Date(tanggal_mulai);
+        let end = new Date(tanggal_akhir);
+
+        // Jika tanggal mulai dan akhir sama, munculkan seluruh hari itu
+        if (start.toDateString() === end.toDateString()) {
+            end = new Date(start);
+            end.setDate(end.getDate() + 1);
+        }
+
+        const record = await prisma.mapping_shifts.findMany({
+            where: {
+                user_id: BigInt(id),
+                tanggal: {
+                    gte: start,
+                    lt: end
+                }
+            },
+            include: {
+                users: {
+                    include: {
+                        lokasi: true
+                    }
+                },
+                shifts: true
+            },
+            orderBy: { id: "desc" },
+        });
+        if (!record) return null;
+        return this.serializeList(record);
+    }   
+
     async create(data) {
         const payload = { ...data };
         if (payload.user_id !== undefined) payload.user_id = BigInt(payload.user_id);

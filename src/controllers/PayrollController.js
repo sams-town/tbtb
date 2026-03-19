@@ -17,7 +17,10 @@ class PayrollController {
 
     async show(req, res) {
         try {
-            const result = await PayrollService.getById(req.params.id);
+            const result = await PayrollService.getWhere({ user_id: BigInt(req.params.id) }).first();
+            if (!result.success) {
+                return res.status(404).json(result);
+            }
             res.json(result);
         } catch (error) {
             console.error(error);
@@ -28,6 +31,23 @@ class PayrollController {
             });
         }
     }
+    async showUser(req, res) {
+         try {
+            const result = await PayrollService.getWhere({ user_id: BigInt(req.params.id),bulan:req.params.bulan,tahun:req.params.tahun }).first();
+            if (!result.success) {
+                return res.status(404).json(result);
+            }
+            res.json(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                success: false,
+                message: "Gagal mengambil detail payroll",
+                error: error.message
+            });
+        }
+    }
+        
 
     async update(req, res) {
         try {

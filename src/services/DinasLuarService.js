@@ -75,12 +75,43 @@ class DinasLuarService {
     async create(data) {
         const payload = { ...data };
         if (payload.user_id !== undefined) payload.user_id = BigInt(payload.user_id);
-        if (payload.shift_id !== undefined) payload.shift_id = BigInt(payload.shift_id);
 
-        // Remove unused/invalid spoofing fields
+        let shiftToUse = payload.shift_id ? BigInt(payload.shift_id) : null;
+
+        // Try to auto-resolve shift_id if missing, use today's mapping_shifts or default
+        if (!shiftToUse && payload.user_id) {
+            const todayStr = payload.tanggal || new Date().toISOString().split('T')[0];
+            const mapping = await prisma.mapping_shifts.findFirst({
+                where: { 
+                    user_id: payload.user_id,
+                    tanggal: {
+                        gte: new Date(todayStr),
+                        lt: new Date(new Date(todayStr).getTime() + 24 * 60 * 60 * 1000)
+                    }
+                }
+            });
+            if (mapping && mapping.shift_id) {
+                shiftToUse = mapping.shift_id;
+            } else {
+                shiftToUse = BigInt(1); // Default safe fallback
+            }
+        }
+        if (shiftToUse) payload.shift_id = shiftToUse;
+
+        // Menerjemahkan isian aplikasi mobile ke skema database
+        if (payload.jam && !payload.jam_absen) payload.jam_absen = payload.jam;
+        if (payload.lat && !payload.lat_absen) payload.lat_absen = payload.lat;
+        if (payload.long && !payload.long_absen) payload.long_absen = payload.long;
+        if (!payload.status_absen) payload.status_absen = "DINAS LUAR"; // Status default jika create
+
+        // Hapus field yang tidak ada di Prisma (menghindari error Unknown argument)
         if (payload._method) delete payload._method;
         if (payload["{}"]) delete payload["{}"];
         if (payload.keterangan) delete payload.keterangan;
+        if (payload.tujuan) delete payload.tujuan;
+        if (payload.jam) delete payload.jam;
+        if (payload.lat) delete payload.lat;
+        if (payload.long) delete payload.long;
 
         // Try converting base64 format picture inside foto_jam_absen and foto_jam_pulang 
         if (payload.foto_jam_absen && payload.foto_jam_absen.startsWith("data:image")) {

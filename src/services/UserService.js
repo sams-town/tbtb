@@ -40,7 +40,7 @@ class UserService {
         });
 
         const cutiRecords = await prisma.cutis.findMany({
-            where: { user_id: { in: userIds }, status_cuti: "APPROVED" },
+            where: { user_id: { in: userIds }, status_cuti: "Diterima" },
             select: { user_id: true, tanggal: true, nama_cuti: true },
         });
         const usedMap = {};
@@ -128,7 +128,7 @@ class UserService {
         const roles = userRoles.map((ur) => ur.roles.name);
 
         const cutiList = await prisma.cutis.findMany({
-            where: { user_id: BigInt(id), status_cuti: "APPROVED" },
+            where: { user_id: BigInt(id), status_cuti: "Diterima" },
             select: { tanggal: true, nama_cuti: true },
         });
         let used = { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };

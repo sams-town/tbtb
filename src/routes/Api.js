@@ -153,6 +153,8 @@ const absensiUpload = createUploadMiddleware("absensi", "absensi");
 router.get("/absensi", (req, res) => absensiController.index(req, res));
 router.get("/absensi/recap", (req, res) => absensiController.recap(req, res));
 router.get("/absensi/:id", (req, res) => absensiController.show(req, res));
+router.get("/absensi_user/:id", (req, res) => absensiController.showUser(req, res));
+router.get("/absensi_user_history/:id/:tanggal_mulai/:tanggal_akhir", (req, res) => absensiController.showUserHistory(req, res));
 router.post("/absensi", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.store(req, res));
 router.put("/absensi/:id", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.update(req, res));
 router.post("/absensi/:id", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.update(req, res)); // Fallback for forms that use POST
@@ -163,8 +165,8 @@ router.delete("/absensi/:id", (req, res) => absensiController.destroy(req, res))
 // ========================
 router.get("/dinas-luar", (req, res) => dinasLuarController.index(req, res));
 router.get("/dinas-luar/:id", (req, res) => dinasLuarController.show(req, res));
-router.post("/dinas-luar", (req, res) => dinasLuarController.store(req, res)); // Normal post
 const dinasUpload = createUploadMiddleware("dinasluar", "dl");
+router.post("/dinas-luar", dinasUpload.any(), (req, res) => dinasLuarController.store(req, res));
 router.post("/dinas-luar/bulk", (req, res) => dinasLuarController.bulkStore(req, res));
 router.put("/dinas-luar/bulk", (req, res) => dinasLuarController.bulkUpdate(req, res));
 router.delete("/dinas-luar/bulk", (req, res) => dinasLuarController.bulkDestroy(req, res));
@@ -186,6 +188,7 @@ router.delete("/status-pajak/:id", (req, res) => statusPajakController.destroy(r
 // ========================
 router.get("/mapping-shifts", (req, res) => mappingShiftController.index(req, res));
 router.get("/mapping-shifts/:id", (req, res) => mappingShiftController.show(req, res));
+router.get("/mapping-shifts-user/:id", (req, res) => mappingShiftController.showUser(req, res));
 router.post("/mapping-shifts/bulk", (req, res) => mappingShiftController.bulkStore(req, res));
 router.put("/mapping-shifts/bulk", (req, res) => mappingShiftController.bulkUpdate(req, res));
 router.delete("/mapping-shifts/bulk", (req, res) => mappingShiftController.bulkDestroy(req, res));
@@ -364,6 +367,7 @@ router.get("/pajak-report", (req, res) => pajakController.index(req, res));
 // ========================
 router.get("/payrolls", (req, res) => payrollController.index(req, res));
 router.get("/payrolls/:id", (req, res) => payrollController.show(req, res));
+router.get("/payrolls_user/:id/:bulan/:tahun", (req, res) => payrollController.showUser(req, res));
 router.post("/payrolls/generate", (req, res) => payrollController.generate(req, res));
 router.post("/payrolls/generate-all", (req, res) => payrollController.generateAll(req, res));
 router.put("/payrolls/:id", (req, res) => payrollController.update(req, res));

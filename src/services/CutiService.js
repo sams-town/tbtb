@@ -60,7 +60,7 @@ class CutiService {
             data: {
                 ...this.sanitizeInput(data),
                 tanggal: tanggalValue,
-                status_cuti: "PENDING",
+                status_cuti: "Pending",
                 created_at: now,
                 updated_at: now,
             },

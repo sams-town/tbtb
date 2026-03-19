@@ -22,9 +22,32 @@ class DinasLuarController {
 
     async store(req, res) {
         try {
-            const data = await dinasLuarService.create(req.body);
+            const payload = { ...req.body };
+
+            if (req.files && Array.isArray(req.files)) {
+                const fotoAbsen = req.files.find(f => f.fieldname === "foto_jam_absen" || f.fieldname === "foto_masuk" || f.fieldname === "foto");
+                if (fotoAbsen) {
+                    payload.foto_jam_absen = `/uploads/dinasluar/${fotoAbsen.filename}`;
+                }
+                
+                const fotoPulang = req.files.find(f => f.fieldname === "foto_jam_pulang" || f.fieldname === "foto_keluar");
+                if (fotoPulang) {
+                    payload.foto_jam_pulang = `/uploads/dinasluar/${fotoPulang.filename}`;
+                }
+            } else if (req.files) {
+                 // Fallback if some other middleware format
+                 if (req.files.foto_jam_absen && req.files.foto_jam_absen.length > 0) {
+                    payload.foto_jam_absen = `/uploads/dinasluar/${req.files.foto_jam_absen[0].filename}`;
+                }
+                if (req.files.foto_jam_pulang && req.files.foto_jam_pulang.length > 0) {
+                    payload.foto_jam_pulang = `/uploads/dinasluar/${req.files.foto_jam_pulang[0].filename}`;
+                }
+            }
+
+            const data = await dinasLuarService.create(payload);
             return res.status(201).json({ success: true, message: "Dinas luar berhasil dibuat", data });
         } catch (error) {
+            console.error("DinasLuarController.store error:", error);
             return res.status(500).json({ success: false, message: "Gagal membuat dinas luar", error: error.message });
         }
     }

@@ -20,6 +20,25 @@ class AbsensiController {
         }
     }
 
+    async showUser(req, res) {
+        try {
+            const data = await absensiService.getByIdUsers(req.params.id);
+            if (!data) return res.status(404).json({ success: false, message: "Absensi tidak ditemukan" });
+            return res.status(200).json({ success: true, message: "Data absensi berhasil diambil", data });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal mengambil data absensi", error: error.message });
+        }
+    }
+    async showUserHistory(req, res) {
+        try {
+            const data = await absensiService.getByIdUsersHistory(req.params.id, req.params.tanggal_mulai, req.params.tanggal_akhir);
+            if (!data) return res.status(404).json({ success: false, message: "Absensi tidak ditemukan" });
+            return res.status(200).json({ success: true, message: "Data absensi berhasil diambil", data });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal mengambil data absensi", error: error.message });
+        }
+    }
+
     async store(req, res) {
         try {
             const payload = { ...req.body };

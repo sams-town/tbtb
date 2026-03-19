@@ -32,6 +32,18 @@ class MappingShiftService {
         return { data: this.serializeList(data) };
     }
 
+    async getWhere(where) {
+        const record = await prisma.mapping_shifts.findFirst({
+            where,
+            include: {
+                users: true,
+                shifts: true
+            }
+        });
+        if (!record) return null;
+        return this.serialize(record);
+    }
+
     async getById(id) {
         const record = await prisma.mapping_shifts.findUnique({
             where: { id: BigInt(id) },

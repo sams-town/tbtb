@@ -1,4 +1,7 @@
 import absensiService from "../services/AbsensiService.js";
+import userService from "../services/UserService.js";
+import faceRecognitionService from "../services/FaceRecognitionService.js";
+import path from "path";
 
 class AbsensiController {
     async index(req, res) {
@@ -57,6 +60,78 @@ class AbsensiController {
             return res.status(500).json({ success: false, message: "Gagal membuat absensi", error: error.message });
         }
     }
+
+    async storeWajah(req, res) {
+        try {
+            const payload = { ...req.body };
+
+            let incomingPath = null;
+            if (req.files) {
+                let uploadedFiles = Array.isArray(req.files) ? req.files : [];
+                if (!Array.isArray(req.files)) {
+                    if (req.files.foto_jam_absen) uploadedFiles.push(...req.files.foto_jam_absen);
+                    if (req.files.foto_jam_pulang) uploadedFiles.push(...req.files.foto_jam_pulang);
+                }
+
+                if (uploadedFiles.length > 0) {
+                    const theFile = uploadedFiles[0];
+                    incomingPath = path.join(process.cwd(), "public", "uploads", "absensi", theFile.filename);
+                    
+                    if (theFile.fieldname === 'foto_jam_pulang') {
+                        payload.foto_jam_pulang = `/uploads/absensi/${theFile.filename}`;
+                    } else {
+                        payload.foto_jam_absen = `/uploads/absensi/${theFile.filename}`;
+                    }
+                }
+            }
+
+            if (!incomingPath) {
+                return res.status(400).json({ success: false, message: "Foto absen wajib disertakan untuk absensi wajah." });
+            }
+
+            const usersResult = await userService.getAll({ limit: 10000 });
+            const allUsers = usersResult.data || [];
+
+            const matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
+            if (!matchResult.user) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Absensi gagal. Wajah tidak dikenali atau tidak cocok dengan data karyawan mana pun.",
+                    error: matchResult.error
+                });
+            }
+
+            // Jika valid, assign user_id dan lanjutkan pembuatan absensi
+            payload.user_id = matchResult.user.id.toString();
+
+            // Mapping custom frontend fields to Prisma schema fields
+            if (payload.tipe_absen === 'masuk') {
+                if (payload.lat) payload.lat_absen = String(payload.lat);
+                if (payload.long) payload.long_absen = String(payload.long);
+            } else if (payload.tipe_absen === 'pulang') {
+                if (payload.lat) payload.lat_pulang = String(payload.lat);
+                if (payload.long) payload.long_pulang = String(payload.long);
+            }
+
+            // Cleanup fields that Prisma mapping_shifts table doesn't have
+            delete payload.lat;
+            delete payload.long;
+            delete payload.tipe_absen;
+
+            const data = await absensiService.create(payload);
+            return res.status(201).json({ 
+                success: true, 
+                message: `Absensi wajah berhasil, dikenali sebagai: ${matchResult.user.name}`, 
+                data, 
+                distance: matchResult.distance,
+                user: { id: matchResult.user.id.toString(), name: matchResult.user.name }
+            });
+        } catch (error) {
+            console.error("AbsensiController.storeWajah error:", error);
+            return res.status(500).json({ success: false, message: "Gagal membuat absensi wajah", error: error.message });
+        }
+    }
+
 
     async update(req, res) {
         try {

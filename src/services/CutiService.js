@@ -104,7 +104,7 @@ class CutiService {
 
         const cuti = await prisma.cutis.update({
             where: { id: BigInt(id) },
-            data: { user_approval: approver, status_cuti: "APPROVED", updated_at: new Date() },
+            data: { user_approval: approver, status_cuti: "Diterima", updated_at: new Date() },
             include: { users: { select: { id: true, name: true } } },
         });
         return this.serialize(cuti);

@@ -156,6 +156,7 @@ router.get("/absensi/:id", (req, res) => absensiController.show(req, res));
 router.get("/absensi_user/:id", (req, res) => absensiController.showUser(req, res));
 router.get("/absensi_user_history/:id/:tanggal_mulai/:tanggal_akhir", (req, res) => absensiController.showUserHistory(req, res));
 router.post("/absensi", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.store(req, res));
+router.post("/absensi_wajah", absensiUpload.any(), (req, res) => absensiController.storeWajah(req, res));
 router.put("/absensi/:id", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.update(req, res));
 router.post("/absensi/:id", absensiUpload.fields([{ name: "foto_jam_absen", maxCount: 1 }, { name: "foto_jam_pulang", maxCount: 1 }]), (req, res) => absensiController.update(req, res)); // Fallback for forms that use POST
 router.delete("/absensi/:id", (req, res) => absensiController.destroy(req, res));

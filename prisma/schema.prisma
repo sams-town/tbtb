@@ -120,8 +120,8 @@ model jabatans {
   created_at           DateTime?              @db.Timestamp(0)
   updated_at           DateTime?              @db.Timestamp(0)
   users                users?                 @relation("jabatans_manager", fields: [manager], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "jabatans_manager_foreign")
-  user_jabatans        users[]                @relation("users_jabatan")
   target_kinerja_teams target_kinerja_teams[]
+  user_jabatans        users[]                @relation("users_jabatan")
 
   @@index([manager], map: "jabatans_manager_foreign")
 }
@@ -139,24 +139,20 @@ model kasbons {
   id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   user_id    BigInt    @db.UnsignedBigInt
   tanggal    DateTime  @db.Date
-  nominal    BigInt
+  nominal    Int
   keperluan  String    @db.Text
-  status     String    @default("PENDING")
+  status     String
   created_at DateTime? @db.Timestamp(0)
   updated_at DateTime? @db.Timestamp(0)
-  user       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([user_id])
 }
 
 model kategoris {
-  id             BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
-  name           String
-  jumlah         BigInt?
-  active         Int?
-  created_at     DateTime?        @db.Timestamp(0)
-  updated_at     DateTime?        @db.Timestamp(0)
-  reimbursements reimbursements[]
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String
+  jumlah     BigInt?
+  active     Int?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
 }
 
 model kontraks {
@@ -239,9 +235,9 @@ model lemburs {
   approved_by     BigInt?   @db.UnsignedBigInt
   created_at      DateTime? @db.Timestamp(0)
   updated_at      DateTime? @db.Timestamp(0)
-  karyawan        users     @relation("KaryawanLembur", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_user_id_foreign")
-  lokasi          lokasis   @relation("LokasiLembur", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_lokasi_id_foreign")
   approver        users?    @relation("ApproverLembur", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_approved_by_foreign")
+  lokasi          lokasis   @relation("LokasiLembur", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_lokasi_id_foreign")
+  karyawan        users     @relation("KaryawanLembur", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_user_id_foreign")
 
   @@index([user_id], map: "lemburs_user_id_foreign")
   @@index([lokasi_id], map: "lemburs_lokasi_id_foreign")
@@ -260,10 +256,10 @@ model lokasis {
   approved_by                      BigInt?   @db.UnsignedBigInt
   created_at                       DateTime? @db.Timestamp(0)
   updated_at                       DateTime? @db.Timestamp(0)
-  user_lokasis                     users[]   @relation("users_lokasi")
+  lemburs                          lemburs[] @relation("LokasiLembur")
   users_lokasis_approved_byTousers users?    @relation("lokasis_approved_byTousers", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lokasis_approved_by_foreign")
   users_lokasis_created_byTousers  users?    @relation("lokasis_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lokasis_created_by_foreign")
-  lemburs                          lemburs[] @relation("LokasiLembur")
+  user_lokasis                     users[]   @relation("users_lokasi")
 
   @@index([approved_by], map: "lokasis_approved_by_foreign")
   @@index([created_by], map: "lokasis_created_by_foreign")
@@ -300,8 +296,8 @@ model mapping_shifts {
   created_at           DateTime? @db.Timestamp(0)
   updated_at           DateTime? @db.Timestamp(0)
   approved_by_user     users?    @relation("ApprovedBy", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mapping_shifts_approved_by_foreign")
-  users                users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mapping_shifts_user_id_foreign")
   shifts               shifts?   @relation(fields: [shift_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users                users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mapping_shifts_user_id_foreign")
 
   @@index([user_id], map: "mapping_shifts_user_id_foreign")
   @@index([approved_by], map: "mapping_shifts_approved_by_foreign")
@@ -433,9 +429,7 @@ model payrolls {
   grand_total                          BigInt
   created_at                           DateTime? @db.Timestamp(0)
   updated_at                           DateTime? @db.Timestamp(0)
-  user                                 users     @relation("users_payrolls", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([user_id])
+  user                                 users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payrolls_user_id_foreign")
 }
 
 model pegawai_keluars {
@@ -466,9 +460,6 @@ model pengajuan_keuangan_items {
   total                 BigInt?
   created_at            DateTime? @db.Timestamp(0)
   updated_at            DateTime? @db.Timestamp(0)
-  pengajuan             pengajuan_keuangans? @relation(fields: [pengajuan_keuangan_id], references: [id], onDelete: Cascade)
-
-  @@index([pengajuan_keuangan_id])
 }
 
 model pengajuan_keuangans {
@@ -487,12 +478,9 @@ model pengajuan_keuangans {
   note_approval  String?
   created_at     DateTime? @db.Timestamp(0)
   updated_at     DateTime? @db.Timestamp(0)
-  requester      users?    @relation("RequesterFinance", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  approver       users?    @relation("ApproverFinance", fields: [user_approval], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  items          pengajuan_keuangan_items[]
+  approver       users?    @relation("ApproverFinance", fields: [user_approval], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pengajuan_keuangans_user_approval_foreign")
 
-  @@index([user_id])
-  @@index([user_approval])
+  @@index([user_approval], map: "pengajuan_keuangans_user_approval_foreign")
 }
 
 model penugasan_items {
@@ -511,10 +499,10 @@ model penugasans {
   tanggal         DateTime? @db.Date
   judul           String?
   rincian         String?   @db.Text
-  progress        String?
   status          String?
   created_at      DateTime? @db.Timestamp(0)
   updated_at      DateTime? @db.Timestamp(0)
+  progress        String?
 }
 
 model permissions {
@@ -576,40 +564,29 @@ model rapats {
 }
 
 model reimbursements {
-  id                   BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id              BigInt?                @db.UnsignedBigInt
-  kategori_id          BigInt?                @db.UnsignedBigInt
-  tanggal              DateTime?              @db.Date
-  event                String?                @db.Text
-  status               String?
-  jumlah               BigInt?
-  qty                  Int?
-  total                BigInt?
-  sisa                 BigInt?
-  file_path            String?
-  file_name            String?
-  created_at           DateTime?              @db.Timestamp(0)
-  updated_at           DateTime?              @db.Timestamp(0)
-  user                 users?                 @relation("users_reimbursements", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  kategori             kategoris?             @relation(fields: [kategori_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  reimbursements_items reimbursements_items[]
-
-  @@index([user_id], map: "reimbursements_user_id_fkey")
-  @@index([kategori_id], map: "reimbursements_kategori_id_fkey")
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id     BigInt    @db.UnsignedBigInt
+  kategori_id BigInt    @db.UnsignedBigInt
+  tanggal     DateTime? @db.Date
+  event       String?   @db.Text
+  status      String?
+  jumlah      BigInt?
+  qty         Int?
+  total       BigInt?
+  sisa        BigInt?
+  file_path   String?
+  file_name   String?
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
 }
 
 model reimbursements_items {
-  id               BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
-  reimbursement_id BigInt         @db.UnsignedBigInt
-  user_id          BigInt?        @db.UnsignedBigInt
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  reimbursement_id BigInt    @db.UnsignedBigInt
+  user_id          BigInt?   @db.UnsignedBigInt
   fee              BigInt?
-  created_at       DateTime?      @db.Timestamp(0)
-  updated_at       DateTime?      @db.Timestamp(0)
-  reimbursements   reimbursements @relation(fields: [reimbursement_id], references: [id], onDelete: Cascade)
-  user             users?         @relation("users_reimbursements_items", fields: [user_id], references: [id])
-
-  @@index([reimbursement_id], map: "reimbursements_items_reimbursement_id_fkey")
-  @@index([user_id], map: "reimbursements_items_user_id_fkey")
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
 }
 
 model reset_cutis {
@@ -809,23 +786,23 @@ model users {
   remember_token                     String?                @db.VarChar(100)
   created_at                         DateTime?              @db.Timestamp(0)
   updated_at                         DateTime?              @db.Timestamp(0)
-  jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  lokasi                             lokasis?               @relation("users_lokasi", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  status_pajak                       status_pajaks?         @relation("users_status_pajak", fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  mapping_shifts                     mapping_shifts[]
   cutis                              cutis[]
   managed_jabatans                   jabatans[]             @relation("jabatans_manager")
-  lemburs                            lemburs[]              @relation("KaryawanLembur")
   approved_lemburs                   lemburs[]              @relation("ApproverLembur")
+  lemburs                            lemburs[]              @relation("KaryawanLembur")
   lokasis_lokasis_approved_byTousers lokasis[]              @relation("lokasis_approved_byTousers")
   lokasis_lokasis_created_byTousers  lokasis[]              @relation("lokasis_created_byTousers")
   approved_mapping_shifts            mapping_shifts[]       @relation("ApprovedBy")
+  mapping_shifts                     mapping_shifts[]
   pegawai_keluars                    pegawai_keluars[]
-  pengajuan_requester                pengajuan_keuangans[] @relation("RequesterFinance")
-  pengajuan_approver                 pengajuan_keuangans[] @relation("ApproverFinance")
-  reimbursements                     reimbursements[]       @relation("users_reimbursements")
-  reimbursements_items               reimbursements_items[] @relation("users_reimbursements_items")
+  pengajuan_approver                 pengajuan_keuangans[]  @relation("ApproverFinance")
   target_kinerja_teams               target_kinerja_teams[]
-  kasbons                            kasbons[]
-  payrolls                           payrolls[]               @relation("users_payrolls")
+  payrolls                           payrolls[]
+  jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lokasi                             lokasis?               @relation("users_lokasi", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status_pajak                       status_pajaks?         @relation("users_status_pajak", fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([jabatan_id], map: "users_jabatan_id_fkey")
+  @@index([lokasi_id], map: "users_lokasi_id_fkey")
+  @@index([status_pajak_id], map: "users_status_pajak_id_fkey")
 }

@@ -429,7 +429,6 @@ model payrolls {
   grand_total                          BigInt
   created_at                           DateTime? @db.Timestamp(0)
   updated_at                           DateTime? @db.Timestamp(0)
-  user                                 users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payrolls_user_id_foreign")
 }
 
 model pegawai_keluars {
@@ -786,6 +785,9 @@ model users {
   remember_token                     String?                @db.VarChar(100)
   created_at                         DateTime?              @db.Timestamp(0)
   updated_at                         DateTime?              @db.Timestamp(0)
+  darurat_nama                       String?                @db.VarChar(100)
+  darurat_telepon                    String?                @db.VarChar(100)
+  darurat_hubungan                   String?                @db.VarChar(100)
   cutis                              cutis[]
   managed_jabatans                   jabatans[]             @relation("jabatans_manager")
   approved_lemburs                   lemburs[]              @relation("ApproverLembur")
@@ -797,7 +799,6 @@ model users {
   pegawai_keluars                    pegawai_keluars[]
   pengajuan_approver                 pengajuan_keuangans[]  @relation("ApproverFinance")
   target_kinerja_teams               target_kinerja_teams[]
-  payrolls                           payrolls[]
   jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lokasi                             lokasis?               @relation("users_lokasi", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   status_pajak                       status_pajaks?         @relation("users_status_pajak", fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

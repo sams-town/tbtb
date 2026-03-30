@@ -69,6 +69,7 @@ class AbsensiController {
             if (req.files) {
                 let uploadedFiles = Array.isArray(req.files) ? req.files : [];
                 if (!Array.isArray(req.files)) {
+                    if (req.files.foto_wajah) uploadedFiles.push(...req.files.foto_wajah);
                     if (req.files.foto_jam_absen) uploadedFiles.push(...req.files.foto_jam_absen);
                     if (req.files.foto_jam_pulang) uploadedFiles.push(...req.files.foto_jam_pulang);
                 }
@@ -77,7 +78,7 @@ class AbsensiController {
                     const theFile = uploadedFiles[0];
                     incomingPath = path.join(process.cwd(), "public", "uploads", "absensi", theFile.filename);
                     
-                    if (theFile.fieldname === 'foto_jam_pulang') {
+                    if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
                         payload.foto_jam_pulang = `/uploads/absensi/${theFile.filename}`;
                     } else {
                         payload.foto_jam_absen = `/uploads/absensi/${theFile.filename}`;
@@ -105,12 +106,16 @@ class AbsensiController {
             payload.user_id = matchResult.user.id.toString();
 
             // Mapping custom frontend fields to Prisma schema fields
+            let isPulang = false;
             if (payload.tipe_absen === 'masuk') {
                 if (payload.lat) payload.lat_absen = String(payload.lat);
                 if (payload.long) payload.long_absen = String(payload.long);
-            } else if (payload.tipe_absen === 'pulang') {
+                payload.status_absen = 'Masuk';
+            } else if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
+                isPulang = true;
                 if (payload.lat) payload.lat_pulang = String(payload.lat);
                 if (payload.long) payload.long_pulang = String(payload.long);
+                payload.status_absen = 'Pulang';
             }
 
             // Cleanup fields that Prisma mapping_shifts table doesn't have
@@ -118,13 +123,28 @@ class AbsensiController {
             delete payload.long;
             delete payload.tipe_absen;
 
-            const data = await absensiService.create(payload);
+            let data;
+            if (isPulang) {
+                // Cari data absensi hari ini khusus user ini
+                const todayStr = payload.tanggal || new Date().toISOString().split('T')[0];
+                const existingRecords = await absensiService.getByIdUsersHistory(matchResult.user.id.toString(), todayStr, todayStr);
+                
+                if (existingRecords && existingRecords.length > 0) {
+                    // Update yang pertama (yang hari ini)
+                    data = await absensiService.update(existingRecords[0].id, payload);
+                } else {
+                    // Kalau ga ada, create baru buat hari ini
+                    data = await absensiService.create(payload);
+                }
+            } else {
+                data = await absensiService.create(payload);
+            }
             return res.status(201).json({ 
                 success: true, 
                 message: `Absensi wajah berhasil, dikenali sebagai: ${matchResult.user.name}`, 
                 data, 
                 distance: matchResult.distance,
-                user: { id: matchResult.user.id.toString(), name: matchResult.user.name }
+                user: matchResult.user
             });
         } catch (error) {
             console.error("AbsensiController.storeWajah error:", error);

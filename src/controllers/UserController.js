@@ -24,6 +24,28 @@ class UserController {
     }
 
     /**
+     * GET /api/users/all
+     */
+    async all(req, res) {
+        try {
+            const result = await userService.getAllNoPaginate(req.query);
+
+            return res.status(200).json({
+                success: true,
+                message: "Semua data users berhasil diambil",
+                ...result,
+            });
+        } catch (error) {
+            console.error("UserController.all error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Gagal mengambil semua data users",
+                error: error.message,
+            });
+        }
+    }
+
+    /**
      * GET /api/users/:id
      */
     async show(req, res) {

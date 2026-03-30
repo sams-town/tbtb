@@ -50,6 +50,7 @@ router.put("/me", authMiddleware, (req, res) => authController.updateProfile(req
 // USER ROUTES
 // ========================
 router.get("/users", (req, res) => userController.index(req, res));
+router.get("/users/all", (req, res) => userController.all(req, res));
 router.get("/users/:id", (req, res) => userController.show(req, res));
 router.post("/users", upload.single("foto_karyawan"), (req, res) => userController.store(req, res));
 router.put("/users/:id", upload.single("foto_karyawan"), (req, res) => userController.update(req, res));
@@ -166,6 +167,7 @@ router.delete("/absensi/:id", (req, res) => absensiController.destroy(req, res))
 // ========================
 router.get("/dinas-luar", (req, res) => dinasLuarController.index(req, res));
 router.get("/dinas-luar/:id", (req, res) => dinasLuarController.show(req, res));
+router.get("/dinas-luar-users/:id", (req, res) => dinasLuarController.showUser(req, res));
 const dinasUpload = createUploadMiddleware("dinasluar", "dl");
 router.post("/dinas-luar", dinasUpload.any(), (req, res) => dinasLuarController.store(req, res));
 router.post("/dinas-luar/bulk", (req, res) => dinasLuarController.bulkStore(req, res));

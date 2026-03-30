@@ -72,6 +72,28 @@ class DinasLuarService {
         return this.serialize(record);
     }
 
+    async getByUserId(id) {
+        const record = await prisma.dinas_luars.findMany({ where: { user_id: BigInt(id) } });
+        if (!record) return null;
+
+        if (record.user_id) {
+            const user = await prisma.users.findUnique({
+                where: { id: record.user_id },
+                select: { id: true, name: true }
+            });
+            if (user) record.users = user;
+        }
+
+        if (record.shift_id) {
+            const shift = await prisma.shifts.findUnique({
+                where: { id: record.shift_id }
+            });
+            if (shift) record.shifts = shift;
+        }
+
+        return this.serialize(record);
+    }   
+
     async create(data) {
         const payload = { ...data };
         if (payload.user_id !== undefined) payload.user_id = BigInt(payload.user_id);

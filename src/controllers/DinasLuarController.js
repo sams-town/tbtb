@@ -19,6 +19,15 @@ class DinasLuarController {
             return res.status(500).json({ success: false, message: "Gagal mengambil data dinas luar", error: error.message });
         }
     }
+    async showUser(req, res) {
+        try {
+            const data = await dinasLuarService.getByUserId(req.params.id);
+            if (!data) return res.status(404).json({ success: false, message: "Dinas luar tidak ditemukan" });
+            return res.status(200).json({ success: true, message: "Data dinas luar berhasil diambil", data });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal mengambil data dinas luar", error: error.message });
+        }
+    }
 
     async store(req, res) {
         try {

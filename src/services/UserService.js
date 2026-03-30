@@ -11,16 +11,23 @@ class UserService {
         const search = query.search || "";
         const skip = (page - 1) * limit;
 
-        const where = search
-            ? {
-                OR: [
-                    { name: { contains: search } },
-                    { email: { contains: search } },
-                    { username: { contains: search } },
-                    { telepon: { contains: search } },
-                ],
-            }
-            : {};
+        const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
+            select: { user_id: true }
+        });
+        const excludedUserIds = pegawaiKeluars.map((pk) => pk.user_id);
+
+        const where = {
+            id: { notIn: excludedUserIds },
+        };
+
+        if (search) {
+            where.OR = [
+                { name: { contains: search } },
+                { email: { contains: search } },
+                { username: { contains: search } },
+                { telepon: { contains: search } },
+            ];
+        }
 
         const [data, total] = await Promise.all([
             prisma.users.findMany({
@@ -111,6 +118,52 @@ class UserService {
     }
 
     /**
+     * Get all users without pagination
+     */
+    async getAllNoPaginate(query = {}) {
+        const search = query.search || "";
+        
+        const where = {};
+
+        if (search) {
+            where.OR = [
+                { name: { contains: search } },
+                { email: { contains: search } },
+                { username: { contains: search } },
+                { telepon: { contains: search } },
+            ];
+        }
+
+        const data = await prisma.users.findMany({
+            where,
+            orderBy: { name: "asc" },
+            include: { jabatan: true, lokasi: true, status_pajak: true },
+        });
+
+        const userIds = data.map((u) => u.id);
+        const userRoles = await prisma.model_has_roles.findMany({
+            where: { model_id: { in: userIds } },
+            include: { roles: true },
+        });
+
+        const dataWithRoles = data.map((user) => {
+            const roles = userRoles
+                .filter((ur) => ur.model_id === user.id)
+                .map((ur) => ur.roles.name);
+            
+            return {
+                ...this.serialize(user),
+                roles,
+            };
+        });
+
+        return {
+            data: dataWithRoles,
+            total: dataWithRoles.length,
+        };
+    }
+
+    /**
      * Get single user by ID
      */
     async getById(id) {
@@ -162,9 +215,14 @@ class UserService {
         const sisaPulangCepat = Math.max(totalPulangCepat - used.pulang_cepat, 0);
         const sisaLainnya = Math.max(totalLainnya - used.lainnya, 0);
 
+        const files = await prisma.files.findMany({
+            where: { user_id: BigInt(id) },
+        });
+
         return {
             ...this.serialize(user),
             roles,
+            files: files.map(f => this.serialize(f)),
             izin_cuti_total: String(totalCuti),
             izin_cuti_terpakai: String(used.cuti),
             izin_cuti_sisa: String(sisaCuti),

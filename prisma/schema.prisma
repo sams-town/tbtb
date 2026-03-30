@@ -788,6 +788,7 @@ model users {
   darurat_nama                       String?                @db.VarChar(100)
   darurat_telepon                    String?                @db.VarChar(100)
   darurat_hubungan                   String?                @db.VarChar(100)
+  batas_terlambat                    BigInt?
   cutis                              cutis[]
   managed_jabatans                   jabatans[]             @relation("jabatans_manager")
   approved_lemburs                   lemburs[]              @relation("ApproverLembur")

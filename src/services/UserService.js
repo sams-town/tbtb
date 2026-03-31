@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import bcrypt from "bcryptjs";
+import fileService from "./FileService.js";
 
 class UserService {
     /**
@@ -46,6 +47,12 @@ class UserService {
             include: { roles: true },
         });
 
+        const userWithFiles = await prisma.files.findMany({
+            where: { user_id: { in: userIds } },
+            select: { user_id: true },
+        });
+        const hasFilesSet = new Set(userWithFiles.map((f) => f.user_id.toString()));
+
         const cutiRecords = await prisma.cutis.findMany({
             where: { user_id: { in: userIds }, status_cuti: "Diterima" },
             select: { user_id: true, tanggal: true, nama_cuti: true },
@@ -91,6 +98,7 @@ class UserService {
             return {
                 ...this.serialize(user),
                 roles,
+                has_dokumen: hasFilesSet.has(user.id.toString()),
                 izin_cuti_total: String(totalCuti),
                 izin_cuti_terpakai: String(used.cuti),
                 izin_cuti_sisa: String(sisaCuti),
@@ -123,6 +131,11 @@ class UserService {
     async getAllNoPaginate(query = {}) {
         const search = query.search || "";
         
+        const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
+            select: { user_id: true }
+        });
+        const keluarIdsSet = new Set(pegawaiKeluars.map((pk) => pk.user_id.toString()));
+
         const where = {};
 
         if (search) {
@@ -146,14 +159,74 @@ class UserService {
             include: { roles: true },
         });
 
+        const userWithFiles = await prisma.files.findMany({
+            where: { user_id: { in: userIds } },
+            select: { user_id: true },
+        });
+        const hasFilesSet = new Set(userWithFiles.map((f) => f.user_id.toString()));
+
+        const cutiRecords = await prisma.cutis.findMany({
+            where: { user_id: { in: userIds }, status_cuti: "Diterima" },
+            select: { user_id: true, tanggal: true, nama_cuti: true },
+        });
+
+        const usedMap = {};
+        for (const r of cutiRecords) {
+            const uid = r.user_id;
+            const label = (r.nama_cuti || "").toLowerCase();
+            let type = "lainnya";
+            if (label.includes("cuti")) type = "cuti";
+            else if (label.includes("telat")) type = "telat";
+            else if (label.includes("pulang")) type = "pulang_cepat";
+            const t = r.tanggal || "";
+            let amount = 1;
+            if (type === "cuti") {
+                if (t.includes(" - ")) {
+                    const [start, end] = t.split(" - ");
+                    const s = new Date(start);
+                    const e = new Date(end);
+                    const diff = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+                    amount = diff > 0 ? diff : 0;
+                } else if (!t) {
+                    amount = 0;
+                }
+            }
+            usedMap[uid] = usedMap[uid] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            usedMap[uid][type] += amount;
+        }
+
         const dataWithRoles = data.map((user) => {
             const roles = userRoles
                 .filter((ur) => ur.model_id === user.id)
                 .map((ur) => ur.roles.name);
             
+            const totalCuti = Number(user.izin_cuti || 0n);
+            const totalTelat = Number(user.izin_telat || 0n);
+            const totalPulangCepat = Number(user.izin_pulang_cepat || 0n);
+            const totalLainnya = Number(user.izin_lainnya || 0n);
+            const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            const sisaCuti = Math.max(totalCuti - used.cuti, 0);
+            const sisaTelat = Math.max(totalTelat - used.telat, 0);
+            const sisaPulangCepat = Math.max(totalPulangCepat - used.pulang_cepat, 0);
+            const sisaLainnya = Math.max(totalLainnya - used.lainnya, 0);
+
             return {
                 ...this.serialize(user),
                 roles,
+                is_keluar: keluarIdsSet.has(user.id.toString()),
+                has_dokumen: hasFilesSet.has(user.id.toString()),
+                izin_cuti_total: String(totalCuti),
+                izin_cuti_terpakai: String(used.cuti),
+                izin_cuti_sisa: String(sisaCuti),
+                izin_telat_total: String(totalTelat),
+                izin_telat_terpakai: String(used.telat),
+                izin_telat_sisa: String(sisaTelat),
+                izin_pulang_cepat_total: String(totalPulangCepat),
+                izin_pulang_cepat_terpakai: String(used.pulang_cepat),
+                izin_pulang_cepat_sisa: String(sisaPulangCepat),
+                izin_lainnya_total: String(totalLainnya),
+                izin_lainnya_terpakai: String(used.lainnya),
+                izin_lainnya_sisa: String(sisaLainnya),
             };
         });
 
@@ -222,7 +295,7 @@ class UserService {
         return {
             ...this.serialize(user),
             roles,
-            files: files.map(f => this.serialize(f)),
+            files: files.map(f => fileService.serialize(f)),
             izin_cuti_total: String(totalCuti),
             izin_cuti_terpakai: String(used.cuti),
             izin_cuti_sisa: String(sisaCuti),
@@ -380,6 +453,64 @@ class UserService {
      * Sanitize input — convert numeric strings to BigInt where needed
      */
     sanitizeInput(data) {
+        const allowedFields = [
+            "name",
+            "foto_karyawan",
+            "foto_face_recognition",
+            "email",
+            "telepon",
+            "username",
+            "password",
+            "tgl_lahir",
+            "gender",
+            "tgl_join",
+            "alamat",
+            "izin_cuti",
+            "izin_lainnya",
+            "izin_telat",
+            "izin_pulang_cepat",
+            "is_admin",
+            "masa_berlaku",
+            "status_pajak_id",
+            "jabatan_id",
+            "lokasi_id",
+            "ktp",
+            "kartu_keluarga",
+            "bpjs_kesehatan",
+            "bpjs_ketenagakerjaan",
+            "npwp",
+            "sim",
+            "no_pkwt",
+            "no_kontrak",
+            "tanggal_mulai_pkwt",
+            "tanggal_berakhir_pkwt",
+            "rekening",
+            "nama_rekening",
+            "gaji_pokok",
+            "tunjangan_makan",
+            "tunjangan_transport",
+            "tunjangan_bpjs_kesehatan",
+            "tunjangan_bpjs_ketenagakerjaan",
+            "lembur",
+            "kehadiran",
+            "thr",
+            "bonus_pribadi",
+            "bonus_team",
+            "bonus_jackpot",
+            "izin",
+            "terlambat",
+            "mangkir",
+            "saldo_kasbon",
+            "potongan_bpjs_kesehatan",
+            "potongan_bpjs_ketenagakerjaan",
+            "email_verified_at",
+            "remember_token",
+            "darurat_nama",
+            "darurat_telepon",
+            "darurat_hubungan",
+            "batas_terlambat",
+        ];
+
         const bigIntFields = [
             "izin_cuti",
             "izin_lainnya",
@@ -405,6 +536,7 @@ class UserService {
             "saldo_kasbon",
             "potongan_bpjs_kesehatan",
             "potongan_bpjs_ketenagakerjaan",
+            "batas_terlambat",
         ];
 
         const dateFields = [
@@ -418,6 +550,7 @@ class UserService {
 
         for (const [key, value] of Object.entries(data)) {
             if (value === undefined) continue;
+            if (!allowedFields.includes(key)) continue;
 
             if (bigIntFields.includes(key)) {
                 sanitized[key] = value !== null && value !== "" ? BigInt(value) : null;

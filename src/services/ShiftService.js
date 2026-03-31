@@ -95,6 +95,11 @@ class ShiftService {
 
         if (!existing) return null;
 
+        // Hapus semua relasi terlebih dahulu agar fitur delete berhasil
+        await prisma.mapping_shifts.deleteMany({ where: { shift_id: BigInt(id) } });
+        await prisma.auto_shifts.deleteMany({ where: { shift_id: BigInt(id) } });
+        await prisma.dinas_luars.deleteMany({ where: { shift_id: BigInt(id) } });
+
         await prisma.shifts.delete({
             where: { id: BigInt(id) },
         });

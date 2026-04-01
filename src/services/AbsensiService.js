@@ -287,4 +287,6 @@ class AbsensiService {
         return items.map((i) => this.serialize(i));
     }
 }
+
+
 export default new AbsensiService();

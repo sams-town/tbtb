@@ -33,15 +33,26 @@ class MappingShiftService {
     }
 
     async getWhere(where) {
-        const record = await prisma.mapping_shifts.findFirst({
+        const records = await prisma.mapping_shifts.findMany({
             where,
             include: {
                 users: true,
                 shifts: true
-            }
+            },
+            orderBy: { tanggal: "desc" }
         });
-        if (!record) return null;
-        return this.serialize(record);
+        return this.serialize(records);
+    }
+    async getWhereFirst(where) {
+        const records = await prisma.mapping_shifts.findFirst({
+            where,
+            include: {
+                users: true,
+                shifts: true
+            },
+            orderBy: { id: "desc" }
+        });
+        return this.serialize(records);
     }
 
     async getById(id) {

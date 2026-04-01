@@ -141,6 +141,13 @@ class AbsensiService {
         return true;
     }
 
+    timeToMinutes(timeStr) {
+        if (!timeStr) return 0;
+        const parts = timeStr.split(':').map(val => parseInt(val, 10));
+        if (parts.length < 2) return 0;
+        return (parts[0] || 0) * 60 + (parts[1] || 0);
+    }
+
     serialize(record) {
         const serialized = {};
         for (const [key, value] of Object.entries(record)) {
@@ -160,6 +167,27 @@ class AbsensiService {
                 serialized[key] = value;
             }
         }
+
+        // Calculation for telat and pulang_cepat based on shifts
+        if (record.shifts && (record.jam_absen || record.jam_pulang)) {
+            const shiftMasuk = record.shifts.jam_masuk;
+            const shiftKeluar = record.shifts.jam_keluar;
+            const jamAbsen = record.jam_absen;
+            const jamPulang = record.jam_pulang;
+            const batasTerlambat = record.users?.batas_terlambat ? Number(record.users.batas_terlambat) : 0;
+
+            if (jamAbsen && shiftMasuk) {
+                const diff = this.timeToMinutes(jamAbsen) - this.timeToMinutes(shiftMasuk);
+                serialized.telat = diff > batasTerlambat ? diff.toString() : "0";
+                serialized.is_terlambat = diff > batasTerlambat;
+            }
+            if (jamPulang && shiftKeluar) {
+                const diff = this.timeToMinutes(shiftKeluar) - this.timeToMinutes(jamPulang);
+                serialized.pulang_cepat = diff > 0 ? diff.toString() : "0";
+                serialized.is_pulang_cepat = diff > 0;
+            }
+        }
+
         return serialized;
     }
 
@@ -168,7 +196,8 @@ class AbsensiService {
             select: {
                 id: true,
                 name: true,
-                foto_karyawan: true
+                foto_karyawan: true,
+                batas_terlambat: true
             }
         });
 
@@ -197,6 +226,7 @@ class AbsensiService {
                 total_alfa: 0,
                 total_libur: 0,
                 total_telat: 0,
+                total_hari_telat: 0,
                 total_pulang_cepat: 0,
                 total_lembur_minutes: 0
             };
@@ -209,11 +239,30 @@ class AbsensiService {
                 else if (a.status_absen === 'Alfa') stats.total_alfa++;
                 else if (a.status_absen === 'Libur') stats.total_libur++;
 
-                if (a.telat) stats.total_telat += parseInt(a.telat);
-                if (a.pulang_cepat) stats.total_pulang_cepat += parseInt(a.pulang_cepat);
+                const tolerance = user.batas_terlambat ? Number(user.batas_terlambat) : 0;
+                let telatRecord = a.telat ? parseInt(a.telat) : 0;
+                let pulangCepatRecord = a.pulang_cepat ? parseInt(a.pulang_cepat) : 0;
 
-                // Simplified overtime calculation if available in status/description or separate table
-                // For now following the fields we see in the UI mockup requirements
+                // Sync with shifts if available
+                if (a.shifts && (a.jam_absen || a.jam_pulang)) {
+                    if (a.jam_absen && a.shifts.jam_masuk) {
+                        const diff = this.timeToMinutes(a.jam_absen) - this.timeToMinutes(a.shifts.jam_masuk);
+                        telatRecord = diff > 0 ? diff : 0;
+                    }
+                    if (a.jam_pulang && a.shifts.jam_keluar) {
+                        const diff = this.timeToMinutes(a.shifts.jam_keluar) - this.timeToMinutes(a.jam_pulang);
+                        pulangCepatRecord = diff > 0 ? diff : 0;
+                    }
+                }
+
+                if (telatRecord > tolerance) {
+                    stats.total_telat += (telatRecord - tolerance);
+                    stats.total_hari_telat++;
+                }
+                
+                if (pulangCepatRecord > 0) {
+                    stats.total_pulang_cepat += pulangCepatRecord;
+                }
             });
 
             const totalPossibleDays = stats.total_hadir + stats.total_alfa + stats.total_izin_masuk + stats.total_sakit + stats.total_cuti;

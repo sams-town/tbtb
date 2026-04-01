@@ -288,4 +288,5 @@ class AbsensiService {
     }
 }
 
+
 export default new AbsensiService();

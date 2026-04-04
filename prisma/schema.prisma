@@ -429,7 +429,7 @@ model payrolls {
   grand_total                          BigInt
   created_at                           DateTime? @db.Timestamp(0)
   updated_at                           DateTime? @db.Timestamp(0)
-  user                                 users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payrolls_user_id_foreign")
+  user                                 users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payrolls_user_id_foreign")
 
   @@index([user_id], map: "payrolls_user_id_foreign")
 }
@@ -628,17 +628,20 @@ model roles {
 }
 
 model settings {
-  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  name         String?
-  logo         String?
-  alamat       String?
-  phone        String?
-  whatsapp     String?
-  api_url      String?
-  api_whatsapp String?
-  email        String?
-  created_at   DateTime? @db.Timestamp(0)
-  updated_at   DateTime? @db.Timestamp(0)
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name             String?
+  logo             String?
+  alamat           String?
+  phone            String?
+  whatsapp         String?
+  api_url          String?
+  api_whatsapp     String?
+  email            String?
+  file_form_cuti   String?   @db.Text
+  file_slip_gaji   String?   @db.Text
+  file_form_lembur String?   @db.Text
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
 }
 
 model shifts {
@@ -803,10 +806,10 @@ model users {
   pegawai_keluars                    pegawai_keluars[]
   pengajuan_approver                 pengajuan_keuangans[]  @relation("ApproverFinance")
   target_kinerja_teams               target_kinerja_teams[]
-  payrolls                           payrolls[]
   jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lokasi                             lokasis?               @relation("users_lokasi", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   status_pajak                       status_pajaks?         @relation("users_status_pajak", fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payrolls                           payrolls[]
 
   @@index([jabatan_id], map: "users_jabatan_id_fkey")
   @@index([lokasi_id], map: "users_lokasi_id_fkey")

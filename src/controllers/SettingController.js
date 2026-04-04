@@ -54,7 +54,25 @@ class SettingController {
      */
     async store(req, res) {
         try {
-            const record = await settingService.create(req.body);
+            const data = { ...req.body };
+            if (req.files) {
+                if (req.files.logo && req.files.logo.length > 0) {
+                    data.logo = `/uploads/logos/${req.files.logo[0].filename}`;
+                }
+                if (req.files.form_cuti && req.files.form_cuti.length > 0) {
+                    data.file_form_cuti = `/uploads/logos/${req.files.form_cuti[0].filename}`;
+                }
+                if (req.files.slip_gaji && req.files.slip_gaji.length > 0) {
+                    data.file_slip_gaji = `/uploads/logos/${req.files.slip_gaji[0].filename}`;
+                }
+                if (req.files.form_lembur && req.files.form_lembur.length > 0) {
+                    data.file_form_lembur = `/uploads/logos/${req.files.form_lembur[0].filename}`;
+                }
+            } else if (req.file) {
+                 data.logo = `/uploads/logos/${req.file.filename}`;
+            }
+
+            const record = await settingService.create(data);
             return res.status(201).json({
                 success: true,
                 message: "Setting berhasil dibuat",
@@ -75,7 +93,25 @@ class SettingController {
      */
     async update(req, res) {
         try {
-            const record = await settingService.update(req.params.id, req.body);
+            const data = { ...req.body };
+            if (req.files) {
+                if (req.files.logo && req.files.logo.length > 0) {
+                    data.logo = `/uploads/logos/${req.files.logo[0].filename}`;
+                }
+                if (req.files.form_cuti && req.files.form_cuti.length > 0) {
+                    data.file_form_cuti = `/uploads/logos/${req.files.form_cuti[0].filename}`;
+                }
+                if (req.files.slip_gaji && req.files.slip_gaji.length > 0) {
+                    data.file_slip_gaji = `/uploads/logos/${req.files.slip_gaji[0].filename}`;
+                }
+                if (req.files.form_lembur && req.files.form_lembur.length > 0) {
+                    data.file_form_lembur = `/uploads/logos/${req.files.form_lembur[0].filename}`;
+                }
+            } else if (req.file) {
+                 data.logo = `/uploads/logos/${req.file.filename}`;
+            }
+
+            const record = await settingService.update(req.params.id, data);
             if (!record) {
                 return res.status(404).json({
                     success: false,

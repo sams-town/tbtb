@@ -250,8 +250,8 @@ router.delete("/documents/:id", (req, res) => fileController.destroy(req, res));
 const settingUpload = createUploadMiddleware("logos", "logo");
 router.get("/settings", (req, res) => settingController.index(req, res));
 router.get("/settings/:id", (req, res) => settingController.show(req, res));
-router.post("/settings", settingUpload.single("logo"), (req, res) => settingController.store(req, res));
-router.put("/settings/:id", settingUpload.single("logo"), (req, res) => settingController.update(req, res));
+router.post("/settings", settingUpload.fields([{ name: "logo", maxCount: 1 }, { name: "form_cuti", maxCount: 1 }, { name: "slip_gaji", maxCount: 1 }, { name: "form_lembur", maxCount: 1 }]), (req, res) => settingController.store(req, res));
+router.put("/settings/:id", settingUpload.fields([{ name: "logo", maxCount: 1 }, { name: "form_cuti", maxCount: 1 }, { name: "slip_gaji", maxCount: 1 }, { name: "form_lembur", maxCount: 1 }]), (req, res) => settingController.update(req, res));
 router.delete("/settings/:id", (req, res) => settingController.destroy(req, res));
 
 // ========================

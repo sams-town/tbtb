@@ -4,6 +4,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import "dotenv/config";
+import multer from "multer";
 import apiRoutes from "./routes/Api.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,6 +22,29 @@ app.use("/lemburs", express.static(path.join(__dirname, "../public/lemburs")));
 app.use("/beritas", express.static(path.join(__dirname, "../public/beritas")));
 
 app.use("/api", apiRoutes);
+
+// Error handling middleware for Multer
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        console.error("Multer Error:", err.message);
+        if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+            console.error("Unexpected field name:", err.field);
+        }
+        return res.status(400).json({
+            success: false,
+            message: `File upload error: ${err.message}`,
+            field: err.field
+        });
+    }
+    if (err) {
+        console.error("General Error:", err.message);
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+    next();
+});
 
 app.get("/", (req, res) => res.send("MeanPay API Running 🚀"));
 

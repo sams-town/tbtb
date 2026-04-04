@@ -22,7 +22,7 @@ class SettingService {
     }
 
     async getById(id) {
-        const record = await prisma.settings.findUnique({
+        const record = await prisma.settings.findFirst({
             where: { id: BigInt(id) },
         });
         if (!record) return null;
@@ -69,7 +69,8 @@ class SettingService {
     sanitizeInput(data) {
         const allowedFields = [
             "name", "logo", "alamat", "phone",
-            "whatsapp", "api_url", "api_whatsapp", "email"
+            "whatsapp", "api_url", "api_whatsapp", "email",
+            "file_form_cuti", "file_slip_gaji", "file_form_lembur"
         ];
         const sanitized = {};
         for (const [key, value] of Object.entries(data)) {

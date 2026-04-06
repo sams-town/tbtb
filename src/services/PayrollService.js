@@ -117,7 +117,7 @@ class PayrollService {
             'jumlah_izin', 'uang_izin', 'total_izin', 'bonus_pribadi', 'bonus_team', 'bonus_jackpot',
             'jumlah_terlambat', 'uang_terlambat', 'total_terlambat', 'jumlah_kehadiran', 'uang_kehadiran', 'total_kehadiran',
             'saldo_kasbon', 'bayar_kasbon', 'jumlah_thr', 'uang_thr', 'total_thr', 'loss',
-            'total_penjumlahan', 'total_pengurangan', 'grand_total'
+            'total_penjumlahan', 'total_pengurangan', 'grand_total', 'potongan_koperasi'
         ];
 
         const updateData = { ...data };
@@ -352,6 +352,7 @@ class PayrollService {
             const tBpjsKet = user.tunjangan_bpjs_ketenagakerjaan || 0n;
             const pBpjsKes = user.potongan_bpjs_kesehatan || 0n;
             const pBpjsKet = user.potongan_bpjs_ketenagakerjaan || 0n;
+            const pKoperasi = user.potongan_koperasi || 0n;
             const bPribadi = user.bonus_pribadi || 0n;
             const bTeam = user.bonus_team || 0n;
             const bJackpot = user.bonus_jackpot || 0n;
@@ -360,16 +361,16 @@ class PayrollService {
             // Kasbon payment (half of balance)
             const bayarKasbon = (user.saldo_kasbon || 0n) / 2n;
 
-            const totalPenjumlahan = gajiPokok 
-                + totalReimbursementUang 
-                + (tTransport * BigInt(hadir)) 
-                + (tMakan * BigInt(hadir)) 
-                + tBpjsKes + tBpjsKet 
-                + totalLemburUang 
-                + bPribadi + bTeam + bJackpot 
+            const totalPenjumlahan = gajiPokok
+                + totalReimbursementUang
+                + (tTransport * BigInt(hadir))
+                + (tMakan * BigInt(hadir))
+                + tBpjsKes + tBpjsKet
+                + totalLemburUang
+                + bPribadi + bTeam + bJackpot
                 + totalKehadiranBonus + totalThr;
 
-            const totalPengurangan = pBpjsKes + pBpjsKet + totalMangkir + totalIzin + totalTerlambat + bayarKasbon;
+            const totalPengurangan = pBpjsKes + pBpjsKet + totalMangkir + totalIzin + totalTerlambat + bayarKasbon + pKoperasi;
             const grandTotal = totalPenjumlahan - totalPengurangan;
 
             const payrollData = {
@@ -419,6 +420,7 @@ class PayrollService {
                 total_penjumlahan: totalPenjumlahan,
                 total_pengurangan: totalPengurangan,
                 grand_total: grandTotal,
+                potongan_koperasi: pKoperasi,
                 updated_at: new Date()
             };
 
@@ -627,6 +629,7 @@ class PayrollService {
         const tBpjsKet = user.tunjangan_bpjs_ketenagakerjaan || 0n;
         const pBpjsKes = user.potongan_bpjs_kesehatan || 0n;
         const pBpjsKet = user.potongan_bpjs_ketenagakerjaan || 0n;
+        const pKoperasi = user.potongan_koperasi || 0n;
         const bPribadi = user.bonus_pribadi || 0n;
         const bTeam = user.bonus_team || 0n;
         const bJackpot = user.bonus_jackpot || 0n;
@@ -636,7 +639,7 @@ class PayrollService {
         const bayarKasbon = (user.saldo_kasbon || 0n) / 2n;
 
         const totalPenjumlahan = gajiPokok + totalReimbursementUang + (tTransport * BigInt(hadir)) + (tMakan * BigInt(hadir)) + tBpjsKes + tBpjsKet + totalLemburUang + bPribadi + bTeam + bJackpot + totalKehadiranBonus + totalThr;
-        const totalPengurangan = pBpjsKes + pBpjsKet + totalMangkir + totalIzin + totalTerlambat + bayarKasbon;
+        const totalPengurangan = pBpjsKes + pBpjsKet + totalMangkir + totalIzin + totalTerlambat + bayarKasbon + pKoperasi;
         const grandTotal = totalPenjumlahan - totalPengurangan;
 
         const payrollData = {
@@ -686,6 +689,7 @@ class PayrollService {
             total_penjumlahan: totalPenjumlahan,
             total_pengurangan: totalPengurangan,
             grand_total: grandTotal,
+            potongan_koperasi: pKoperasi,
             updated_at: new Date()
         };
 

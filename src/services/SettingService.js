@@ -40,7 +40,7 @@ class SettingService {
         });
         return this.serialize(record);
     }
-
+ 
     async update(id, data) {
         const existing = await prisma.settings.findUnique({
             where: { id: BigInt(id) },

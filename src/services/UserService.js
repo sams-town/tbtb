@@ -509,6 +509,7 @@ class UserService {
             "darurat_telepon",
             "darurat_hubungan",
             "batas_terlambat",
+            "potongan_koperasi",
         ];
 
         const bigIntFields = [
@@ -537,6 +538,7 @@ class UserService {
             "potongan_bpjs_kesehatan",
             "potongan_bpjs_ketenagakerjaan",
             "batas_terlambat",
+            "potongan_koperasi",
         ];
 
         const dateFields = [

@@ -47,6 +47,15 @@ class CutiService {
         return this.serialize({ ...cuti, pemohon });
     }
 
+    async getByUserId(userId) {
+        const cutis = await prisma.cutis.findMany({
+            where: { user_id: BigInt(userId) },
+            orderBy: { id: "desc" },
+            include: { users: { select: { id: true, name: true, jabatan: true } } },
+        });
+        return this.serializeList(cutis);
+    }
+
     async create(data) {
         const now = new Date();
         
@@ -127,21 +136,15 @@ class CutiService {
     }
 
     serialize(item) {
-        const serialized = {};
-        for (const [key, value] of Object.entries(item)) {
-            if (typeof value === "bigint") {
-                serialized[key] = value.toString();
-            } else if (value !== null && typeof value === "object" && !(value instanceof Date)) {
-                const nested = {};
-                for (const [k, v] of Object.entries(value)) {
-                    nested[k] = typeof v === "bigint" ? v.toString() : v;
-                }
-                serialized[key] = nested;
-            } else {
-                serialized[key] = value;
-            }
+        if (item === null || item === undefined) return item;
+        if (typeof item === "bigint") return item.toString();
+        if (Array.isArray(item)) return item.map((i) => this.serialize(i));
+        if (typeof item === "object" && !(item instanceof Date)) {
+            return Object.fromEntries(
+                Object.entries(item).map(([key, value]) => [key, this.serialize(value)])
+            );
         }
-        return serialized;
+        return item;
     }
 
     serializeList(list) {

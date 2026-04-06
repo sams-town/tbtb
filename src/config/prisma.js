@@ -1,6 +1,11 @@
 import { PrismaClient } from '@prisma/client'
 // Force restart after prisma generate
 
+// Global BigInt serialization fix
+BigInt.prototype.toJSON = function() {
+  return this.toString();
+};
+
 const prisma = new PrismaClient({
     datasources: {
         db: {
@@ -9,7 +14,6 @@ const prisma = new PrismaClient({
     },
     log: ['query', 'info', 'warn', 'error'],
 })
-
 
 process.on('beforeExit', async () => {
     await prisma.$disconnect()

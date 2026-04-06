@@ -111,6 +111,7 @@ router.delete("/shifts/:id", (req, res) => shiftController.destroy(req, res));
 // ========================
 router.get("/cutis", (req, res) => cutiController.index(req, res));
 router.get("/cutis/:id", (req, res) => cutiController.show(req, res));
+router.get("/cutis/user/:userId", (req, res) => cutiController.showByUserId(req, res));
 const cutiUpload = createUploadMiddleware("cuti", "cuti");
 router.post("/cutis", authMiddleware, cutiUpload.single("foto_cuti"), (req, res) => cutiController.store(req, res));
 router.put("/cutis/:id", cutiUpload.single("foto_cuti"), (req, res) => cutiController.update(req, res));

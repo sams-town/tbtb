@@ -20,6 +20,16 @@ class CutiController {
         }
     }
 
+    async showByUserId(req, res) {
+        try {
+            const cuti = await cutiService.getByUserId(req.params.userId);
+            if (!cuti) return res.status(404).json({ success: false, message: "Cuti tidak ditemukan" });
+            return res.status(200).json({ success: true, message: "Data cuti berhasil diambil", data: cuti });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal mengambil data cuti", error: error.message });
+        }
+    }
+
     async store(req, res) {
         try {
             const roles = (req.user && req.user.roles) || [];

@@ -70,7 +70,7 @@ class SettingService {
         const allowedFields = [
             "name", "logo", "alamat", "phone",
             "whatsapp", "api_url", "api_whatsapp", "email",
-            "file_form_cuti", "file_slip_gaji", "file_form_lembur"
+            "file_form_cuti", "file_slip_gaji", "file_form_lembur", "footer"
         ];
         const sanitized = {};
         for (const [key, value] of Object.entries(data)) {

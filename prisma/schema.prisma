@@ -429,9 +429,6 @@ model payrolls {
   grand_total                          BigInt
   created_at                           DateTime? @db.Timestamp(0)
   updated_at                           DateTime? @db.Timestamp(0)
-  user                                 users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payrolls_user_id_foreign")
-
-  @@index([user_id], map: "payrolls_user_id_foreign")
 }
 
 model pegawai_keluars {
@@ -640,6 +637,7 @@ model settings {
   file_form_cuti   String?   @db.Text
   file_slip_gaji   String?   @db.Text
   file_form_lembur String?   @db.Text
+  footer           String?   @db.VarChar(100)
   created_at       DateTime? @db.Timestamp(0)
   updated_at       DateTime? @db.Timestamp(0)
 }
@@ -809,7 +807,6 @@ model users {
   jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lokasi                             lokasis?               @relation("users_lokasi", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   status_pajak                       status_pajaks?         @relation("users_status_pajak", fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  payrolls                           payrolls[]
 
   @@index([jabatan_id], map: "users_jabatan_id_fkey")
   @@index([lokasi_id], map: "users_lokasi_id_fkey")

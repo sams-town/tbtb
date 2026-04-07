@@ -53,13 +53,19 @@ export function createUploadMiddleware(subfolder = "profile", prefix = "file", a
 export const upload = createUploadMiddleware("profile", "profile");
 
 export function saveBase64Image(base64String, subfolder, prefix, useUploads = true) {
-    if (!base64String || typeof base64String !== 'string' || !base64String.startsWith("data:image")) return base64String;
+    if (!base64String || typeof base64String !== 'string') return base64String;
+    
+    // Support both data:image and data:application (for PDF)
+    if (!base64String.startsWith("data:image") && !base64String.startsWith("data:application")) return base64String;
 
-    const matches = base64String.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) return base64String;
+    const matches = base64String.match(/^data:(image|application)\/([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 4) return base64String;
 
-    const extension = matches[1] === 'jpeg' ? 'jpg' : matches[1];
-    const base64Data = matches[2];
+    let extension = matches[2];
+    if (extension === 'jpeg') extension = 'jpg';
+    if (extension.includes('officedocument')) extension = 'docx'; // Rough handling for docx
+    
+    const base64Data = matches[3];
     const buffer = Buffer.from(base64Data, 'base64');
 
     const filename = `${prefix}-base64-${Date.now()}.${extension}`;

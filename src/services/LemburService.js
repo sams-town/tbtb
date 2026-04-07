@@ -39,8 +39,22 @@ class LemburService {
         return this.serialize(record);
     }
 
+    async getByUserId(user_id) {
+        const record = await prisma.lemburs.findMany({
+            where: { user_id: BigInt(user_id) },
+            include: {
+                karyawan: true,
+                lokasi: true,
+                approver: true,
+            }
+        });
+        if (!record) return null;
+        return this.serializeList(record);
+    }
+
     async create(data, baseUrl = null) {
-        const payload = { ...data };
+        const sanitizedData = this.sanitizeInput(data);
+        const payload = { ...sanitizedData };
         if (payload.user_id) payload.user_id = BigInt(payload.user_id);
         if (payload.lokasi_id) payload.lokasi_id = BigInt(payload.lokasi_id);
         if (payload.approved_by) payload.approved_by = BigInt(payload.approved_by);
@@ -54,6 +68,9 @@ class LemburService {
         if (payload.foto_jam_keluar && payload.foto_jam_keluar.startsWith("data:image")) {
             payload.foto_jam_keluar = saveBase64Image(payload.foto_jam_keluar, "lemburs", "lembur-out", false);
         }
+        if (payload.file_lembur && (payload.file_lembur.startsWith("data:image") || payload.file_lembur.startsWith("data:application"))) {
+            payload.file_lembur = saveBase64Image(payload.file_lembur, "lemburs", "lembur-file", false);
+        }
 
         // Prepend baseUrl if path is relative
         if (payload.foto_jam_masuk && !payload.foto_jam_masuk.startsWith('http')) {
@@ -63,6 +80,10 @@ class LemburService {
         if (payload.foto_jam_keluar && !payload.foto_jam_keluar.startsWith('http')) {
             const cleanPath = payload.foto_jam_keluar.startsWith('/') ? payload.foto_jam_keluar : `/${payload.foto_jam_keluar}`;
             payload.foto_jam_keluar = `${currentBaseUrl}${cleanPath}`;
+        }
+        if (payload.file_lembur && !payload.file_lembur.startsWith('http')) {
+            const cleanPath = payload.file_lembur.startsWith('/') ? payload.file_lembur : `/${payload.file_lembur}`;
+            payload.file_lembur = `${currentBaseUrl}${cleanPath}`;
         }
 
         // Default status
@@ -152,8 +173,9 @@ class LemburService {
     async update(id, data, baseUrl = null) {
         const existing = await prisma.lemburs.findUnique({ where: { id: BigInt(id) } });
         if (!existing) return null;
-
-        const updateData = { ...data };
+        
+        const sanitizedData = this.sanitizeInput(data);
+        const updateData = { ...sanitizedData };
         if (updateData.user_id) updateData.user_id = BigInt(updateData.user_id);
         if (updateData.lokasi_id) updateData.lokasi_id = BigInt(updateData.lokasi_id);
         if (updateData.approved_by) updateData.approved_by = BigInt(updateData.approved_by);
@@ -167,6 +189,9 @@ class LemburService {
         if (updateData.foto_jam_keluar && updateData.foto_jam_keluar.startsWith("data:image")) {
             updateData.foto_jam_keluar = saveBase64Image(updateData.foto_jam_keluar, "lemburs", "lembur-out", false);
         }
+        if (updateData.file_lembur && (updateData.file_lembur.startsWith("data:image") || updateData.file_lembur.startsWith("data:application"))) {
+            updateData.file_lembur = saveBase64Image(updateData.file_lembur, "lemburs", "lembur-file", false);
+        }
 
         // Prepend baseUrl if path is relative
         if (updateData.foto_jam_masuk && !updateData.foto_jam_masuk.startsWith('http')) {
@@ -176,6 +201,10 @@ class LemburService {
         if (updateData.foto_jam_keluar && !updateData.foto_jam_keluar.startsWith('http')) {
             const cleanPath = updateData.foto_jam_keluar.startsWith('/') ? updateData.foto_jam_keluar : `/${updateData.foto_jam_keluar}`;
             updateData.foto_jam_keluar = `${currentBaseUrl}${cleanPath}`;
+        }
+        if (updateData.file_lembur && !updateData.file_lembur.startsWith('http')) {
+            const cleanPath = updateData.file_lembur.startsWith('/') ? updateData.file_lembur : `/${updateData.file_lembur}`;
+            updateData.file_lembur = `${currentBaseUrl}${cleanPath}`;
         }
 
         // Re-calculate total_lembur if times are updated
@@ -231,7 +260,7 @@ class LemburService {
             const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
             const serialized = {};
             for (const [key, value] of Object.entries(obj)) {
-                if (["foto_jam_masuk", "foto_jam_keluar"].includes(key) && value) {
+                if (["foto_jam_masuk", "foto_jam_keluar", "file_lembur"].includes(key) && value) {
                     // Logic in serialize to ensure returned data always has full URL
                     serialized[key] = value.startsWith('http') ? value : (value.startsWith('/') ? `${baseUrl}${value}` : `${baseUrl}/${value}`);
                 } else {
@@ -246,6 +275,34 @@ class LemburService {
 
     serializeList(items) {
         return items.map((i) => this.serialize(i));
+    }
+
+    sanitizeInput(data) {
+        const allowedFields = [
+            'user_id', 'lokasi_id', 'tanggal', 'jam_masuk', 'lat_masuk', 'long_masuk',
+            'jarak_masuk', 'foto_jam_masuk', 'jam_keluar', 'lat_keluar', 'long_keluar',
+            'jarak_keluar', 'foto_jam_keluar', 'total_lembur', 'status', 'notes',
+            'approved_by', 'file_lembur'
+        ];
+
+        const sanitized = {};
+        
+        // Mapping
+        if (data.keterangan && !data.notes) data.notes = data.keterangan;
+        if (data.status_lembur && !data.status) data.status = data.status_lembur;
+        if (data.lama_lembur && !data.total_lembur) {
+            // Assume lama_lembur is in hours if it's a small number, or just pass it as is
+            // But let's just pass it as is for now to avoid wrong calculation
+            data.total_lembur = data.lama_lembur;
+        }
+
+        for (const field of allowedFields) {
+            if (data[field] !== undefined) {
+                sanitized[field] = data[field];
+            }
+        }
+
+        return sanitized;
     }
 }
 

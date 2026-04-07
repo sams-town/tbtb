@@ -235,6 +235,7 @@ model lemburs {
   approved_by     BigInt?   @db.UnsignedBigInt
   created_at      DateTime? @db.Timestamp(0)
   updated_at      DateTime? @db.Timestamp(0)
+  file_lembur     String?   @db.Text
   approver        users?    @relation("ApproverLembur", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_approved_by_foreign")
   lokasi          lokasis   @relation("LokasiLembur", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_lokasi_id_foreign")
   karyawan        users     @relation("KaryawanLembur", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "lemburs_user_id_foreign")
@@ -382,7 +383,6 @@ model patrolis {
 model payrolls {
   id                                   BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   user_id                              BigInt    @db.UnsignedBigInt
-  user                                 users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tanggal_mulai                        DateTime  @db.Date
   tanggal_akhir                        DateTime  @db.Date
   bulan                                String
@@ -805,7 +805,6 @@ model users {
   approved_mapping_shifts            mapping_shifts[]       @relation("ApprovedBy")
   mapping_shifts                     mapping_shifts[]
   pegawai_keluars                    pegawai_keluars[]
-  payrolls                           payrolls[]
   pengajuan_approver                 pengajuan_keuangans[]  @relation("ApproverFinance")
   target_kinerja_teams               target_kinerja_teams[]
   jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

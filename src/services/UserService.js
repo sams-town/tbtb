@@ -625,11 +625,21 @@ class UserService {
             if (!allowedFields.includes(key)) continue;
 
             if (bigIntFields.includes(key)) {
-                sanitized[key] = value !== null && value !== "" ? BigInt(value) : null;
+                // Handle null, undefined, empty string, and "null" string
+                if (value === null || value === undefined || value === "" || value === "null") {
+                    sanitized[key] = null;
+                } else {
+                    try {
+                        sanitized[key] = BigInt(value);
+                    } catch (e) {
+                        console.warn(`Failed to convert ${key} with value ${value} to BigInt:`, e.message);
+                        sanitized[key] = null;
+                    }
+                }
             } else if (dateFields.includes(key)) {
-                sanitized[key] = value !== null && value !== "" ? new Date(value) : null;
+                sanitized[key] = value !== null && value !== undefined && value !== "" && value !== "null" ? new Date(value) : null;
             } else {
-                sanitized[key] = value;
+                sanitized[key] = value === "null" ? null : value;
             }
         }
 

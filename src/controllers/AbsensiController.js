@@ -80,6 +80,7 @@ class AbsensiController {
                 }
 
                 if (uploadedFiles.length > 0) {
+                    const theFile = uploadedFiles[0];
                     incomingPath = path.join(ROOT_DIR, "public", "uploads", "absensi", theFile.filename);
                     
                     if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {

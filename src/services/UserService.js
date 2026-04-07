@@ -436,17 +436,87 @@ class UserService {
      * Delete user by ID
      */
     async delete(id) {
+        const userId = BigInt(id);
         const existing = await prisma.users.findUnique({
-            where: { id: BigInt(id) },
+            where: { id: userId },
         });
 
         if (!existing) return null;
 
-        await prisma.users.delete({
-            where: { id: BigInt(id) },
-        });
+        return await prisma.$transaction(async (tx) => {
+            // 1. Nullify references (optional fields where the user is an approver/manager)
+            await tx.cutis.updateMany({
+                where: { user_approval: userId },
+                data: { user_approval: null }
+            });
 
-        return true;
+            await tx.pengajuan_keuangans.updateMany({
+                where: { user_approval: userId },
+                data: { user_approval: null }
+            });
+
+            await tx.lemburs.updateMany({
+                where: { approved_by: userId },
+                data: { approved_by: null }
+            });
+
+            await tx.lokasis.updateMany({
+                where: { OR: [{ approved_by: userId }, { created_by: userId }] },
+                data: { approved_by: null, created_by: null }
+            });
+
+            await tx.mapping_shifts.updateMany({
+                where: { approved_by: userId },
+                data: { approved_by: null }
+            });
+
+            await tx.pegawai_keluars.updateMany({
+                where: { approved_by: userId },
+                data: { approved_by: null }
+            });
+
+            await tx.jabatans.updateMany({
+                where: { manager: userId },
+                data: { manager: null }
+            });
+
+            // 2. Delete data that belongs to the user (required/Cascade-like)
+            await tx.cutis.deleteMany({ where: { user_id: userId } });
+            await tx.files.deleteMany({ where: { user_id: userId } });
+            await tx.kasbons.deleteMany({ where: { user_id: userId } });
+            await tx.kontraks.deleteMany({ where: { user_id: userId } });
+            await tx.kunjungans.deleteMany({ where: { user_id: userId } });
+            await tx.laporan_kerjas.deleteMany({ where: { user_id: userId } });
+            await tx.laporan_kinerjas.deleteMany({ where: { user_id: userId } });
+            await tx.lemburs.deleteMany({ where: { user_id: userId } });
+            await tx.mapping_shifts.deleteMany({ where: { user_id: userId } });
+            await tx.pajaks.deleteMany({ where: { user_id: userId } });
+            await tx.patrolis.deleteMany({ where: { user_id: userId } });
+            await tx.payrolls.deleteMany({ where: { user_id: userId } });
+            await tx.pegawai_keluars.deleteMany({ where: { user_id: userId } });
+            await tx.pengajuan_keuangans.deleteMany({ where: { user_id: userId } });
+            await tx.rapat_notulens.deleteMany({ where: { user_id: userId } });
+            await tx.rapat_pegawais.deleteMany({ where: { user_id: userId } });
+            await tx.reimbursements.deleteMany({ where: { user_id: userId } });
+            await tx.reimbursements_items.deleteMany({ where: { user_id: userId } });
+            await tx.sips.deleteMany({ where: { user_id: userId } });
+            await tx.target_kinerja_teams.deleteMany({ where: { user_id: userId } });
+            await tx.model_has_roles.deleteMany({ where: { model_id: userId } });
+            await tx.model_has_permissions.deleteMany({ where: { model_id: userId } });
+            await tx.notifications.deleteMany({
+                where: { notifiable_id: userId, notifiable_type: "App\\Models\\User" },
+            });
+            await tx.personal_access_tokens.deleteMany({
+                where: { tokenable_id: userId, tokenable_type: "App\\Models\\User" },
+            });
+
+            // 3. Delete the user
+            await tx.users.delete({
+                where: { id: userId },
+            });
+
+            return true;
+        });
     }
 
     /**

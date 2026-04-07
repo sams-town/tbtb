@@ -90,17 +90,47 @@ class LokasiService {
      * Delete lokasi by ID
      */
     async delete(id) {
+        const lokasiId = BigInt(id);
         const existing = await prisma.lokasis.findUnique({
-            where: { id: BigInt(id) },
+            where: { id: lokasiId },
         });
 
         if (!existing) return null;
 
-        await prisma.lokasis.delete({
-            where: { id: BigInt(id) },
-        });
+        return await prisma.$transaction(async (tx) => {
+            // 1. Nullify references (optional fields)
+            await tx.cutis.updateMany({
+                where: { lokasi_id: lokasiId },
+                data: { lokasi_id: null }
+            });
 
-        return true;
+            await tx.inventories.updateMany({
+                where: { lokasi_id: lokasiId },
+                data: { lokasi_id: null }
+            });
+
+            await tx.patrolis.updateMany({
+                where: { lokasi_id: lokasiId },
+                data: { lokasi_id: null }
+            });
+
+            await tx.users.updateMany({
+                where: { lokasi_id: lokasiId },
+                data: { lokasi_id: null }
+            });
+
+            // 2. Delete data that belongs to the lokasi (required fields)
+            await tx.lemburs.deleteMany({
+                where: { lokasi_id: lokasiId }
+            });
+
+            // 3. Delete the lokasi
+            await tx.lokasis.delete({
+                where: { id: lokasiId },
+            });
+
+            return true;
+        });
     }
 
     /**

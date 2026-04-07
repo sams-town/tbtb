@@ -80,6 +80,52 @@ class LemburService {
         payload.foto_jam_masuk = payload.foto_jam_masuk || "";
 
         const record = await prisma.lemburs.create({ data: payload });
+
+        // ==========================================================
+        // KIRIM NOTIFIKASI
+        // ==========================================================
+        try {
+            const pemohon = await prisma.users.findUnique({
+                where: { id: record.user_id },
+                include: { jabatan: true }
+            });
+
+            if (pemohon) {
+                const now = new Date();
+                const recipients = new Set();
+                const notificationService = (await import("./NotificationService.js")).default;
+                
+                // 1. All Admins
+                const adminRoles = await prisma.roles.findMany({ where: { name: { in: ['admin', 'super-admin'] } } });
+                const adminIds = adminRoles.length > 0 ? await prisma.model_has_roles.findMany({
+                    where: { role_id: { in: adminRoles.map(r => r.id) } }
+                }) : [];
+                adminIds.forEach(a => recipients.add(a.model_id.toString()));
+
+                // 2. Manager
+                if (pemohon.jabatan && pemohon.jabatan.manager) {
+                    recipients.add(pemohon.jabatan.manager.toString());
+                }
+
+                for (const recipientId of recipients) {
+                    if (recipientId === pemohon.id.toString()) continue;
+                    await notificationService.create({
+                        type: 'Pengajuan Lembur',
+                        notifiable_type: 'App\\Models\\User',
+                        notifiable_id: recipientId,
+                        data: {
+                            message: `${pemohon.name} mengajukan lembur tanggal: ${record.tanggal}`,
+                            user_id: pemohon.id.toString(),
+                            lembur_id: record.id.toString(),
+                            status: 'Pending'
+                        }
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Gagal mengirim notifikasi lembur:", err.message);
+        }
+
         return this.serialize(record);
     }
 

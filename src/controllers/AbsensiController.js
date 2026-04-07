@@ -66,6 +66,18 @@ class AbsensiController {
         }
     }
 
+    calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // radius bumi dalam meter
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // jarak dalam meter
+    }
+
     async storeWajah(req, res) {
         try {
             const payload = { ...req.body };
@@ -107,17 +119,74 @@ class AbsensiController {
                 });
             }
 
+            const user = matchResult.user;
+            const todayStr = payload.tanggal || new Date().toISOString().split('T')[0];
+
+            // 1. Cek Shift hari ini (Mapping Shift)
+            const existingRecords = await absensiService.getByIdUsersHistory(user.id.toString(), todayStr, todayStr);
+            if (!existingRecords || existingRecords.length === 0) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Absensi gagal. Anda belum mempunyai shift untuk hari ini." 
+                });
+            }
+            const shiftRecord = existingRecords[0];
+
+            // 1.1 Cek jika sudah absen masuk & pulang (Selesai)
+            if (shiftRecord.jam_absen && shiftRecord.jam_pulang) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Absensi gagal. Anda sudah melakukan absensi masuk dan pulang untuk hari ini." 
+                });
+            }
+
+            // 1.2 Cek spesifik sesuai tipe (Masuk atau Pulang)
+            if (payload.tipe_absen === 'masuk' && shiftRecord.jam_absen) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Absensi gagal. Anda sudah mengisi jam masuk untuk hari ini." 
+                });
+            }
+            if ((payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') && shiftRecord.jam_pulang) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Absensi gagal. Anda sudah mengisi jam pulang untuk hari ini." 
+                });
+            }
+
+            // 2. Cek Lokasi dan Radius
+            if (payload.lat && payload.long && user.lokasi) {
+                const userLat = parseFloat(payload.lat);
+                const userLong = parseFloat(payload.long);
+                const officeLat = parseFloat(user.lokasi.lat_kantor);
+                const officeLong = parseFloat(user.lokasi.long_kantor);
+                const radius = parseFloat(user.lokasi.radius || 0);
+
+                if (officeLat && officeLong && radius > 0) {
+                    const distance = this.calculateDistance(userLat, userLong, officeLat, officeLong);
+                    if (distance > radius) {
+                        return res.status(400).json({ 
+                            success: false, 
+                            message: `Absensi gagal. Anda berada di luar radius lokasi yang diizinkan (Jarak: ${Math.round(distance)}m, Izin: ${radius}m).` 
+                        });
+                    }
+                    if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
+                        payload.jarak_pulang = String(Math.round(distance));
+                    } else {
+                        payload.jarak_masuk = String(Math.round(distance));
+                    }
+                }
+            }
+
             // Jika valid, assign user_id dan lanjutkan pembuatan absensi
-            payload.user_id = matchResult.user.id.toString();
+            payload.user_id = user.id.toString();
 
             // Mapping custom frontend fields to Prisma schema fields
-            let isPulang = false;
             if (payload.tipe_absen === 'masuk') {
                 if (payload.lat) payload.lat_absen = String(payload.lat);
                 if (payload.long) payload.long_absen = String(payload.long);
                 payload.status_absen = 'Masuk';
             } else if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
-                isPulang = true;
                 if (payload.lat) payload.lat_pulang = String(payload.lat);
                 if (payload.long) payload.long_pulang = String(payload.long);
                 payload.status_absen = 'Pulang';
@@ -128,28 +197,15 @@ class AbsensiController {
             delete payload.long;
             delete payload.tipe_absen;
 
-            let data;
-            if (isPulang) {
-                // Cari data absensi hari ini khusus user ini
-                const todayStr = payload.tanggal || new Date().toISOString().split('T')[0];
-                const existingRecords = await absensiService.getByIdUsersHistory(matchResult.user.id.toString(), todayStr, todayStr);
-                
-                if (existingRecords && existingRecords.length > 0) {
-                    // Update yang pertama (yang hari ini)
-                    data = await absensiService.update(existingRecords[0].id, payload);
-                } else {
-                    // Kalau ga ada, create baru buat hari ini
-                    data = await absensiService.create(payload);
-                }
-            } else {
-                data = await absensiService.create(payload);
-            }
+            // Update record shift yang sudah ada (allocation) atau gunakan yang lama
+            const data = await absensiService.update(shiftRecord.id, payload);
+
             return res.status(201).json({ 
                 success: true, 
-                message: `Absensi wajah berhasil, dikenali sebagai: ${matchResult.user.name}`, 
+                message: `Absensi wajah berhasil, dikenali sebagai: ${user.name}`, 
                 data, 
                 distance: matchResult.distance,
-                user: matchResult.user
+                user: user
             });
         } catch (error) {
             console.error("AbsensiController.storeWajah error:", error);

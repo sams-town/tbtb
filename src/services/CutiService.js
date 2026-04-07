@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import notificationService from "./NotificationService.js";
 
 class CutiService {
     async getAll(query = {}) {
@@ -74,6 +75,59 @@ class CutiService {
                 updated_at: now,
             },
         });
+
+        // ==========================================================
+        // KIRIM NOTIFIKASI
+        // ==========================================================
+        try {
+            const pemohon = await prisma.users.findUnique({
+                where: { id: cuti.user_id },
+                include: { jabatan: true }
+            });
+
+            if (pemohon) {
+                // Pengirim/Penerima notifikasi
+                const recipients = new Set();
+                
+                // 1. Ambil semua Admin
+                const adminRoles = await prisma.roles.findMany({
+                    where: { name: { in: ['admin', 'super-admin'] } }
+                });
+                const adminIds = adminRoles.length > 0 ? await prisma.model_has_roles.findMany({
+                    where: { role_id: { in: adminRoles.map(r => r.id) } }
+                }) : [];
+                adminIds.forEach(a => recipients.add(a.model_id.toString()));
+
+                // 2. Ambil Manager Jabatan pemohon
+                if (pemohon.jabatan && pemohon.jabatan.manager) {
+                    recipients.add(pemohon.jabatan.manager.toString());
+                }
+
+                // Buat notifikasi untuk setiap recipient
+                for (const recipientId of recipients) {
+                    // Jangan notifikasi diri sendiri jika recipient adalah pemohon
+                    if (recipientId === pemohon.id.toString()) continue;
+
+                    await notificationService.create({
+                        type: 'Pengajuan Cuti',
+                        notifiable_type: 'App\\Models\\User',
+                        notifiable_id: recipientId,
+                        data: {
+                            message: `${pemohon.name} mengajukan cuti: ${tanggalValue}`,
+                            user_id: pemohon.id.toString(),
+                            cuti_id: cuti.id.toString(),
+                            status: 'Pending'
+                        },
+                        created_at: now,
+                        updated_at: now
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Gagal mengirim notifikasi cuti:", err.message);
+            // Jangan gagalkan transaksi cuti hanya karena notifikasi gagal
+        }
+
         return this.serialize(cuti);
     }
 
@@ -96,27 +150,103 @@ class CutiService {
     }
 
     async approve(id, body = {}) {
-        const existing = await prisma.cutis.findUnique({ where: { id: BigInt(id) } });
-        if (!existing) return null;
+        return await prisma.$transaction(async (tx) => {
+            const existing = await tx.cutis.findUnique({ 
+                where: { id: BigInt(id) },
+                include: { users: true }
+             });
+            if (!existing) return null;
 
-        let approver = null;
-        if (body.user_approval !== undefined && body.user_approval !== null) {
-            const val = String(body.user_approval).trim();
-            if (val !== "" && /^\d+$/.test(val)) {
-                approver = BigInt(val);
+            let approver = null;
+            if (body.user_approval !== undefined && body.user_approval !== null) {
+                const val = String(body.user_approval).trim();
+                if (val !== "" && /^\d+$/.test(val)) {
+                    approver = BigInt(val);
+                } else {
+                    throw new Error("user_approval harus berupa angka");
+                }
             } else {
-                throw new Error("user_approval harus berupa angka");
+                throw new Error("Field 'user_approval' wajib diisi");
             }
-        } else {
-            throw new Error("Field 'user_approval' wajib diisi");
-        }
 
-        const cuti = await prisma.cutis.update({
-            where: { id: BigInt(id) },
-            data: { user_approval: approver, status_cuti: "Diterima", updated_at: new Date() },
-            include: { users: { select: { id: true, name: true } } },
+            // 1. Hitung jumlah hari cuti
+            let amount = 0;
+            const t = existing.tanggal || "";
+            if (t.includes(" - ")) {
+                const [start, end] = t.split(" - ");
+                const s = new Date(start);
+                const e = new Date(end);
+                const diff = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+                amount = diff > 0 ? diff : 0;
+            } else if (t) {
+                amount = 1;
+            }
+
+            // 2. Update status cuti ke Diterima
+            const cuti = await tx.cutis.update({
+                where: { id: BigInt(id) },
+                data: { user_approval: approver, status_cuti: "Diterima", updated_at: new Date() },
+                include: { users: { select: { id: true, name: true } } },
+            });
+
+            // 3. Kurangi kuota cuti di tabel users
+            if (amount > 0 && existing.user_id) {
+                const label = (existing.nama_cuti || "").toLowerCase();
+                let fieldToUpdate = "izin_lainnya";
+                if (label.includes("cuti")) fieldToUpdate = "izin_cuti";
+                else if (label.includes("telat")) fieldToUpdate = "izin_telat";
+                else if (label.includes("pulang")) fieldToUpdate = "izin_pulang_cepat";
+
+                await tx.users.update({
+                    where: { id: existing.user_id },
+                    data: {
+                        [fieldToUpdate]: {
+                            decrement: BigInt(amount)
+                        }
+                    }
+                });
+
+                // 4. Update mapping_shifts menjadi "Cuti" agar tidak dianggap Alfa
+                if (t.includes(" - ")) {
+                    const [startStr, endStr] = t.split(" - ");
+                    const start = new Date(startStr);
+                    const end = new Date(endStr);
+                    end.setDate(end.getDate() + 1); // include end date
+
+                    await tx.mapping_shifts.updateMany({
+                        where: {
+                            user_id: existing.user_id,
+                            tanggal: {
+                                gte: start,
+                                lt: end
+                            }
+                        },
+                        data: {
+                            status_absen: "Cuti"
+                        }
+                    });
+                } else if (t) {
+                    const start = new Date(t);
+                    const end = new Date(t);
+                    end.setDate(end.getDate() + 1);
+
+                    await tx.mapping_shifts.updateMany({
+                        where: {
+                            user_id: existing.user_id,
+                            tanggal: {
+                                gte: start,
+                                lt: end
+                            }
+                        },
+                        data: {
+                            status_absen: "Cuti"
+                        }
+                    });
+                }
+            }
+
+            return this.serialize(cuti);
         });
-        return this.serialize(cuti);
     }
 
     sanitizeInput(data) {

@@ -86,29 +86,26 @@ class UserService {
             const roles = userRoles
                 .filter((ur) => ur.model_id === user.id)
                 .map((ur) => ur.roles.name);
-            const totalCuti = Number(user.izin_cuti || 0n);
-            const totalTelat = Number(user.izin_telat || 0n);
-            const totalPulangCepat = Number(user.izin_pulang_cepat || 0n);
-            const totalLainnya = Number(user.izin_lainnya || 0n);
+            const sisaCuti = Number(user.izin_cuti || 0n);
+            const sisaTelat = Number(user.izin_telat || 0n);
+            const sisaPulangCepat = Number(user.izin_pulang_cepat || 0n);
+            const sisaLainnya = Number(user.izin_lainnya || 0n);
             const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
-            const sisaCuti = Math.max(totalCuti - used.cuti, 0);
-            const sisaTelat = Math.max(totalTelat - used.telat, 0);
-            const sisaPulangCepat = Math.max(totalPulangCepat - used.pulang_cepat, 0);
-            const sisaLainnya = Math.max(totalLainnya - used.lainnya, 0);
+            
             return {
                 ...this.serialize(user),
                 roles,
                 has_dokumen: hasFilesSet.has(user.id.toString()),
-                izin_cuti_total: String(totalCuti),
+                izin_cuti_total: String(sisaCuti + used.cuti),
                 izin_cuti_terpakai: String(used.cuti),
                 izin_cuti_sisa: String(sisaCuti),
-                izin_telat_total: String(totalTelat),
+                izin_telat_total: String(sisaTelat + used.telat),
                 izin_telat_terpakai: String(used.telat),
                 izin_telat_sisa: String(sisaTelat),
-                izin_pulang_cepat_total: String(totalPulangCepat),
+                izin_pulang_cepat_total: String(sisaPulangCepat + used.pulang_cepat),
                 izin_pulang_cepat_terpakai: String(used.pulang_cepat),
                 izin_pulang_cepat_sisa: String(sisaPulangCepat),
-                izin_lainnya_total: String(totalLainnya),
+                izin_lainnya_total: String(sisaLainnya + used.lainnya),
                 izin_lainnya_terpakai: String(used.lainnya),
                 izin_lainnya_sisa: String(sisaLainnya),
             };
@@ -200,31 +197,27 @@ class UserService {
                 .filter((ur) => ur.model_id === user.id)
                 .map((ur) => ur.roles.name);
             
-            const totalCuti = Number(user.izin_cuti || 0n);
-            const totalTelat = Number(user.izin_telat || 0n);
-            const totalPulangCepat = Number(user.izin_pulang_cepat || 0n);
-            const totalLainnya = Number(user.izin_lainnya || 0n);
+            const sisaCuti = Number(user.izin_cuti || 0n);
+            const sisaTelat = Number(user.izin_telat || 0n);
+            const sisaPulangCepat = Number(user.izin_pulang_cepat || 0n);
+            const sisaLainnya = Number(user.izin_lainnya || 0n);
             const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
-            const sisaCuti = Math.max(totalCuti - used.cuti, 0);
-            const sisaTelat = Math.max(totalTelat - used.telat, 0);
-            const sisaPulangCepat = Math.max(totalPulangCepat - used.pulang_cepat, 0);
-            const sisaLainnya = Math.max(totalLainnya - used.lainnya, 0);
 
             return {
                 ...this.serialize(user),
                 roles,
                 is_keluar: keluarIdsSet.has(user.id.toString()),
                 has_dokumen: hasFilesSet.has(user.id.toString()),
-                izin_cuti_total: String(totalCuti),
+                izin_cuti_total: String(sisaCuti + used.cuti),
                 izin_cuti_terpakai: String(used.cuti),
                 izin_cuti_sisa: String(sisaCuti),
-                izin_telat_total: String(totalTelat),
+                izin_telat_total: String(sisaTelat + used.telat),
                 izin_telat_terpakai: String(used.telat),
                 izin_telat_sisa: String(sisaTelat),
-                izin_pulang_cepat_total: String(totalPulangCepat),
+                izin_pulang_cepat_total: String(sisaPulangCepat + used.pulang_cepat),
                 izin_pulang_cepat_terpakai: String(used.pulang_cepat),
                 izin_pulang_cepat_sisa: String(sisaPulangCepat),
-                izin_lainnya_total: String(totalLainnya),
+                izin_lainnya_total: String(sisaLainnya + used.lainnya),
                 izin_lainnya_terpakai: String(used.lainnya),
                 izin_lainnya_sisa: String(sisaLainnya),
             };
@@ -279,14 +272,10 @@ class UserService {
             }
             used[type] += amount;
         }
-        const totalCuti = Number(user.izin_cuti || 0n);
-        const totalTelat = Number(user.izin_telat || 0n);
-        const totalPulangCepat = Number(user.izin_pulang_cepat || 0n);
-        const totalLainnya = Number(user.izin_lainnya || 0n);
-        const sisaCuti = Math.max(totalCuti - used.cuti, 0);
-        const sisaTelat = Math.max(totalTelat - used.telat, 0);
-        const sisaPulangCepat = Math.max(totalPulangCepat - used.pulang_cepat, 0);
-        const sisaLainnya = Math.max(totalLainnya - used.lainnya, 0);
+        const sisaCuti = Number(user.izin_cuti || 0n);
+        const sisaTelat = Number(user.izin_telat || 0n);
+        const sisaPulangCepat = Number(user.izin_pulang_cepat || 0n);
+        const sisaLainnya = Number(user.izin_lainnya || 0n);
 
         const files = await prisma.files.findMany({
             where: { user_id: BigInt(id) },
@@ -296,16 +285,16 @@ class UserService {
             ...this.serialize(user),
             roles,
             files: files.map(f => fileService.serialize(f)),
-            izin_cuti_total: String(totalCuti),
+            izin_cuti_total: String(sisaCuti + used.cuti),
             izin_cuti_terpakai: String(used.cuti),
             izin_cuti_sisa: String(sisaCuti),
-            izin_telat_total: String(totalTelat),
+            izin_telat_total: String(sisaTelat + used.telat),
             izin_telat_terpakai: String(used.telat),
             izin_telat_sisa: String(sisaTelat),
-            izin_pulang_cepat_total: String(totalPulangCepat),
+            izin_pulang_cepat_total: String(sisaPulangCepat + used.pulang_cepat),
             izin_pulang_cepat_terpakai: String(used.pulang_cepat),
             izin_pulang_cepat_sisa: String(sisaPulangCepat),
-            izin_lainnya_total: String(totalLainnya),
+            izin_lainnya_total: String(sisaLainnya + used.lainnya),
             izin_lainnya_terpakai: String(used.lainnya),
             izin_lainnya_sisa: String(sisaLainnya),
         };

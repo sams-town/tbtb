@@ -2,6 +2,11 @@ import absensiService from "../services/AbsensiService.js";
 import userService from "../services/UserService.js";
 import faceRecognitionService from "../services/FaceRecognitionService.js";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, "../../");
 
 class AbsensiController {
     async index(req, res) {
@@ -75,8 +80,7 @@ class AbsensiController {
                 }
 
                 if (uploadedFiles.length > 0) {
-                    const theFile = uploadedFiles[0];
-                    incomingPath = path.join(process.cwd(), "public", "uploads", "absensi", theFile.filename);
+                    incomingPath = path.join(ROOT_DIR, "public", "uploads", "absensi", theFile.filename);
                     
                     if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
                         payload.foto_jam_pulang = `/uploads/absensi/${theFile.filename}`;

@@ -27,6 +27,10 @@ class UserService {
                 { email: { contains: search } },
                 { username: { contains: search } },
                 { telepon: { contains: search } },
+                { provinsi: { contains: search } },
+                { kota_kabupaten: { contains: search } },
+                { kecamatan: { contains: search } },
+                { kelurahan: { contains: search } },
             ];
         }
 
@@ -141,6 +145,10 @@ class UserService {
                 { email: { contains: search } },
                 { username: { contains: search } },
                 { telepon: { contains: search } },
+                { provinsi: { contains: search } },
+                { kota_kabupaten: { contains: search } },
+                { kecamatan: { contains: search } },
+                { kelurahan: { contains: search } },
             ];
         }
 
@@ -569,6 +577,10 @@ class UserService {
             "darurat_hubungan",
             "batas_terlambat",
             "potongan_koperasi",
+            "provinsi",
+            "kota_kabupaten",
+            "kecamatan",
+            "kelurahan",
         ];
 
         const bigIntFields = [

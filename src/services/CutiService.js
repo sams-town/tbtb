@@ -98,8 +98,10 @@ class CutiService {
                 }) : [];
                 adminIds.forEach(a => recipients.add(a.model_id.toString()));
 
-                // 2. Ambil Manager Jabatan pemohon
-                if (pemohon.jabatan && pemohon.jabatan.manager) {
+                // 2. Ambil Manager (dari payload atau Jabatan pemohon)
+                if (data.id_manager) {
+                    recipients.add(data.id_manager.toString());
+                } else if (pemohon.jabatan && pemohon.jabatan.manager) {
                     recipients.add(pemohon.jabatan.manager.toString());
                 }
 
@@ -250,16 +252,27 @@ class CutiService {
     }
 
     sanitizeInput(data) {
+        const allowedFields = [
+            "lokasi_id",
+            "user_id",
+            "nama_cuti",
+            "tanggal",
+            "alasan_cuti",
+            "foto_cuti",
+            "status_cuti",
+            "catatan",
+            "user_approval",
+        ];
         const bigIntFields = ["lokasi_id", "user_id", "user_approval"];
-        const excludeFields = ["users", "tanggal_mulai", "tanggal_akhir"]; // Exclude tanggal fields
         const sanitized = {};
-        for (const [key, value] of Object.entries(data)) {
-            if (value === undefined) continue;
-            if (excludeFields.includes(key)) continue;
-            if (bigIntFields.includes(key)) {
-                sanitized[key] = value !== null && value !== "" ? BigInt(value) : null;
-            } else {
-                sanitized[key] = value;
+
+        for (const field of allowedFields) {
+            if (data[field] !== undefined) {
+                if (bigIntFields.includes(field)) {
+                    sanitized[field] = data[field] !== null && data[field] !== "" ? BigInt(data[field]) : null;
+                } else {
+                    sanitized[field] = data[field];
+                }
             }
         }
         return sanitized;

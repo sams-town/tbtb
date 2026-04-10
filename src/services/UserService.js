@@ -6,7 +6,7 @@ class UserService {
     /**
      * Get all users with optional pagination & search
      */
-    async getAll(query = {}) {
+    async getAll(query = {}, authUser = null) {
         const page = parseInt(query.page) || 1;
         const limit = parseInt(query.limit) || 10;
         const search = query.search || "";
@@ -18,8 +18,37 @@ class UserService {
         const excludedUserIds = pegawaiKeluars.map((pk) => pk.user_id);
 
         const where = {
-            id: { notIn: excludedUserIds },
+            id: { 
+                notIn: excludedUserIds,
+            },
         };
+
+        // Selain id=1 atau super admin maka data id=1 tidak bisa dilihat atau dihide
+        const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        if (!isSuperAdmin) {
+            where.id.not = 1n;
+
+            // Filter berdasarkan divisi (jabatan)
+            if (authUser && authUser.id) {
+                const managedJabatans = await prisma.jabatans.findMany({
+                    where: { manager: BigInt(authUser.id) },
+                    select: { id: true }
+                });
+
+                if (managedJabatans.length > 0) {
+                    where.jabatan_id = { in: managedJabatans.map(j => j.id) };
+                } else {
+                    // Jika bukan manager, tampilkan hanya yang satu divisi (jabatan) dengan dia
+                    const currentUser = await prisma.users.findUnique({
+                        where: { id: BigInt(authUser.id) },
+                        select: { jabatan_id: true }
+                    });
+                    if (currentUser && currentUser.jabatan_id) {
+                        where.jabatan_id = currentUser.jabatan_id;
+                    }
+                }
+            }
+        }
 
         if (search) {
             where.OR = [
@@ -129,7 +158,7 @@ class UserService {
     /**
      * Get all users without pagination
      */
-    async getAllNoPaginate(query = {}) {
+    async getAllNoPaginate(query = {}, authUser = null) {
         const search = query.search || "";
         
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
@@ -138,6 +167,33 @@ class UserService {
         const keluarIdsSet = new Set(pegawaiKeluars.map((pk) => pk.user_id.toString()));
 
         const where = {};
+
+        // Selain id=1 atau super admin maka data id=1 tidak bisa dilihat atau dihide
+        const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        if (!isSuperAdmin) {
+            where.id = { not: 1n };
+
+            // Filter berdasarkan divisi (jabatan)
+            if (authUser && authUser.id) {
+                const managedJabatans = await prisma.jabatans.findMany({
+                    where: { manager: BigInt(authUser.id) },
+                    select: { id: true }
+                });
+
+                if (managedJabatans.length > 0) {
+                    where.jabatan_id = { in: managedJabatans.map(j => j.id) };
+                } else {
+                    // Jika bukan manager, tampilkan hanya yang satu divisi (jabatan) dengan dia
+                    const currentUser = await prisma.users.findUnique({
+                        where: { id: BigInt(authUser.id) },
+                        select: { jabatan_id: true }
+                    });
+                    if (currentUser && currentUser.jabatan_id) {
+                        where.jabatan_id = currentUser.jabatan_id;
+                    }
+                }
+            }
+        }
 
         if (search) {
             where.OR = [
@@ -240,13 +296,45 @@ class UserService {
     /**
      * Get single user by ID
      */
-    async getById(id) {
+    async getById(id, authUser = null) {
+        const userId = BigInt(id);
+        const authId = authUser ? BigInt(authUser.id) : null;
+
+        // Selain id=1 atau super admin maka data id=1 tidak bisa dilihat atau dihide
+        const isSuperAdmin = authUser && (authId === 1n || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        if (userId === 1n && !isSuperAdmin) {
+            return null;
+        }
+
         const user = await prisma.users.findUnique({
-            where: { id: BigInt(id) },
+            where: { id: userId },
             include: { jabatan: true, lokasi: true, status_pajak: true },
         });
 
         if (!user) return null;
+
+        // Division check (Skip if it's the user themselves or no authUser)
+        if (!isSuperAdmin && authId && authId !== userId) {
+            const managedJabatans = await prisma.jabatans.findMany({
+                where: { manager: authId },
+                select: { id: true }
+            });
+
+            if (managedJabatans.length > 0) {
+                const managedIds = managedJabatans.map(j => j.id);
+                if (!user.jabatan_id || !managedIds.includes(user.jabatan_id)) {
+                    return null;
+                }
+            } else {
+                const currentUser = await prisma.users.findUnique({
+                    where: { id: authId },
+                    select: { jabatan_id: true }
+                });
+                if (user.jabatan_id !== currentUser?.jabatan_id) {
+                    return null;
+                }
+            }
+        }
 
         const userRoles = await prisma.model_has_roles.findMany({
             where: { model_id: BigInt(id) },
@@ -361,10 +449,43 @@ class UserService {
     /**
      * Update user by ID
      */
-    async update(id, data) {
+    async update(id, data, authUser = null) {
+        const userId = BigInt(id);
+        const authId = authUser ? BigInt(authUser.id) : null;
+
+        // Selain id=1 atau super admin maka data id=1 tidak bisa diedit
+        const isSuperAdmin = authUser && (authId === 1n || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        if (userId === 1n && !isSuperAdmin) {
+            return null;
+        }
+
         const existing = await prisma.users.findUnique({
-            where: { id: BigInt(id) },
+            where: { id: userId },
         });
+        if (!existing) return null;
+
+        // Division check (Skip if it's the user themselves or no authUser)
+        if (!isSuperAdmin && authId && authId !== userId) {
+            const managedJabatans = await prisma.jabatans.findMany({
+                where: { manager: authId },
+                select: { id: true }
+            });
+
+            if (managedJabatans.length > 0) {
+                const managedIds = managedJabatans.map(j => j.id);
+                if (!existing.jabatan_id || !managedIds.includes(existing.jabatan_id)) {
+                    return null;
+                }
+            } else {
+                const currentUser = await prisma.users.findUnique({
+                    where: { id: authId },
+                    select: { jabatan_id: true }
+                });
+                if (existing.jabatan_id !== currentUser?.jabatan_id) {
+                    return null;
+                }
+            }
+        }
 
         if (!existing) return null;
 
@@ -421,7 +542,12 @@ class UserService {
         return this.getById(id);
     }
 
-    async updateFaceRecognition(id, photoPath) {
+    async updateFaceRecognition(id, photoPath, authUser = null) {
+        // Selain id=1 atau super admin maka data id=1 tidak bisa diedit
+        const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        if (String(id) === "1" && !isSuperAdmin) {
+            return null;
+        }
         const user = await prisma.users.update({
             where: { id: BigInt(id) },
             data: { foto_face_recognition: photoPath },
@@ -432,11 +558,40 @@ class UserService {
     /**
      * Delete user by ID
      */
-    async delete(id) {
+    async delete(id, authUser = null) {
+        // Selain id=1 atau super admin maka data id=1 tidak bisa dihapus
+        const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        if (String(id) === "1" && !isSuperAdmin) {
+            return null;
+        }
         const userId = BigInt(id);
         const existing = await prisma.users.findUnique({
             where: { id: userId },
         });
+        if (!existing) return null;
+
+        // Division check (Skip if no authUser)
+        if (!isSuperAdmin && authUser && authUser.id) {
+            const managedJabatans = await prisma.jabatans.findMany({
+                where: { manager: BigInt(authUser.id) },
+                select: { id: true }
+            });
+
+            if (managedJabatans.length > 0) {
+                const managedIds = managedJabatans.map(j => j.id);
+                if (!existing.jabatan_id || !managedIds.includes(existing.jabatan_id)) {
+                    return null;
+                }
+            } else {
+                const currentUser = await prisma.users.findUnique({
+                    where: { id: BigInt(authUser.id) },
+                    select: { jabatan_id: true }
+                });
+                if (!existing.jabatan_id || existing.jabatan_id !== currentUser?.jabatan_id) {
+                    return null;
+                }
+            }
+        }
 
         if (!existing) return null;
 
@@ -581,6 +736,7 @@ class UserService {
             "kota_kabupaten",
             "kecamatan",
             "kelurahan",
+            "lock_face",
         ];
 
         const bigIntFields = [
@@ -639,6 +795,17 @@ class UserService {
                 }
             } else if (dateFields.includes(key)) {
                 sanitized[key] = value !== null && value !== undefined && value !== "" && value !== "null" ? new Date(value) : null;
+            } else if (["tgl_lahir", "tgl_join"].includes(key)) {
+                if (value !== null && value !== undefined && value !== "" && value !== "null") {
+                    const d = new Date(value);
+                    if (!isNaN(d.getTime())) {
+                        sanitized[key] = d.toISOString().split('T')[0];
+                    } else {
+                        sanitized[key] = value;
+                    }
+                } else {
+                    sanitized[key] = null;
+                }
             } else {
                 sanitized[key] = value === "null" ? null : value;
             }

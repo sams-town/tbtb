@@ -69,13 +69,30 @@ class MappingShiftService {
 
     async bulkCreateRange(data) {
         const { user_id, shift_id, start_date, end_date, lock_location } = data;
+        
+        // Buat objek date dengan jam 00:00:00 agar gte/lte di prisma tepat
         const start = new Date(start_date);
         const end = new Date(end_date);
         const createdRecords = [];
 
+        // Hapus data lama di rentang tersebut agar 'disesuaikan'
+        await prisma.mapping_shifts.deleteMany({
+            where: {
+                user_id: BigInt(user_id),
+                tanggal: {
+                    gte: start,
+                    lte: end
+                }
+            }
+        });
+
         let current = new Date(start);
         while (current <= end) {
-            const dateStr = current.toISOString().split('T')[0];
+            // Gunakan UTC agar tidak bergeser karena timezone server (Vercel/DigitalOcean dll)
+            const y = current.getUTCFullYear();
+            const m = String(current.getUTCMonth() + 1).padStart(2, '0');
+            const d = String(current.getUTCDate()).padStart(2, '0');
+            const dateStr = `${y}-${m}-${d}`;
 
             const record = await prisma.mapping_shifts.create({
                 data: {
@@ -83,12 +100,11 @@ class MappingShiftService {
                     shift_id: shift_id ? BigInt(shift_id) : null,
                     tanggal: new Date(dateStr),
                     lock_location: lock_location ? lock_location.toString() : "0"
-                    // Status default or keep it empty for manual attendance
                 }
             });
 
             createdRecords.push(this.serialize(record));
-            current.setDate(current.getDate() + 1);
+            current.setUTCDate(current.getUTCDate() + 1);
         }
 
         return { data: createdRecords };

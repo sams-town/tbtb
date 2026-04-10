@@ -6,7 +6,7 @@ class UserController {
      */
     async index(req, res) {
         try {
-            const result = await userService.getAll(req.query);
+            const result = await userService.getAll(req.query, req.user);
 
             return res.status(200).json({
                 success: true,
@@ -28,7 +28,7 @@ class UserController {
      */
     async all(req, res) {
         try {
-            const result = await userService.getAllNoPaginate(req.query);
+            const result = await userService.getAllNoPaginate(req.query, req.user);
 
             return res.status(200).json({
                 success: true,
@@ -50,7 +50,7 @@ class UserController {
      */
     async show(req, res) {
         try {
-            const user = await userService.getById(req.params.id);
+            const user = await userService.getById(req.params.id, req.user);
 
             if (!user) {
                 return res.status(404).json({
@@ -123,7 +123,7 @@ class UserController {
                 data.foto_karyawan = `${baseUrl}/uploads/profile/${req.file.filename}`;
             }
 
-            const user = await userService.update(req.params.id, data);
+            const user = await userService.update(req.params.id, data, req.user);
 
             if (!user) {
                 return res.status(404).json({
@@ -181,7 +181,7 @@ class UserController {
                 });
             }
 
-            const user = await userService.updateFaceRecognition(userId, photoPath);
+            const user = await userService.updateFaceRecognition(userId, photoPath, req.user);
 
             return res.status(200).json({
                 success: true,
@@ -203,7 +203,7 @@ class UserController {
      */
     async destroy(req, res) {
         try {
-            const result = await userService.delete(req.params.id);
+            const result = await userService.delete(req.params.id, req.user);
 
             if (!result) {
                 return res.status(404).json({

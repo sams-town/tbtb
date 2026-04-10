@@ -107,20 +107,49 @@ class AbsensiController {
                 return res.status(400).json({ success: false, message: "Foto absen wajib disertakan untuk absensi wajah." });
             }
 
-            const usersResult = await userService.getAll({ limit: 10000 });
-            const allUsers = usersResult.data || [];
+            let user = null;
+            let matchResult = { user: null, distance: null };
 
-            const matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
-            if (!matchResult.user) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Absensi gagal. Wajah tidak dikenali atau tidak cocok dengan data karyawan mana pun.",
-                    error: matchResult.error
-                });
+            // Jika user_id dikirim dari frontend, cek lock_face
+            if (payload.user_id) {
+                user = await userService.getById(payload.user_id);
+                if (user && user.lock_face === "0") {
+                    // Jika lock_face tidak aktif, lewati pencarian wajah dan gunakan user ini
+                    console.log(`Bypassing face recognition for user ${user.name} (lock_face=0)`);
+                } else {
+                    // Jika lock_face aktif atau user tidak ditemukan, lakukan pencarian wajah
+                    const usersResult = await userService.getAll({ limit: 10000 });
+                    const allUsers = usersResult.data || [];
+                    matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
+                    
+                    if (!matchResult.user || matchResult.user.id.toString() !== payload.user_id.toString()) {
+                        return res.status(400).json({ 
+                            success: false, 
+                            message: "Absensi gagal. Wajah tidak cocok dengan identitas yang dipilih.",
+                            error: matchResult.error
+                        });
+                    }
+                    user = matchResult.user;
+                }
+            } else {
+                // Jika tidak ada user_id, lakukan pencarian wajah ke semua user (Auto-ID)
+                const usersResult = await userService.getAll({ limit: 10000 });
+                const allUsers = usersResult.data || [];
+                matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
+                if (!matchResult.user) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Absensi gagal. Wajah tidak dikenali atau tidak cocok dengan data karyawan mana pun.",
+                        error: matchResult.error
+                    });
+                }
+                user = matchResult.user;
             }
-
-            const user = matchResult.user;
-            const todayStr = payload.tanggal || new Date().toISOString().split('T')[0];
+            
+            // Gunakan tanggal lokal server YYYY-MM-DD
+            const now = new Date();
+            const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const todayStr = payload.tanggal || localToday;
 
             // 1. Cek Shift hari ini (Mapping Shift)
             const existingRecords = await absensiService.getByIdUsersHistory(user.id.toString(), todayStr, todayStr);
@@ -155,26 +184,48 @@ class AbsensiController {
             }
 
             // 2. Cek Lokasi dan Radius
-            if (payload.lat && payload.long && user.lokasi) {
-                const userLat = parseFloat(payload.lat);
-                const userLong = parseFloat(payload.long);
-                const officeLat = parseFloat(user.lokasi.lat_kantor);
-                const officeLong = parseFloat(user.lokasi.long_kantor);
-                const radius = parseFloat(user.lokasi.radius || 0);
+            const isLocked = shiftRecord.lock_location === "1" || shiftRecord.lock_location === 1;
 
-                if (officeLat && officeLong && radius > 0) {
-                    const distance = this.calculateDistance(userLat, userLong, officeLat, officeLong);
-                    if (distance > radius) {
-                        return res.status(400).json({ 
-                            success: false, 
-                            message: `Absensi gagal. Anda berada di luar radius lokasi yang diizinkan (Jarak: ${Math.round(distance)}m, Izin: ${radius}m).` 
-                        });
+            // Jika terkunci, WAJIB ada koordinat
+            if (isLocked && (!payload.lat || !payload.long)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Absensi gagal. Lokasi (GPS) wajib aktif untuk shift ini." 
+                });
+            }
+
+            if (payload.lat && payload.long) {
+                if (user.lokasi) {
+                    const userLat = parseFloat(payload.lat);
+                    const userLong = parseFloat(payload.long);
+                    const officeLat = parseFloat(user.lokasi.lat_kantor);
+                    const officeLong = parseFloat(user.lokasi.long_kantor);
+                    const radius = parseFloat(user.lokasi.radius || 0);
+
+                    if (officeLat && officeLong && radius > 0) {
+                        const distance = this.calculateDistance(userLat, userLong, officeLat, officeLong);
+                        
+                        // Cek radius HANYA jika isLocked adalah benar (1)
+                        if (isLocked && distance > radius) {
+                            return res.status(400).json({ 
+                                success: false, 
+                                message: `Absensi gagal. Anda berada di luar radius lokasi yang diizinkan (Jarak: ${Math.round(distance)}m, Izin: ${radius}m).` 
+                            });
+                        }
+
+                        // Simpan info jarak 
+                        if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
+                            payload.jarak_pulang = String(Math.round(distance));
+                        } else {
+                            payload.jarak_masuk = String(Math.round(distance));
+                        }
                     }
-                    if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
-                        payload.jarak_pulang = String(Math.round(distance));
-                    } else {
-                        payload.jarak_masuk = String(Math.round(distance));
-                    }
+                } else if (isLocked) {
+                    // Jika ter-lock tapi user tidak punya lokasi kantor
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Absensi gagal. Lokasi kantor belum diatur untuk Anda (Shift Locked)." 
+                    });
                 }
             }
 

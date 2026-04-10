@@ -49,14 +49,14 @@ router.put("/me", authMiddleware, (req, res) => authController.updateProfile(req
 // ========================
 // USER ROUTES
 // ========================
-router.get("/users", (req, res) => userController.index(req, res));
-router.get("/users/all", (req, res) => userController.all(req, res));
-router.get("/users/:id", (req, res) => userController.show(req, res));
-router.post("/users", upload.single("foto_karyawan"), (req, res) => userController.store(req, res));
-router.put("/users/:id", upload.single("foto_karyawan"), (req, res) => userController.update(req, res));
-router.post("/users/face-recognition", upload.single("foto_face_recognition"), (req, res) => userController.faceRecognition(req, res));
-router.post("/users/:id/face-recognition", upload.single("foto_face_recognition"), (req, res) => userController.faceRecognition(req, res));
-router.delete("/users/:id", (req, res) => userController.destroy(req, res));
+router.get("/users", authMiddleware, (req, res) => userController.index(req, res));
+router.get("/users/all", authMiddleware, (req, res) => userController.all(req, res));
+router.get("/users/:id", authMiddleware, (req, res) => userController.show(req, res));
+router.post("/users", authMiddleware, upload.single("foto_karyawan"), (req, res) => userController.store(req, res));
+router.put("/users/:id", authMiddleware, upload.single("foto_karyawan"), (req, res) => userController.update(req, res));
+router.post("/users/face-recognition", authMiddleware, upload.single("foto_face_recognition"), (req, res) => userController.faceRecognition(req, res));
+router.post("/users/:id/face-recognition", authMiddleware, upload.single("foto_face_recognition"), (req, res) => userController.faceRecognition(req, res));
+router.delete("/users/:id", authMiddleware, (req, res) => userController.destroy(req, res));
 
 // ========================
 // ROLE ROUTES

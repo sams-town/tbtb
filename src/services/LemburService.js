@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { saveBase64Image } from "../middleware/uploadMiddleware.js";
+import notificationService from "./NotificationService.js";
 
 class LemburService {
     async getAll(query = {}) {
@@ -107,41 +108,22 @@ class LemburService {
         // ==========================================================
         try {
             const pemohon = await prisma.users.findUnique({
-                where: { id: record.user_id },
-                include: { jabatan: true }
+                where: { id: record.user_id }
             });
 
-            if (pemohon) {
-                const now = new Date();
-                const recipients = new Set();
+            if (pemohon && pemohon.id.toString() !== "1") {
                 const notificationService = (await import("./NotificationService.js")).default;
-                
-                // 1. All Admins
-                const adminRoles = await prisma.roles.findMany({ where: { name: { in: ['admin', 'super-admin'] } } });
-                const adminIds = adminRoles.length > 0 ? await prisma.model_has_roles.findMany({
-                    where: { role_id: { in: adminRoles.map(r => r.id) } }
-                }) : [];
-                adminIds.forEach(a => recipients.add(a.model_id.toString()));
-
-                // 2. Manager
-                if (pemohon.jabatan && pemohon.jabatan.manager) {
-                    recipients.add(pemohon.jabatan.manager.toString());
-                }
-
-                for (const recipientId of recipients) {
-                    if (recipientId === pemohon.id.toString()) continue;
-                    await notificationService.create({
-                        type: 'Pengajuan Lembur',
-                        notifiable_type: 'App\\Models\\User',
-                        notifiable_id: recipientId,
-                        data: {
-                            message: `${pemohon.name} mengajukan lembur tanggal: ${record.tanggal}`,
-                            user_id: pemohon.id.toString(),
-                            lembur_id: record.id.toString(),
-                            status: 'Pending'
-                        }
-                    });
-                }
+                await notificationService.create({
+                    type: 'Pengajuan Lembur',
+                    notifiable_type: 'App\\Models\\User',
+                    notifiable_id: "1",
+                    data: {
+                        message: `${pemohon.name} mengajukan lembur tanggal: ${record.tanggal}`,
+                        user_id: pemohon.id.toString(),
+                        lembur_id: record.id.toString(),
+                        status: 'Pending'
+                    }
+                });
             }
         } catch (err) {
             console.error("Gagal mengirim notifikasi lembur:", err.message);
@@ -167,6 +149,30 @@ class LemburService {
                 approver: true,
             }
         });
+
+        // ==========================================================
+        // KIRIM NOTIFIKASI KE PEMOHON
+        // ==========================================================
+        try {
+            if (record.user_id) {
+                await notificationService.create({
+                    type: 'Persetujuan Lembur',
+                    notifiable_type: 'App\\Models\\User',
+                    notifiable_id: record.user_id.toString(),
+                    data: {
+                        message: `Pengajuan lembur Anda pada tanggal ${record.tanggal} telah disetujui`,
+                        user_id: record.user_id.toString(),
+                        lembur_id: record.id.toString(),
+                        status: 'Approved'
+                    },
+                    created_at: new Date(),
+                    updated_at: new Date()
+                });
+            }
+        } catch (err) {
+            console.error("Gagal mengirim notifikasi persetujuan lembur:", err.message);
+        }
+
         return this.serialize(record);
     }
 

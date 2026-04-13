@@ -146,6 +146,8 @@ router.get("/notifications/:id", (req, res) => notificationController.show(req, 
 router.post("/notifications", (req, res) => notificationController.store(req, res));
 router.put("/notifications/:id", (req, res) => notificationController.update(req, res));
 router.put("/notifications/:id/read", (req, res) => notificationController.markRead(req, res));
+router.put("/notifications/clear", (req, res) => notificationController.clear(req, res));
+router.put("/notifications/:id/clear", (req, res) => notificationController.clear(req, res));
 router.delete("/notifications/:id", (req, res) => notificationController.destroy(req, res));
 
 // ========================

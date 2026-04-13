@@ -1,5 +1,4 @@
 import prisma from "../config/prisma.js";
-import { randomUUID } from "crypto";
 
 class NotificationService {
     async getAll(query = {}) {
@@ -64,7 +63,9 @@ class NotificationService {
     }
 
     async getById(id) {
-        const record = await prisma.notifications.findUnique({ where: { id } });
+        const parsedId = Number(id);
+        if (isNaN(parsedId)) return null;
+        const record = await prisma.notifications.findUnique({ where: { id: parsedId } });
         if (!record) return null;
         const serialized = this.serialize(record);
 
@@ -98,7 +99,7 @@ class NotificationService {
 
     async create(data) {
         const payload = { ...data };
-        payload.id = payload.id || randomUUID();
+        if (payload.id) delete payload.id; // Ensure DB handles auto-increment
         if (payload.notifiable_id !== undefined) payload.notifiable_id = BigInt(payload.notifiable_id);
         if (payload.data && typeof payload.data === "object") payload.data = JSON.stringify(payload.data);
         if (payload.read_at) payload.read_at = new Date(payload.read_at);
@@ -110,7 +111,9 @@ class NotificationService {
     }
 
     async update(id, data) {
-        const existing = await prisma.notifications.findUnique({ where: { id } });
+        const parsedId = Number(id);
+        if (isNaN(parsedId)) return null;
+        const existing = await prisma.notifications.findUnique({ where: { id: parsedId } });
         if (!existing) return null;
 
         const updateData = { ...data };
@@ -119,22 +122,46 @@ class NotificationService {
         if (updateData.read_at) updateData.read_at = new Date(updateData.read_at);
         updateData.updated_at = new Date();
 
-        const record = await prisma.notifications.update({ where: { id }, data: updateData });
+        const record = await prisma.notifications.update({ where: { id: parsedId }, data: updateData });
         return this.getById(record.id);
     }
 
     async delete(id) {
-        const existing = await prisma.notifications.findUnique({ where: { id } });
+        const parsedId = Number(id);
+        if (isNaN(parsedId)) return null;
+        const existing = await prisma.notifications.findUnique({ where: { id: parsedId } });
         if (!existing) return null;
-        await prisma.notifications.delete({ where: { id } });
+        await prisma.notifications.delete({ where: { id: parsedId } });
         return true;
     }
 
     async markRead(id) {
-        const existing = await prisma.notifications.findUnique({ where: { id } });
+        const parsedId = Number(id);
+        if (isNaN(parsedId)) return null;
+        const existing = await prisma.notifications.findUnique({ where: { id: parsedId } });
         if (!existing) return null;
-        const record = await prisma.notifications.update({ where: { id }, data: { read_at: new Date() } });
+        const record = await prisma.notifications.update({ where: { id: parsedId }, data: { read_at: new Date() } });
         return this.getById(record.id);
+    }
+
+    async clearByNotifiableId(notifiableId) {
+        const where = {};
+        if (notifiableId) {
+            where.notifiable_id = BigInt(notifiableId);
+        }
+        return await prisma.notifications.updateMany({
+            where,
+            data: { notifiable_id: BigInt(0) }
+        });
+    }
+
+    async clearById(id) {
+        const parsedId = Number(id);
+        if (isNaN(parsedId)) return null;
+        return await prisma.notifications.update({
+            where: { id: parsedId },
+            data: { notifiable_id: BigInt(0) }
+        });
     }
 
     serialize(record) {

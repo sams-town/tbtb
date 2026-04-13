@@ -81,49 +81,23 @@ class CutiService {
         // ==========================================================
         try {
             const pemohon = await prisma.users.findUnique({
-                where: { id: cuti.user_id },
-                include: { jabatan: true }
+                where: { id: cuti.user_id }
             });
 
-            if (pemohon) {
-                // Pengirim/Penerima notifikasi
-                const recipients = new Set();
-                
-                // 1. Ambil semua Admin
-                const adminRoles = await prisma.roles.findMany({
-                    where: { name: { in: ['admin', 'super-admin'] } }
+            if (pemohon && pemohon.id.toString() !== "1") {
+                await notificationService.create({
+                    type: 'Pengajuan Cuti',
+                    notifiable_type: 'App\\Models\\User',
+                    notifiable_id: "1",
+                    data: {
+                        message: `${pemohon.name} mengajukan cuti: ${tanggalValue}`,
+                        user_id: pemohon.id.toString(),
+                        cuti_id: cuti.id.toString(),
+                        status: 'Pending'
+                    },
+                    created_at: now,
+                    updated_at: now
                 });
-                const adminIds = adminRoles.length > 0 ? await prisma.model_has_roles.findMany({
-                    where: { role_id: { in: adminRoles.map(r => r.id) } }
-                }) : [];
-                adminIds.forEach(a => recipients.add(a.model_id.toString()));
-
-                // 2. Ambil Manager (dari payload atau Jabatan pemohon)
-                if (data.id_manager) {
-                    recipients.add(data.id_manager.toString());
-                } else if (pemohon.jabatan && pemohon.jabatan.manager) {
-                    recipients.add(pemohon.jabatan.manager.toString());
-                }
-
-                // Buat notifikasi untuk setiap recipient
-                for (const recipientId of recipients) {
-                    // Jangan notifikasi diri sendiri jika recipient adalah pemohon
-                    if (recipientId === pemohon.id.toString()) continue;
-
-                    await notificationService.create({
-                        type: 'Pengajuan Cuti',
-                        notifiable_type: 'App\\Models\\User',
-                        notifiable_id: recipientId,
-                        data: {
-                            message: `${pemohon.name} mengajukan cuti: ${tanggalValue}`,
-                            user_id: pemohon.id.toString(),
-                            cuti_id: cuti.id.toString(),
-                            status: 'Pending'
-                        },
-                        created_at: now,
-                        updated_at: now
-                    });
-                }
             }
         } catch (err) {
             console.error("Gagal mengirim notifikasi cuti:", err.message);
@@ -245,6 +219,29 @@ class CutiService {
                         }
                     });
                 }
+            }
+
+            // ==========================================================
+            // KIRIM NOTIFIKASI KE PEMOHON
+            // ==========================================================
+            try {
+                if (existing.user_id) {
+                    await notificationService.create({
+                        type: 'Persetujuan Cuti',
+                        notifiable_type: 'App\\Models\\User',
+                        notifiable_id: existing.user_id.toString(),
+                        data: {
+                            message: `Pengajuan cuti Anda telah disetujui`,
+                            user_id: existing.user_id.toString(),
+                            cuti_id: existing.id.toString(),
+                            status: '2'
+                        },
+                        created_at: new Date(),
+                        updated_at: new Date()
+                    });
+                }
+            } catch (err) {
+                console.error("Gagal mengirim notifikasi persetujuan cuti:", err.message);
             }
 
             return this.serialize(cuti);

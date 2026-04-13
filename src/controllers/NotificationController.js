@@ -58,6 +58,30 @@ class NotificationController {
             return res.status(500).json({ success: false, message: "Gagal menghapus notification", error: error.message });
         }
     }
+
+    async clear(req, res) {
+        try {
+            const id = req.params.id;
+            if (id) {
+                const result = await notificationService.clearById(id);
+                return res.status(200).json({ 
+                    success: true, 
+                    message: `Notification ID ${id} berhasil di-clear (notifiable_id set to 0)`, 
+                    data: result 
+                });
+            } else {
+                const notifiableId = req.query.notifiable_id || req.body.notifiable_id;
+                const result = await notificationService.clearByNotifiableId(notifiableId);
+                return res.status(200).json({ 
+                    success: true, 
+                    message: "Semua notification berhasil di-clear (notifiable_id set to 0)", 
+                    count: result.count 
+                });
+            }
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Gagal meng-clear notification", error: error.message });
+        }
+    }
 }
 
 export default new NotificationController();

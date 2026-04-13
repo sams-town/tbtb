@@ -97,40 +97,22 @@ class KasbonService {
         // ==========================================================
         try {
             const pemohon = await prisma.users.findUnique({
-                where: { id: newItem.user_id },
-                include: { jabatan: true }
+                where: { id: newItem.user_id }
             });
 
-            if (pemohon) {
-                const recipients = new Set();
+            if (pemohon && pemohon.id.toString() !== "1") {
                 const notificationService = (await import("./NotificationService.js")).default;
-                
-                // 1. All Admins
-                const adminRoles = await prisma.roles.findMany({ where: { name: { in: ['admin', 'super-admin'] } } });
-                const adminIds = adminRoles.length > 0 ? await prisma.model_has_roles.findMany({
-                    where: { role_id: { in: adminRoles.map(r => r.id) } }
-                }) : [];
-                adminIds.forEach(a => recipients.add(a.model_id.toString()));
-
-                // 2. Manager
-                if (pemohon.jabatan && pemohon.jabatan.manager) {
-                    recipients.add(pemohon.jabatan.manager.toString());
-                }
-
-                for (const recipientId of recipients) {
-                    if (recipientId === pemohon.id.toString()) continue;
-                    await notificationService.create({
-                        type: 'Pengajuan Kasbon',
-                        notifiable_type: 'App\\Models\\User',
-                        notifiable_id: recipientId,
-                        data: {
-                            message: `${pemohon.name} mengajukan kasbon sebesar Rp ${newItem.nominal.toLocaleString('id-ID')}`,
-                            user_id: pemohon.id.toString(),
-                            kasbon_id: newItem.id.toString(),
-                            status: 'PENDING'
-                        }
-                    });
-                }
+                await notificationService.create({
+                    type: 'Pengajuan Kasbon',
+                    notifiable_type: 'App\\Models\\User',
+                    notifiable_id: "1",
+                    data: {
+                        message: `${pemohon.name} mengajukan kasbon sebesar Rp ${newItem.nominal.toLocaleString('id-ID')}`,
+                        user_id: pemohon.id.toString(),
+                        kasbon_id: newItem.id.toString(),
+                        status: 'PENDING'
+                    }
+                });
             }
         } catch (err) {
             console.error("Gagal mengirim notifikasi kasbon:", err.message);

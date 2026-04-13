@@ -2,6 +2,9 @@ import prisma from "../config/prisma.js";
 
 class PegawaiKeluarService {
     async getAll(query = {}) {
+        const page = parseInt(query.page) || 1;
+        const limit = parseInt(query.limit) || 100;
+        const skip = (page - 1) * limit;
         const search = query.search || "";
         const where = search
             ? {
@@ -12,13 +15,20 @@ class PegawaiKeluarService {
                 ],
             }
             : {};
-        const data = await prisma.pegawai_keluars.findMany({
-            where,
-            orderBy: { id: "desc" },
-            include: {
-                users: { select: { id: true, name: true, email: true } }
-            }
-        });
+        
+        const [data, total] = await Promise.all([
+            prisma.pegawai_keluars.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { id: "desc" },
+                include: {
+                    users: { select: { id: true, name: true, email: true } }
+                }
+            }),
+            prisma.pegawai_keluars.count({ where })
+        ]);
+
         const ids = Array.from(new Set(data.map(d => d.user_id).filter(Boolean)));
         let usersMap = {};
         if (ids.length) {
@@ -29,7 +39,15 @@ class PegawaiKeluarService {
             usersMap = Object.fromEntries(users.map(u => [u.id, u]));
         }
         const enriched = data.map(d => ({ ...d, user: usersMap[d.user_id] || null }));
-        return { data: this.serializeList(enriched) };
+        return { 
+            data: this.serializeList(enriched),
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
     }
 
     async getById(id) {

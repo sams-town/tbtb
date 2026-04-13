@@ -8,7 +8,7 @@ class UserService {
      */
     async getAll(query = {}, authUser = null) {
         const page = parseInt(query.page) || 1;
-        const limit = parseInt(query.limit) || 10;
+        const limit = parseInt(query.limit) || 100;
         const search = query.search || "";
         const skip = (page - 1) * limit;
 
@@ -66,8 +66,8 @@ class UserService {
         const [data, total] = await Promise.all([
             prisma.users.findMany({
                 where,
-                // skip,
-                // take: limit,
+                skip,
+                take: limit,
                 orderBy: { id: "desc" },
                 include: { jabatan: true, lokasi: true, status_pajak: true },
             }),
@@ -159,6 +159,9 @@ class UserService {
      * Get all users without pagination
      */
     async getAllNoPaginate(query = {}, authUser = null) {
+        const page = parseInt(query.page) || 1;
+        const limit = parseInt(query.limit) || 100;
+        const skip = (page - 1) * limit;
         const search = query.search || "";
         
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
@@ -208,11 +211,16 @@ class UserService {
             ];
         }
 
-        const data = await prisma.users.findMany({
-            where,
-            orderBy: { name: "asc" },
-            include: { jabatan: true, lokasi: true, status_pajak: true },
-        });
+        const [data, total] = await Promise.all([
+            prisma.users.findMany({
+                where,
+                skip: query.page ? skip : undefined,
+                take: query.page ? limit : undefined,
+                orderBy: { name: "asc" },
+                include: { jabatan: true, lokasi: true, status_pajak: true },
+            }),
+            prisma.users.count({ where }),
+        ]);
 
         const userIds = data.map((u) => u.id);
         const userRoles = await prisma.model_has_roles.findMany({
@@ -289,6 +297,12 @@ class UserService {
 
         return {
             data: dataWithRoles,
+            meta: query.page ? {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            } : undefined,
             total: dataWithRoles.length,
         };
     }
@@ -405,6 +419,24 @@ class UserService {
     async create(data) {
         // Pisahkan roles dari data user (sama seperti di update)
         const { roles, jabatan, lokasi, status_pajak, ...userData } = data;
+
+        // Cek apakah user sudah ada berdasarkan email atau username
+        const conditions = [];
+        if (userData.email) conditions.push({ email: userData.email });
+        if (userData.username) conditions.push({ username: userData.username });
+
+        if (conditions.length > 0) {
+            const existingUser = await prisma.users.findFirst({
+                where: {
+                    OR: conditions
+                }
+            });
+
+            if (existingUser) {
+                // Jika data ditemukan, lakukan update
+                return this.update(existingUser.id.toString(), data);
+            }
+        }
 
         // Hash password jika ada
         if (userData.password) {

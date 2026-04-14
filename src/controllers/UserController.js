@@ -223,6 +223,42 @@ class UserController {
                 message: "Gagal menghapus user",
                 error: error.message,
             });
+    }
+    }
+
+    /**
+     * DELETE /api/users/bulk
+     */
+    async bulkDestroy(req, res) {
+        try {
+            const { ids } = req.body;
+            if (!ids || !Array.isArray(ids) || ids.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Daftar ID user (array) wajib disertakan",
+                });
+            }
+
+            const result = await userService.bulkDelete(ids, req.user);
+
+            if (!result) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Gagal menghapus beberapa user atau user tidak ditemukan",
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: `${ids.length} user berhasil dihapus`,
+            });
+        } catch (error) {
+            console.error("UserController.bulkDestroy error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Gagal menghapus user secara massal",
+                error: error.message,
+            });
         }
     }
 }

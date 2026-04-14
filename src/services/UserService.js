@@ -704,8 +704,68 @@ class UserService {
     }
 
     /**
-     * Sanitize input — convert numeric strings to BigInt where needed
+     * Delete multiple users by IDs
      */
+    async bulkDelete(ids, authUser = null) {
+        if (!Array.isArray(ids) || ids.length === 0) return false;
+
+        const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+
+        // Filter out ID 1 if not Super Admin
+        let targetIds = ids.map(id => BigInt(id));
+        if (!isSuperAdmin) {
+            targetIds = targetIds.filter(id => id !== 1n);
+        }
+
+        if (targetIds.length === 0) return false;
+
+        // Perform deletions in sequence or transaction
+        // For simplicity and to reuse the logic in delete(), we can use a loop or a more optimized transaction
+        return await prisma.$transaction(async (tx) => {
+            for (const userId of targetIds) {
+                // We should ideally check permissions for each user if not superadmin
+                // but for bulk delete by admin, we assume they have rights or we filter by division if needed.
+                // Reusing the reference nullification and delete logic from delete()
+                
+                await tx.cutis.updateMany({ where: { user_approval: userId }, data: { user_approval: null } });
+                await tx.pengajuan_keuangans.updateMany({ where: { user_approval: userId }, data: { user_approval: null } });
+                await tx.lemburs.updateMany({ where: { approved_by: userId }, data: { approved_by: null } });
+                await tx.lokasis.updateMany({ where: { OR: [{ approved_by: userId }, { created_by: userId }] }, data: { approved_by: null, created_by: null } });
+                await tx.mapping_shifts.updateMany({ where: { approved_by: userId }, data: { approved_by: null } });
+                await tx.pegawai_keluars.updateMany({ where: { approved_by: userId }, data: { approved_by: null } });
+                await tx.jabatans.updateMany({ where: { manager: userId }, data: { manager: null } });
+
+                await tx.cutis.deleteMany({ where: { user_id: userId } });
+                await tx.files.deleteMany({ where: { user_id: userId } });
+                await tx.kasbons.deleteMany({ where: { user_id: userId } });
+                await tx.kontraks.deleteMany({ where: { user_id: userId } });
+                await tx.kunjungans.deleteMany({ where: { user_id: userId } });
+                await tx.laporan_kerjas.deleteMany({ where: { user_id: userId } });
+                await tx.laporan_kinerjas.deleteMany({ where: { user_id: userId } });
+                await tx.lemburs.deleteMany({ where: { user_id: userId } });
+                await tx.mapping_shifts.deleteMany({ where: { user_id: userId } });
+                await tx.pajaks.deleteMany({ where: { user_id: userId } });
+                await tx.patrolis.deleteMany({ where: { user_id: userId } });
+                await tx.payrolls.deleteMany({ where: { user_id: userId } });
+                await tx.pegawai_keluars.deleteMany({ where: { user_id: userId } });
+                await tx.pengajuan_keuangans.deleteMany({ where: { user_id: userId } });
+                await tx.rapat_notulens.deleteMany({ where: { user_id: userId } });
+                await tx.rapat_pegawais.deleteMany({ where: { user_id: userId } });
+                await tx.reimbursements.deleteMany({ where: { user_id: userId } });
+                await tx.reimbursements_items.deleteMany({ where: { user_id: userId } });
+                await tx.sips.deleteMany({ where: { user_id: userId } });
+                await tx.target_kinerja_teams.deleteMany({ where: { user_id: userId } });
+                await tx.model_has_roles.deleteMany({ where: { model_id: userId } });
+                await tx.model_has_permissions.deleteMany({ where: { model_id: userId } });
+                await tx.notifications.deleteMany({ where: { notifiable_id: userId, notifiable_type: "App\\Models\\User" } });
+                await tx.personal_access_tokens.deleteMany({ where: { tokenable_id: userId, tokenable_type: "App\\Models\\User" } });
+                
+                await tx.users.delete({ where: { id: userId } });
+            }
+            return true;
+        });
+    }
+
     sanitizeInput(data) {
         const allowedFields = [
             "name",

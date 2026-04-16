@@ -45,50 +45,60 @@ class UserService {
             { id: { notIn: excludedUserIds } }
         ];
 
-        if (!isSuperAdmin && authUser && authUser.id) {
+        if (!isSuperAdmin) {
+            // Non-superadmin or Public access
             andConditions.push({ id: { not: 1n } });
             
-            const managedJabatans = await prisma.jabatans.findMany({
-                where: { manager: BigInt(authUser.id) },
-                select: { id: true }
-            });
-            const managedIds = managedJabatans.map(j => j.id);
+            if (authUser && authUser.id) {
+                const managedJabatans = await prisma.jabatans.findMany({
+                    where: { manager: BigInt(authUser.id) },
+                    select: { id: true }
+                });
+                const managedIds = managedJabatans.map(j => j.id);
 
-            if (managedIds.length > 0) {
-                // Manager logic
-                if (filterJabatanId) {
-                    if (managedIds.includes(filterJabatanId)) {
-                        andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
-                    } else {
+                if (managedIds.length > 0) {
+                    // Manager logic
+                    if (filterJabatanId) {
+                        if (managedIds.includes(filterJabatanId)) {
+                            andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
+                        } else {
+                            andConditions.push({ jabatan_id: null });
+                        }
+                    } else if (showEmptyJabatan) {
                         andConditions.push({ jabatan_id: null });
+                    } else {
+                        andConditions.push({ jabatan_id: { in: [...managedIds, null] } });
                     }
-                } else if (showEmptyJabatan) {
-                    andConditions.push({ jabatan_id: null });
                 } else {
-                    andConditions.push({ jabatan_id: { in: [...managedIds, null] } });
+                    // Regular User logic
+                    const currentUserRecord = await prisma.users.findUnique({
+                        where: { id: BigInt(authUser.id) },
+                        select: { jabatan_id: true }
+                    });
+                    const userJabatanId = currentUserRecord?.jabatan_id || null;
+                    
+                    if (filterJabatanId) {
+                        if (userJabatanId === filterJabatanId) {
+                            andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
+                        } else {
+                            andConditions.push({ jabatan_id: null });
+                        }
+                    } else if (showEmptyJabatan) {
+                        andConditions.push({ jabatan_id: null });
+                    } else {
+                        andConditions.push({ jabatan_id: { in: [userJabatanId, null] } });
+                    }
                 }
             } else {
-                // Regular User logic
-                const currentUserRecord = await prisma.users.findUnique({
-                    where: { id: BigInt(authUser.id) },
-                    select: { jabatan_id: true }
-                });
-                const userJabatanId = currentUserRecord?.jabatan_id || null;
-                
+                // Public logic: Show people with selected jabatan (or everyone if no filter) AND null
                 if (filterJabatanId) {
-                    if (userJabatanId === filterJabatanId) {
-                        andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
-                    } else {
-                        andConditions.push({ jabatan_id: null });
-                    }
+                    andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
                 } else if (showEmptyJabatan) {
                     andConditions.push({ jabatan_id: null });
-                } else {
-                    andConditions.push({ jabatan_id: { in: [userJabatanId, null] } });
                 }
             }
         } else if (isSuperAdmin) {
-            // Super Admin logic
+            // Super Admin logic (Private access)
             if (filterJabatanId) {
                 andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
             } else if (showEmptyJabatan) {
@@ -281,42 +291,52 @@ class UserService {
             { id: { not: 1n } }
         ];
 
-        if (!isSuperAdmin && authUser && authUser.id) {
-            const managedJabatans = await prisma.jabatans.findMany({
-                where: { manager: BigInt(authUser.id) },
-                select: { id: true }
-            });
-            const managedIds = managedJabatans.map(j => j.id);
+        if (!isSuperAdmin) {
+            andConditions.push({ id: { not: 1n } });
+            
+            if (authUser && authUser.id) {
+                const managedJabatans = await prisma.jabatans.findMany({
+                    where: { manager: BigInt(authUser.id) },
+                    select: { id: true }
+                });
+                const managedIds = managedJabatans.map(j => j.id);
 
-            if (managedIds.length > 0) {
-                if (filterJabatanId) {
-                    if (managedIds.includes(filterJabatanId)) {
-                        andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
-                    } else {
+                if (managedIds.length > 0) {
+                    if (filterJabatanId) {
+                        if (managedIds.includes(filterJabatanId)) {
+                            andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
+                        } else {
+                            andConditions.push({ jabatan_id: null });
+                        }
+                    } else if (showEmptyJabatan) {
                         andConditions.push({ jabatan_id: null });
+                    } else {
+                        andConditions.push({ jabatan_id: { in: [...managedIds, null] } });
                     }
-                } else if (showEmptyJabatan) {
-                    andConditions.push({ jabatan_id: null });
                 } else {
-                    andConditions.push({ jabatan_id: { in: [...managedIds, null] } });
+                    const currentUserRecord = await prisma.users.findUnique({
+                        where: { id: BigInt(authUser.id) },
+                        select: { jabatan_id: true }
+                    });
+                    const userJabatanId = currentUserRecord?.jabatan_id || null;
+                    
+                    if (filterJabatanId) {
+                        if (userJabatanId === filterJabatanId) {
+                            andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
+                        } else {
+                            andConditions.push({ jabatan_id: null });
+                        }
+                    } else if (showEmptyJabatan) {
+                        andConditions.push({ jabatan_id: null });
+                    } else {
+                        andConditions.push({ jabatan_id: { in: [userJabatanId, null] } });
+                    }
                 }
             } else {
-                const currentUserRecord = await prisma.users.findUnique({
-                    where: { id: BigInt(authUser.id) },
-                    select: { jabatan_id: true }
-                });
-                const userJabatanId = currentUserRecord?.jabatan_id || null;
-                
                 if (filterJabatanId) {
-                    if (userJabatanId === filterJabatanId) {
-                        andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
-                    } else {
-                        andConditions.push({ jabatan_id: null });
-                    }
+                    andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
                 } else if (showEmptyJabatan) {
                     andConditions.push({ jabatan_id: null });
-                } else {
-                    andConditions.push({ jabatan_id: { in: [userJabatanId, null] } });
                 }
             }
         } else if (isSuperAdmin) {

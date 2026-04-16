@@ -23,17 +23,24 @@ class UserService {
             id: { notIn: excludedUserIds }
         };
 
-        const filterLokasiId = query.lokasi_id ? BigInt(query.lokasi_id) : null;
+        const filterLokasiId = (query.lokasi_id && query.lokasi_id !== "null" && query.lokasi_id !== "undefined") ? BigInt(query.lokasi_id) : null;
         let filterJabatanId = null;
         let showEmptyJabatan = false;
 
         if (query.jabatan_id === "null" || query.jabatan_id === "kosong") {
             showEmptyJabatan = true;
-        } else if (query.jabatan_id) {
-            filterJabatanId = BigInt(query.jabatan_id);
+        } else if (query.jabatan_id && query.jabatan_id !== "null" && query.jabatan_id !== "undefined") {
+            try {
+                filterJabatanId = BigInt(query.jabatan_id);
+            } catch (e) {
+                filterJabatanId = null;
+            }
         }
 
-        const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        const isSuperAdmin = authUser && (
+            String(authUser.id) === "1" || 
+            (Array.isArray(authUser.roles) && authUser.roles.some(r => r && typeof r === "string" && r.toLowerCase().replace(/\s/g, "") === "superadmin"))
+        );
         
         if (!isSuperAdmin) {
             where.id = { ...where.id, not: 1n };

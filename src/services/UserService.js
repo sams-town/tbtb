@@ -23,8 +23,23 @@ class UserService {
             },
         };
 
+        const filterLokasiId = query.lokasi_id ? BigInt(query.lokasi_id) : null;
+        let filterJabatanId = null;
+        let showEmptyJabatan = false;
+
+        if (query.jabatan_id === "null" || query.jabatan_id === "kosong") {
+            showEmptyJabatan = true;
+        } else if (query.jabatan_id) {
+            filterJabatanId = BigInt(query.jabatan_id);
+        }
+
+        if (filterLokasiId) {
+            where.lokasi_id = filterLokasiId;
+        }
+
         // Selain id=1 atau super admin maka data id=1 tidak bisa dilihat atau dihide
         const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        
         if (!isSuperAdmin) {
             where.id.not = 1n;
 
@@ -34,19 +49,42 @@ class UserService {
                     where: { manager: BigInt(authUser.id) },
                     select: { id: true }
                 });
+                const managedIds = managedJabatans.map(j => j.id);
 
-                if (managedJabatans.length > 0) {
-                    where.jabatan_id = { in: managedJabatans.map(j => j.id) };
+                if (managedIds.length > 0) {
+                    if (filterJabatanId) {
+                        const targetId = managedIds.includes(filterJabatanId) ? filterJabatanId : null;
+                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                    } else if (showEmptyJabatan) {
+                        where.jabatan_id = null;
+                    } else {
+                        // Manager view: show people in their divisions AND people with no division
+                        where.jabatan_id = { in: [...managedIds, null] };
+                    }
                 } else {
-                    // Jika bukan manager, tampilkan hanya yang satu divisi (jabatan) dengan dia
+                    // Not a manager: show only their division AND people with no division
                     const currentUser = await prisma.users.findUnique({
                         where: { id: BigInt(authUser.id) },
                         select: { jabatan_id: true }
                     });
-                    if (currentUser && currentUser.jabatan_id) {
-                        where.jabatan_id = currentUser.jabatan_id;
+                    
+                    if (filterJabatanId) {
+                        const targetId = (currentUser && currentUser.jabatan_id === filterJabatanId) ? filterJabatanId : null;
+                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                    } else if (showEmptyJabatan) {
+                        where.jabatan_id = (currentUser && currentUser.jabatan_id === null) ? null : { in: [] };
+                    } else {
+                        const userJabatanId = currentUser?.jabatan_id || null;
+                        where.jabatan_id = { in: [userJabatanId, null] };
                     }
                 }
+            }
+        } else {
+            // Super Admin: Full filtering support
+            if (filterJabatanId) {
+                where.jabatan_id = { in: [filterJabatanId, null] };
+            } else if (showEmptyJabatan) {
+                where.jabatan_id = null;
             }
         }
 
@@ -198,8 +236,23 @@ class UserService {
 
         const where = {};
 
+        const filterLokasiId = query.lokasi_id ? BigInt(query.lokasi_id) : null;
+        let filterJabatanId = null;
+        let showEmptyJabatan = false;
+
+        if (query.jabatan_id === "null" || query.jabatan_id === "kosong") {
+            showEmptyJabatan = true;
+        } else if (query.jabatan_id) {
+            filterJabatanId = BigInt(query.jabatan_id);
+        }
+
+        if (filterLokasiId) {
+            where.lokasi_id = filterLokasiId;
+        }
+
         // Selain id=1 atau super admin maka data id=1 tidak bisa dilihat atau dihide
         const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
+        
         if (!isSuperAdmin) {
             where.id = { not: 1n };
 
@@ -209,19 +262,42 @@ class UserService {
                     where: { manager: BigInt(authUser.id) },
                     select: { id: true }
                 });
+                const managedIds = managedJabatans.map(j => j.id);
 
-                if (managedJabatans.length > 0) {
-                    where.jabatan_id = { in: managedJabatans.map(j => j.id) };
+                if (managedIds.length > 0) {
+                    if (filterJabatanId) {
+                        const targetId = managedIds.includes(filterJabatanId) ? filterJabatanId : null;
+                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                    } else if (showEmptyJabatan) {
+                        where.jabatan_id = null;
+                    } else {
+                        // Manager view: show people in their divisions AND people with no division
+                        where.jabatan_id = { in: [...managedIds, null] };
+                    }
                 } else {
-                    // Jika bukan manager, tampilkan hanya yang satu divisi (jabatan) dengan dia
+                    // Not a manager: show only their division AND people with no division
                     const currentUser = await prisma.users.findUnique({
                         where: { id: BigInt(authUser.id) },
                         select: { jabatan_id: true }
                     });
-                    if (currentUser && currentUser.jabatan_id) {
-                        where.jabatan_id = currentUser.jabatan_id;
+                    
+                    if (filterJabatanId) {
+                        const targetId = (currentUser && currentUser.jabatan_id === filterJabatanId) ? filterJabatanId : null;
+                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                    } else if (showEmptyJabatan) {
+                        where.jabatan_id = (currentUser && currentUser.jabatan_id === null) ? null : { in: [] };
+                    } else {
+                        const userJabatanId = currentUser?.jabatan_id || null;
+                        where.jabatan_id = { in: [userJabatanId, null] };
                     }
                 }
+            }
+        } else {
+            // Super Admin: Full filtering support
+            if (filterJabatanId) {
+                where.jabatan_id = { in: [filterJabatanId, null] };
+            } else if (showEmptyJabatan) {
+                where.jabatan_id = null;
             }
         }
 
@@ -484,6 +560,20 @@ class UserService {
         // Pisahkan roles dari data user (sama seperti di update)
         const { roles, jabatan, lokasi, status_pajak, ...userData } = data;
 
+        // Mapping name to IDs if provided (useful for import)
+        if (data.jabatan_name && !userData.jabatan_id) {
+            const jab = await prisma.jabatans.findFirst({ where: { nama_jabatan: data.jabatan_name } });
+            if (jab) userData.jabatan_id = jab.id;
+        }
+        if (data.lokasi_name && !userData.lokasi_id) {
+            const lok = await prisma.lokasi.findFirst({ where: { nama_lokasi: data.lokasi_name } });
+            if (lok) userData.lokasi_id = lok.id;
+        }
+        if (data.status_pajak_name && !userData.status_pajak_id) {
+            const stp = await prisma.status_pajak.findFirst({ where: { name: data.status_pajak_name } });
+            if (stp) userData.status_pajak_id = stp.id;
+        }
+
         // Cek apakah user sudah ada berdasarkan email atau username
         const conditions = [];
         if (userData.email) conditions.push({ email: userData.email });
@@ -587,6 +677,20 @@ class UserService {
 
         // Pisahkan roles dari data, sisa data masuk ke sanitizeInput
         const { roles, jabatan, lokasi, status_pajak, ...userData } = data;
+
+        // Mapping name to IDs if provided (useful for import)
+        if (data.jabatan_name && !userData.jabatan_id) {
+            const jab = await prisma.jabatans.findFirst({ where: { nama_jabatan: data.jabatan_name } });
+            if (jab) userData.jabatan_id = jab.id;
+        }
+        if (data.lokasi_name && !userData.lokasi_id) {
+            const lok = await prisma.lokasi.findFirst({ where: { nama_lokasi: data.lokasi_name } });
+            if (lok) userData.lokasi_id = lok.id;
+        }
+        if (data.status_pajak_name && !userData.status_pajak_id) {
+            const stp = await prisma.status_pajak.findFirst({ where: { name: data.status_pajak_name } });
+            if (stp) userData.status_pajak_id = stp.id;
+        }
 
         // Hash password jika ada
         if (userData.password) {

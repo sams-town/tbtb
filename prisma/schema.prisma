@@ -800,6 +800,8 @@ model users {
   kota_kabupaten                     String?                @db.VarChar(120)
   kecamatan                          String?                @db.VarChar(120)
   kelurahan                          String?                @db.VarChar(120)
+  cuti_melahirkan                    BigInt?
+  cuti_kematian                      BigInt?
   cutis                              cutis[]
   managed_jabatans                   jabatans[]             @relation("jabatans_manager")
   approved_lemburs                   lemburs[]              @relation("ApproverLembur")

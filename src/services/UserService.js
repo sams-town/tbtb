@@ -63,6 +63,23 @@ class UserService {
             ];
         }
 
+        if (query.role) {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        name: query.role
+                    }
+                },
+                select: { model_id: true }
+            });
+            const roleUserIds = roleUsers.map(ru => ru.model_id);
+            if (where.id) {
+                where.id = { ...where.id, in: roleUserIds };
+            } else {
+                where.id = { in: roleUserIds };
+            }
+        }
+
         const [data, total] = await Promise.all([
             prisma.users.findMany({
                 where,
@@ -95,12 +112,14 @@ class UserService {
             const uid = r.user_id;
             const label = (r.nama_cuti || "").toLowerCase();
             let type = "lainnya";
-            if (label.includes("cuti")) type = "cuti";
+            if (label.includes("melahirkan")) type = "melahirkan";
+            else if (label.includes("kematian")) type = "kematian";
+            else if (label.includes("cuti")) type = "cuti";
             else if (label.includes("telat")) type = "telat";
             else if (label.includes("pulang")) type = "pulang_cepat";
             const t = r.tanggal || "";
             let amount = 1;
-            if (type === "cuti") {
+            if (["cuti", "melahirkan", "kematian"].includes(type)) {
                 if (t.includes(" - ")) {
                     const [start, end] = t.split(" - ");
                     const s = new Date(start);
@@ -111,7 +130,7 @@ class UserService {
                     amount = 0;
                 }
             }
-            usedMap[uid] = usedMap[uid] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            usedMap[uid] = usedMap[uid] || { cuti: 0, telat: 0, pulang_cepat: 0, melahirkan: 0, kematian: 0, lainnya: 0 };
             usedMap[uid][type] += amount;
         }
 
@@ -123,7 +142,9 @@ class UserService {
             const sisaTelat = Number(user.izin_telat || 0n);
             const sisaPulangCepat = Number(user.izin_pulang_cepat || 0n);
             const sisaLainnya = Number(user.izin_lainnya || 0n);
-            const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            const sisaMelahirkan = Number(user.cuti_melahirkan || 0n);
+            const sisaKematian = Number(user.cuti_kematian || 0n);
+            const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, melahirkan: 0, kematian: 0, lainnya: 0 };
             
             return {
                 ...this.serialize(user),
@@ -141,6 +162,12 @@ class UserService {
                 izin_lainnya_total: String(sisaLainnya + used.lainnya),
                 izin_lainnya_terpakai: String(used.lainnya),
                 izin_lainnya_sisa: String(sisaLainnya),
+                cuti_melahirkan_total: String(sisaMelahirkan + used.melahirkan),
+                cuti_melahirkan_terpakai: String(used.melahirkan),
+                cuti_melahirkan_sisa: String(sisaMelahirkan),
+                cuti_kematian_total: String(sisaKematian + used.kematian),
+                cuti_kematian_terpakai: String(used.kematian),
+                cuti_kematian_sisa: String(sisaKematian),
             };
         });
 
@@ -211,6 +238,23 @@ class UserService {
             ];
         }
 
+        if (query.role) {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        name: query.role
+                    }
+                },
+                select: { model_id: true }
+            });
+            const roleUserIds = roleUsers.map(ru => ru.model_id);
+            if (where.id) {
+                where.id = { ...where.id, in: roleUserIds };
+            } else {
+                where.id = { in: roleUserIds };
+            }
+        }
+
         const [data, total] = await Promise.all([
             prisma.users.findMany({
                 where,
@@ -244,12 +288,14 @@ class UserService {
             const uid = r.user_id;
             const label = (r.nama_cuti || "").toLowerCase();
             let type = "lainnya";
-            if (label.includes("cuti")) type = "cuti";
+            if (label.includes("melahirkan")) type = "melahirkan";
+            else if (label.includes("kematian")) type = "kematian";
+            else if (label.includes("cuti")) type = "cuti";
             else if (label.includes("telat")) type = "telat";
             else if (label.includes("pulang")) type = "pulang_cepat";
             const t = r.tanggal || "";
             let amount = 1;
-            if (type === "cuti") {
+            if (["cuti", "melahirkan", "kematian"].includes(type)) {
                 if (t.includes(" - ")) {
                     const [start, end] = t.split(" - ");
                     const s = new Date(start);
@@ -260,7 +306,7 @@ class UserService {
                     amount = 0;
                 }
             }
-            usedMap[uid] = usedMap[uid] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            usedMap[uid] = usedMap[uid] || { cuti: 0, telat: 0, pulang_cepat: 0, melahirkan: 0, kematian: 0, lainnya: 0 };
             usedMap[uid][type] += amount;
         }
 
@@ -273,7 +319,9 @@ class UserService {
             const sisaTelat = Number(user.izin_telat || 0n);
             const sisaPulangCepat = Number(user.izin_pulang_cepat || 0n);
             const sisaLainnya = Number(user.izin_lainnya || 0n);
-            const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+            const sisaMelahirkan = Number(user.cuti_melahirkan || 0n);
+            const sisaKematian = Number(user.cuti_kematian || 0n);
+            const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, melahirkan: 0, kematian: 0, lainnya: 0 };
 
             return {
                 ...this.serialize(user),
@@ -292,6 +340,12 @@ class UserService {
                 izin_lainnya_total: String(sisaLainnya + used.lainnya),
                 izin_lainnya_terpakai: String(used.lainnya),
                 izin_lainnya_sisa: String(sisaLainnya),
+                cuti_melahirkan_total: String(sisaMelahirkan + used.melahirkan),
+                cuti_melahirkan_terpakai: String(used.melahirkan),
+                cuti_melahirkan_sisa: String(sisaMelahirkan),
+                cuti_kematian_total: String(sisaKematian + used.kematian),
+                cuti_kematian_terpakai: String(used.kematian),
+                cuti_kematian_sisa: String(sisaKematian),
             };
         });
 
@@ -360,16 +414,18 @@ class UserService {
             where: { user_id: BigInt(id), status_cuti: "Diterima" },
             select: { tanggal: true, nama_cuti: true },
         });
-        let used = { cuti: 0, telat: 0, pulang_cepat: 0, lainnya: 0 };
+        let used = { cuti: 0, telat: 0, pulang_cepat: 0, melahirkan: 0, kematian: 0, lainnya: 0 };
         for (const r of cutiList) {
             const label = (r.nama_cuti || "").toLowerCase();
             let type = "lainnya";
-            if (label.includes("cuti")) type = "cuti";
+            if (label.includes("melahirkan")) type = "melahirkan";
+            else if (label.includes("kematian")) type = "kematian";
+            else if (label.includes("cuti")) type = "cuti";
             else if (label.includes("telat")) type = "telat";
             else if (label.includes("pulang")) type = "pulang_cepat";
             const t = r.tanggal || "";
             let amount = 1;
-            if (type === "cuti") {
+            if (["cuti", "melahirkan", "kematian"].includes(type)) {
                 if (t.includes(" - ")) {
                     const [start, end] = t.split(" - ");
                     const s = new Date(start);
@@ -386,6 +442,8 @@ class UserService {
         const sisaTelat = Number(user.izin_telat || 0n);
         const sisaPulangCepat = Number(user.izin_pulang_cepat || 0n);
         const sisaLainnya = Number(user.izin_lainnya || 0n);
+        const sisaMelahirkan = Number(user.cuti_melahirkan || 0n);
+        const sisaKematian = Number(user.cuti_kematian || 0n);
 
         const files = await prisma.files.findMany({
             where: { user_id: BigInt(id) },
@@ -407,6 +465,12 @@ class UserService {
             izin_lainnya_total: String(sisaLainnya + used.lainnya),
             izin_lainnya_terpakai: String(used.lainnya),
             izin_lainnya_sisa: String(sisaLainnya),
+            cuti_melahirkan_total: String(sisaMelahirkan + used.melahirkan),
+            cuti_melahirkan_terpakai: String(used.melahirkan),
+            cuti_melahirkan_sisa: String(sisaMelahirkan),
+            cuti_kematian_total: String(sisaKematian + used.kematian),
+            cuti_kematian_terpakai: String(used.kematian),
+            cuti_kematian_sisa: String(sisaKematian),
         };
     }
 
@@ -829,6 +893,8 @@ class UserService {
             "kecamatan",
             "kelurahan",
             "lock_face",
+            "cuti_melahirkan",
+            "cuti_kematian",
         ];
 
         const bigIntFields = [
@@ -858,6 +924,8 @@ class UserService {
             "potongan_bpjs_ketenagakerjaan",
             "batas_terlambat",
             "potongan_koperasi",
+            "cuti_melahirkan",
+            "cuti_kematian",
         ];
 
         const dateFields = [

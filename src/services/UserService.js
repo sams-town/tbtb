@@ -271,7 +271,10 @@ class UserService {
 
         const isSuperAdmin = authUser && (
             String(authUser.id) === "1" || 
-            (Array.isArray(authUser.roles) && authUser.roles.some(r => r && typeof r === "string" && r.toLowerCase().replace(/\s/g, "") === "superadmin"))
+            (Array.isArray(authUser.roles) && authUser.roles.some(r => {
+                const roleName = typeof r === "string" ? r : (r?.name || "");
+                return roleName && typeof roleName === "string" && roleName.toLowerCase().replace(/\s/g, "") === "superadmin";
+            }))
         );
 
         const andConditions = [

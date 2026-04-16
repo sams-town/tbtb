@@ -18,9 +18,7 @@ class UserService {
         const excludedUserIds = pegawaiKeluars.map((pk) => pk.user_id);
 
         const where = {
-            id: { 
-                notIn: excludedUserIds,
-            },
+            id: { notIn: excludedUserIds }
         };
 
         const filterLokasiId = query.lokasi_id ? BigInt(query.lokasi_id) : null;
@@ -33,17 +31,11 @@ class UserService {
             filterJabatanId = BigInt(query.jabatan_id);
         }
 
-        if (filterLokasiId) {
-            where.lokasi_id = filterLokasiId;
-        }
-
-        // Selain id=1 atau super admin maka data id=1 tidak bisa dilihat atau dihide
         const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
         
         if (!isSuperAdmin) {
-            where.id.not = 1n;
+            where.id = { ...where.id, not: 1n };
 
-            // Filter berdasarkan divisi (jabatan)
             if (authUser && authUser.id) {
                 const managedJabatans = await prisma.jabatans.findMany({
                     where: { manager: BigInt(authUser.id) },
@@ -53,39 +45,38 @@ class UserService {
 
                 if (managedIds.length > 0) {
                     if (filterJabatanId) {
-                        const targetId = managedIds.includes(filterJabatanId) ? filterJabatanId : null;
-                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                        where.jabatan_id = (managedIds.includes(filterJabatanId)) ? { in: [filterJabatanId, null] } : null;
                     } else if (showEmptyJabatan) {
                         where.jabatan_id = null;
                     } else {
-                        // Manager view: show people in their divisions AND people with no division
                         where.jabatan_id = { in: [...managedIds, null] };
                     }
                 } else {
-                    // Not a manager: show only their division AND people with no division
                     const currentUser = await prisma.users.findUnique({
                         where: { id: BigInt(authUser.id) },
                         select: { jabatan_id: true }
                     });
+                    const userJabatanId = currentUser?.jabatan_id || null;
                     
                     if (filterJabatanId) {
-                        const targetId = (currentUser && currentUser.jabatan_id === filterJabatanId) ? filterJabatanId : null;
-                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                        where.jabatan_id = (userJabatanId === filterJabatanId) ? { in: [filterJabatanId, null] } : null;
                     } else if (showEmptyJabatan) {
-                        where.jabatan_id = (currentUser && currentUser.jabatan_id === null) ? null : { in: [] };
+                        where.jabatan_id = (userJabatanId === null) ? null : { in: [] };
                     } else {
-                        const userJabatanId = currentUser?.jabatan_id || null;
                         where.jabatan_id = { in: [userJabatanId, null] };
                     }
                 }
             }
         } else {
-            // Super Admin: Full filtering support
             if (filterJabatanId) {
                 where.jabatan_id = { in: [filterJabatanId, null] };
             } else if (showEmptyJabatan) {
                 where.jabatan_id = null;
             }
+        }
+
+        if (filterLokasiId) {
+            where.lokasi_id = filterLokasiId;
         }
 
         if (search) {
@@ -250,13 +241,11 @@ class UserService {
             where.lokasi_id = filterLokasiId;
         }
 
-        // Selain id=1 atau super admin maka data id=1 tidak bisa dilihat atau dihide
         const isSuperAdmin = authUser && (String(authUser.id) === "1" || (authUser.roles && authUser.roles.some(r => r.toLowerCase().replace(/\s/g, "") === "superadmin")));
         
         if (!isSuperAdmin) {
             where.id = { not: 1n };
 
-            // Filter berdasarkan divisi (jabatan)
             if (authUser && authUser.id) {
                 const managedJabatans = await prisma.jabatans.findMany({
                     where: { manager: BigInt(authUser.id) },
@@ -266,39 +255,38 @@ class UserService {
 
                 if (managedIds.length > 0) {
                     if (filterJabatanId) {
-                        const targetId = managedIds.includes(filterJabatanId) ? filterJabatanId : null;
-                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                        where.jabatan_id = (managedIds.includes(filterJabatanId)) ? { in: [filterJabatanId, null] } : null;
                     } else if (showEmptyJabatan) {
                         where.jabatan_id = null;
                     } else {
-                        // Manager view: show people in their divisions AND people with no division
                         where.jabatan_id = { in: [...managedIds, null] };
                     }
                 } else {
-                    // Not a manager: show only their division AND people with no division
                     const currentUser = await prisma.users.findUnique({
                         where: { id: BigInt(authUser.id) },
                         select: { jabatan_id: true }
                     });
+                    const userJabatanId = currentUser?.jabatan_id || null;
                     
                     if (filterJabatanId) {
-                        const targetId = (currentUser && currentUser.jabatan_id === filterJabatanId) ? filterJabatanId : null;
-                        where.jabatan_id = { in: [targetId, null].filter(v => v !== null || targetId === null) };
+                        where.jabatan_id = (userJabatanId === filterJabatanId) ? { in: [filterJabatanId, null] } : null;
                     } else if (showEmptyJabatan) {
-                        where.jabatan_id = (currentUser && currentUser.jabatan_id === null) ? null : { in: [] };
+                        where.jabatan_id = (userJabatanId === null) ? null : { in: [] };
                     } else {
-                        const userJabatanId = currentUser?.jabatan_id || null;
                         where.jabatan_id = { in: [userJabatanId, null] };
                     }
                 }
             }
         } else {
-            // Super Admin: Full filtering support
             if (filterJabatanId) {
                 where.jabatan_id = { in: [filterJabatanId, null] };
             } else if (showEmptyJabatan) {
                 where.jabatan_id = null;
             }
+        }
+
+        if (filterLokasiId) {
+            where.lokasi_id = filterLokasiId;
         }
 
         if (search) {

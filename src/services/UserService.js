@@ -15,7 +15,9 @@ class UserService {
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
             select: { user_id: true }
         });
-        const excludedUserIds = pegawaiKeluars.map((pk) => pk.user_id);
+        const excludedUserIds = pegawaiKeluars
+            .map((pk) => pk.user_id)
+            .filter((id) => id !== null && id !== undefined);
 
         const where = {
             id: { notIn: excludedUserIds }
@@ -223,7 +225,12 @@ class UserService {
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
             select: { user_id: true }
         });
-        const keluarIdsSet = new Set(pegawaiKeluars.map((pk) => pk.user_id.toString()));
+        const keluarIdsSet = new Set(
+            pegawaiKeluars
+                .map((pk) => pk.user_id)
+                .filter((id) => id !== null && id !== undefined)
+                .map((id) => id.toString())
+        );
 
         const where = {};
 

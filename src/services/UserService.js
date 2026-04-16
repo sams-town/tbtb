@@ -19,6 +19,25 @@ class UserService {
             .map((pk) => pk.user_id)
             .filter((id) => id !== null && id !== undefined);
 
+        const filterLokasiId = (query.lokasi_id && query.lokasi_id !== "null" && query.lokasi_id !== "undefined") ? BigInt(query.lokasi_id) : null;
+        let filterJabatanId = null;
+        let showEmptyJabatan = false;
+
+        if (query.jabatan_id === "null" || query.jabatan_id === "kosong") {
+            showEmptyJabatan = true;
+        } else if (query.jabatan_id && query.jabatan_id !== "null" && query.jabatan_id !== "undefined") {
+            try {
+                filterJabatanId = BigInt(query.jabatan_id);
+            } catch (e) {
+                filterJabatanId = null;
+            }
+        }
+
+        const isSuperAdmin = authUser && (
+            String(authUser.id) === "1" || 
+            (Array.isArray(authUser.roles) && authUser.roles.some(r => r && typeof r === "string" && r.toLowerCase().replace(/\s/g, "") === "superadmin"))
+        );
+
         const andConditions = [
             { id: { notIn: excludedUserIds } }
         ];
@@ -230,8 +249,6 @@ class UserService {
                 .map((id) => id.toString())
         );
 
-        const where = {};
-
         const filterLokasiId = (query.lokasi_id && query.lokasi_id !== "null" && query.lokasi_id !== "undefined") ? BigInt(query.lokasi_id) : null;
         let filterJabatanId = null;
         let showEmptyJabatan = false;
@@ -246,73 +263,81 @@ class UserService {
             }
         }
 
-        if (filterLokasiId) {
-            where.lokasi_id = filterLokasiId;
-        }
-
         const isSuperAdmin = authUser && (
             String(authUser.id) === "1" || 
             (Array.isArray(authUser.roles) && authUser.roles.some(r => r && typeof r === "string" && r.toLowerCase().replace(/\s/g, "") === "superadmin"))
         );
-        
-        if (!isSuperAdmin) {
-            where.id = { not: 1n };
 
-            if (authUser && authUser.id) {
-                const managedJabatans = await prisma.jabatans.findMany({
-                    where: { manager: BigInt(authUser.id) },
-                    select: { id: true }
-                });
-                const managedIds = managedJabatans.map(j => j.id);
+        const andConditions = [
+            { id: { not: 1n } }
+        ];
 
-                if (managedIds.length > 0) {
-                    if (filterJabatanId) {
-                        where.jabatan_id = (managedIds.includes(filterJabatanId)) ? { in: [filterJabatanId, null] } : null;
-                    } else if (showEmptyJabatan) {
-                        where.jabatan_id = null;
+        if (!isSuperAdmin && authUser && authUser.id) {
+            const managedJabatans = await prisma.jabatans.findMany({
+                where: { manager: BigInt(authUser.id) },
+                select: { id: true }
+            });
+            const managedIds = managedJabatans.map(j => j.id);
+
+            if (managedIds.length > 0) {
+                if (filterJabatanId) {
+                    if (managedIds.includes(filterJabatanId)) {
+                        andConditions.push({ OR: [{ jabatan_id: filterJabatanId }, { jabatan_id: null }] });
                     } else {
-                        where.jabatan_id = { in: [...managedIds, null] };
+                        andConditions.push({ jabatan_id: null });
                     }
+                } else if (showEmptyJabatan) {
+                    andConditions.push({ jabatan_id: null });
                 } else {
-                    const currentUser = await prisma.users.findUnique({
-                        where: { id: BigInt(authUser.id) },
-                        select: { jabatan_id: true }
-                    });
-                    const userJabatanId = currentUser?.jabatan_id || null;
-                    
-                    if (filterJabatanId) {
-                        where.jabatan_id = (userJabatanId === filterJabatanId) ? { in: [filterJabatanId, null] } : null;
-                    } else if (showEmptyJabatan) {
-                        where.jabatan_id = (userJabatanId === null) ? null : { in: [] };
+                    andConditions.push({ OR: [{ jabatan_id: { in: managedIds } }, { jabatan_id: null }] });
+                }
+            } else {
+                const currentUserRecord = await prisma.users.findUnique({
+                    where: { id: BigInt(authUser.id) },
+                    select: { jabatan_id: true }
+                });
+                const userJabatanId = currentUserRecord?.jabatan_id || null;
+                
+                if (filterJabatanId) {
+                    if (userJabatanId === filterJabatanId) {
+                        andConditions.push({ OR: [{ jabatan_id: filterJabatanId }, { jabatan_id: null }] });
                     } else {
-                        where.jabatan_id = { in: [userJabatanId, null] };
+                        andConditions.push({ jabatan_id: null });
                     }
+                } else if (showEmptyJabatan) {
+                    andConditions.push({ jabatan_id: (userJabatanId === null) ? null : { id: 0n } });
+                } else {
+                    andConditions.push({ OR: [{ jabatan_id: userJabatanId }, { jabatan_id: null }] });
                 }
             }
-        } else {
+        } else if (isSuperAdmin) {
             if (filterJabatanId) {
-                where.jabatan_id = { in: [filterJabatanId, null] };
+                andConditions.push({ OR: [{ jabatan_id: filterJabatanId }, { jabatan_id: null }] });
             } else if (showEmptyJabatan) {
-                where.jabatan_id = null;
+                andConditions.push({ jabatan_id: null });
             }
         }
 
         if (filterLokasiId) {
-            where.lokasi_id = filterLokasiId;
+            andConditions.push({ lokasi_id: filterLokasiId });
         }
 
         if (search) {
-            where.OR = [
-                { name: { contains: search } },
-                { email: { contains: search } },
-                { username: { contains: search } },
-                { telepon: { contains: search } },
-                { provinsi: { contains: search } },
-                { kota_kabupaten: { contains: search } },
-                { kecamatan: { contains: search } },
-                { kelurahan: { contains: search } },
-            ];
+            andConditions.push({
+                OR: [
+                    { name: { contains: search } },
+                    { email: { contains: search } },
+                    { username: { contains: search } },
+                    { telepon: { contains: search } },
+                    { provinsi: { contains: search } },
+                    { kota_kabupaten: { contains: search } },
+                    { kecamatan: { contains: search } },
+                    { kelurahan: { contains: search } },
+                ]
+            });
         }
+
+        const where = { AND: andConditions };
 
         if (query.role) {
             const roleUsers = await prisma.model_has_roles.findMany({
@@ -330,6 +355,7 @@ class UserService {
                 where.id = { in: roleUserIds };
             }
         }
+
 
         const [data, total] = await Promise.all([
             prisma.users.findMany({

@@ -19,7 +19,14 @@ class UserService {
             .map((pk) => pk.user_id)
             .filter((id) => id !== null && id !== undefined);
 
-        const filterLokasiId = (query.lokasi_id && query.lokasi_id !== "null" && query.lokasi_id !== "undefined") ? BigInt(query.lokasi_id) : null;
+        let filterLokasiId = null;
+        if (query.lokasi_id && query.lokasi_id !== "null" && query.lokasi_id !== "undefined") {
+            try {
+                filterLokasiId = BigInt(query.lokasi_id);
+            } catch (e) {
+                filterLokasiId = null;
+            }
+        }
         let filterJabatanId = null;
         let showEmptyJabatan = false;
 
@@ -265,7 +272,14 @@ class UserService {
                 .map((id) => id.toString())
         );
 
-        const filterLokasiId = (query.lokasi_id && query.lokasi_id !== "null" && query.lokasi_id !== "undefined") ? BigInt(query.lokasi_id) : null;
+        let filterLokasiId = null;
+        if (query.lokasi_id && query.lokasi_id !== "null" && query.lokasi_id !== "undefined") {
+            try {
+                filterLokasiId = BigInt(query.lokasi_id);
+            } catch (e) {
+                filterLokasiId = null;
+            }
+        }
         let filterJabatanId = null;
         let showEmptyJabatan = false;
 

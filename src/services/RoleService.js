@@ -59,10 +59,22 @@ class RoleService {
      */
     async create(data) {
         return await prisma.$transaction(async (tx) => {
+            const name = data.name;
+            const guard_name = data.guard_name || "web";
+
+            // Check for duplicate
+            const duplicate = await tx.roles.findFirst({
+                where: { name, guard_name }
+            });
+
+            if (duplicate) {
+                throw new Error(`Role '${name}' with guard '${guard_name}' already exists`);
+            }
+
             const role = await tx.roles.create({
                 data: {
-                    name: data.name,
-                    guard_name: data.guard_name || "web",
+                    name,
+                    guard_name,
                 },
             });
 
@@ -101,6 +113,22 @@ class RoleService {
             });
 
             if (!existing) return null;
+
+            const newName = data.name !== undefined ? data.name : existing.name;
+            const newGuard = data.guard_name !== undefined ? data.guard_name : existing.guard_name;
+
+            // Check for duplicate name + guard_name combo on other roles
+            const duplicate = await tx.roles.findFirst({
+                where: {
+                    name: newName,
+                    guard_name: newGuard,
+                    NOT: { id: BigInt(id) }
+                }
+            });
+
+            if (duplicate) {
+                throw new Error(`Role '${newName}' with guard '${newGuard}' already exists`);
+            }
 
             const updateData = {};
             if (data.name !== undefined) updateData.name = data.name;

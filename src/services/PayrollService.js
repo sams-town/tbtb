@@ -17,7 +17,7 @@ class PayrollService {
                 bulan ? { bulan } : {},
                 tahun ? { tahun } : {},
                 search ? {
-                    user: { name: { contains: search } }
+                    employee: { name: { contains: search } }
                 } : {}
             ]
         };
@@ -25,7 +25,7 @@ class PayrollService {
         const result = await prisma.payrolls.findMany({
             where,
             include: {
-                user: {
+                employee: {
                     select: {
                         id: true,
                         name: true,
@@ -54,7 +54,7 @@ class PayrollService {
         const item = await prisma.payrolls.findUnique({
             where: { id: BigInt(id) },
             include: {
-                user: {
+                employee: {
                     include: {
                         jabatan: true
                     }
@@ -83,7 +83,7 @@ class PayrollService {
                 const item = await prisma.payrolls.findFirst({
                     where: conditions,
                     include: {
-                        user: {
+                        employee: {
                             include: {
                                 jabatan: true
                             }
@@ -160,305 +160,309 @@ class PayrollService {
     }
 
     async generateAll(bulan, tahun, tanggalMulai, tanggalAkhir) {
-        // Get all users with their related info
-        // Get all users who are not admins
-        const allUsers = await prisma.users.findMany({
-            where: {
-                is_admin: { not: "admin" }
-            },
-            include: {
-                jabatan: true
-            },
-            orderBy: {
-                name: 'asc'
-            }
-        });
-
-        const results = [];
-        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        const monthIndex = monthNames.indexOf(bulan);
-
-        const startDate = tanggalMulai ? new Date(tanggalMulai) : new Date(parseInt(tahun), monthIndex, 1);
-        const endDate = tanggalAkhir ? new Date(tanggalAkhir) : new Date(parseInt(tahun), monthIndex + 1, 0);
-
-        // Fetch attendance recap
-        const absensiService = (await import("./AbsensiService.js")).default;
-        const recap = await absensiService.getRecap(startDate, endDate);
-
-        // Fetch all approved lemburs in the period
-        const allLemburs = await prisma.lemburs.findMany({
-            where: {
-                status: 'Approved',
-                tanggal: {
-                    gte: startDate.toISOString().split('T')[0],
-                    lte: endDate.toISOString().split('T')[0]
-                }
-            }
-        });
-
-        // Fetch all mapping_shifts in the period
-        const allMappingShifts = await prisma.mapping_shifts.findMany({
-            where: {
-                tanggal: {
-                    gte: startDate,
-                    lte: endDate
-                }
-            },
-            include: { shifts: true }
-        });
-
-        // Fetch all approved reimbursements in the period
-        const allReimbursements = await prisma.reimbursements.findMany({
-            where: {
-                status: 'Approved',
-                tanggal: {
-                    gte: startDate,
-                    lte: endDate
-                }
-            }
-        });
-
-        // Fetch all reimbursement items
-        const allReimbursementItems = await prisma.reimbursements_items.findMany();
-
-        // Fetch all approved kasbons in the period
-        const allKasbons = await prisma.kasbons.findMany({
-            where: {
-                status: 'Approved',
-                tanggal: {
-                    gte: startDate,
-                    lte: endDate
-                }
-            }
-        });
-
-        // Fetch all cutis (for izin count)
-        const allCutis = await prisma.cutis.findMany({
-            where: {
-                status_cuti: 'Diterima',
-                tanggal: {
-                    gte: startDate.toISOString().split('T')[0],
-                    lte: endDate.toISOString().split('T')[0]
-                }
-            }
-        });
-
-        let counterRecord = await prisma.counters.findFirst({ where: { name: 'Gaji' } });
-        if (!counterRecord) {
-            counterRecord = await prisma.counters.create({ data: { name: 'Gaji', counter: 0, text: 'GJ' } });
-        }
-
-        const jumlahHari = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-
-        for (const user of allUsers) {
-            // Check if payroll already exists for this user, month, and year
-            const existing = await prisma.payrolls.findFirst({
+        return await prisma.$transaction(async (tx) => {
+            // Get all users who are not admins
+            const allUsers = await tx.users.findMany({
                 where: {
-                    user_id: user.id,
-                    bulan,
-                    tahun
+                    is_admin: { not: "admin" }
+                },
+                include: {
+                    jabatan: true
+                },
+                orderBy: {
+                    name: 'asc'
                 }
             });
 
-            const userMappingShifts = allMappingShifts.filter(m => m.user_id === user.id);
-            const userCutis = allCutis.filter(c => c.user_id === user.id);
+            const results = [];
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const monthIndex = monthNames.indexOf(bulan);
 
-            let noGaji;
-            if (existing) {
-                noGaji = existing.no_gaji;
-            } else {
-                counterRecord = await prisma.counters.update({
+            if (monthIndex === -1) throw new Error(`Bulan tidak valid: ${bulan}`);
+
+            const startDate = tanggalMulai ? new Date(tanggalMulai) : new Date(parseInt(tahun), monthIndex, 1);
+            const endDate = tanggalAkhir ? new Date(tanggalAkhir) : new Date(parseInt(tahun), monthIndex + 1, 0);
+
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                throw new Error("Tanggal periode tidak valid");
+            }
+
+            const startDateStr = startDate.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+
+            // Clear existing payroll for this period to prevent duplicates
+            await tx.payrolls.deleteMany({
+                where: {
+                    bulan: bulan,
+                    tahun: tahun.toString()
+                }
+            });
+
+            // Fetch all necessary data outside the loop
+            const absensiService = (await import("./AbsensiService.js")).default;
+            
+            const [allLemburs, allMappingShifts, allReimbursements, allKasbons, allCutis] = await Promise.all([
+                tx.lemburs.findMany({
+                    where: {
+                        status: 'Approved',
+                        tanggal: { gte: startDateStr, lte: endDateStr }
+                    }
+                }),
+                tx.mapping_shifts.findMany({
+                    where: {
+                        tanggal: { gte: startDate, lte: endDate }
+                    },
+                    include: { shifts: true }
+                }),
+                tx.reimbursements.findMany({
+                    where: {
+                        status: 'Approved',
+                        tanggal: { gte: startDate, lte: endDate }
+                    }
+                }),
+                tx.kasbons.findMany({
+                    where: {
+                        status: 'Approved',
+                        tanggal: { gte: startDate, lte: endDate }
+                    }
+                }),
+                tx.cutis.findMany({
+                    where: {
+                        status_cuti: 'Diterima',
+                        tanggal: { gte: startDateStr, lte: endDateStr }
+                    }
+                })
+            ]);
+
+            // Fetch reimbursement items for the specific reimbursements found
+            const reimbursementIds = allReimbursements.map(r => r.id);
+            const userReimbursementItems = await tx.reimbursements_items.findMany({
+                where: {
+                    reimbursement_id: { in: reimbursementIds }
+                }
+            });
+
+            // Group data by user_id for O(1) lookup
+            const lembursByUser = new Map();
+            allLemburs.forEach(l => {
+                const list = lembursByUser.get(l.user_id) || [];
+                list.push(l);
+                lembursByUser.set(l.user_id, list);
+            });
+
+            const shiftsByUser = new Map();
+            allMappingShifts.forEach(m => {
+                const list = shiftsByUser.get(m.user_id) || [];
+                list.push(m);
+                shiftsByUser.set(m.user_id, list);
+            });
+
+            const reimbursementsByUser = new Map();
+            allReimbursements.forEach(r => {
+                const list = reimbursementsByUser.get(r.user_id) || [];
+                list.push(r);
+                reimbursementsByUser.set(r.user_id, list);
+            });
+
+            const itemsByUser = new Map();
+            userReimbursementItems.forEach(item => {
+                if (item.user_id) {
+                    const list = itemsByUser.get(item.user_id) || [];
+                    list.push(item);
+                    itemsByUser.set(item.user_id, list);
+                }
+            });
+
+            const cutisByUser = new Map();
+            allCutis.forEach(c => {
+                if (c.user_id) {
+                    const list = cutisByUser.get(c.user_id) || [];
+                    list.push(c);
+                    cutisByUser.set(c.user_id, list);
+                }
+            });
+
+            let counterRecord = await tx.counters.findFirst({ where: { name: 'Gaji' } });
+            if (!counterRecord) {
+                counterRecord = await tx.counters.create({ data: { name: 'Gaji', counter: 0, text: 'GJ' } });
+            }
+
+            const jumlahHari = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+            for (const user of allUsers) {
+                const userMappingShifts = shiftsByUser.get(user.id) || [];
+                const userCutis = cutisByUser.get(user.id) || [];
+                const userLemburs = lembursByUser.get(user.id) || [];
+                const userReimbursements = reimbursementsByUser.get(user.id) || [];
+                const userItems = itemsByUser.get(user.id) || [];
+
+                counterRecord = await tx.counters.update({
                     where: { id: counterRecord.id },
                     data: { counter: counterRecord.counter + 1 }
                 });
                 const nextNumber = counterRecord.counter.toString().padStart(6, '0');
-                noGaji = `${counterRecord.text || 'GJ'}/${nextNumber}`;
-            }
+                const noGaji = `${counterRecord.text || 'GJ'}/${nextNumber}`;
 
-            // Attendance calculations
-            const hadir = userMappingShifts.filter(m => ['Masuk', 'Pulang'].includes(m.status_absen)).length;
-            const izinTelat = userMappingShifts.filter(m => m.status_absen === 'Izin Telat').length;
-            const izinPulangCepat = userMappingShifts.filter(m => m.status_absen === 'Izin Pulang Cepat').length;
-            const libur = userMappingShifts.filter(m => m.status_absen === 'Libur').length;
-            const cuti = userMappingShifts.filter(m => m.status_absen === 'Cuti').length;
-            const izinMasukMapping = userMappingShifts.filter(m => m.status_absen === 'Izin Masuk').length;
-            const sakit = userMappingShifts.filter(m => m.status_absen === 'Sakit').length;
+                // Attendance calculations
+                const hadir = userMappingShifts.filter(m => 
+                    ['Masuk', 'Pulang', 'Dinas Luar', 'Izin Telat', 'Izin Pulang Cepat'].includes(m.status_absen)
+                ).length;
 
-            const persentaseKehadiran = (jumlahHari > 0) ? 
-                ((hadir + izinTelat + izinPulangCepat + libur) / jumlahHari) * 100 : 0;
+                const cuti = userMappingShifts.filter(m => m.status_absen === 'Cuti').length;
+                const sakit = userMappingShifts.filter(m => m.status_absen === 'Sakit').length;
+                const libur = userMappingShifts.filter(m => m.status_absen === 'Libur').length;
+                const izinMasukMapping = userMappingShifts.filter(m => m.status_absen === 'Izin Masuk').length;
+                const izinPelatihan = userMappingShifts.filter(m => m.status_absen === 'Izin Pelatihan').length;
 
-            const totalAlfa = Math.max(0, jumlahHari - hadir - cuti - izinMasukMapping - libur - sakit);
+                const persentaseKehadiran = (jumlahHari > 0) ? 
+                    ((hadir + cuti + sakit + libur) / jumlahHari) * 100 : 0;
 
-            // ... (overtime, reimbursement, etc.) ...
-            // Overtime
-            const userLemburs = allLemburs.filter(l => l.user_id === user.id);
-            const totalLemburDetik = userLemburs.reduce((acc, l) => acc + BigInt(l.total_lembur || 0), 0n);
-            const jamLembur = totalLemburDetik / 3600n;
-            const totalLemburUang = jamLembur * (user.lembur || 0n);
+                const totalAlfa = Math.max(0, jumlahHari - hadir - cuti - izinMasukMapping - libur - sakit - izinPelatihan);
 
-            // Reimbursement
-            const userReimbursements = allReimbursements.filter(r => r.user_id === user.id);
-            const sisaReimbursement = userReimbursements.reduce((acc, r) => acc + (r.sisa || 0n), 0n);
-            const feeReimbursement = allReimbursementItems
-                .filter(item => {
-                    const parent = allReimbursements.find(r => r.id === item.reimbursement_id);
-                    return parent && parent.user_id === user.id;
-                })
-                .filter(item => item.user_id === user.id)
-                .reduce((acc, item) => acc + (item.fee || 0n), 0n);
-            const totalReimbursementUang = sisaReimbursement + feeReimbursement;
+                // Overtime
+                const totalLemburDetik = userLemburs.reduce((acc, l) => acc + BigInt(l.total_lembur || 0), 0n);
+                const jamLembur = totalLemburDetik / 3600n;
+                const totalLemburUang = jamLembur * (user.lembur || 0n);
 
-            // Izin count from cutis table
-            const countIzin = userCutis.filter(c => c.nama_cuti === 'Izin Masuk').length;
+                // Reimbursement
+                const sisaReimbursement = userReimbursements.reduce((acc, r) => acc + (r.sisa || 0n), 0n);
+                const feeReimbursement = userItems.reduce((acc, item) => acc + (item.fee || 0n), 0n);
+                const totalReimbursementUang = sisaReimbursement + feeReimbursement;
 
-            // Lateness calculation per minute (synced with shifts)
-            let totalMenitTelat = 0n;
-            const tolerance = user.batas_terlambat ? Number(user.batas_terlambat) : 0;
-            
-            userMappingShifts.forEach(m => {
-                let telatMins = 0;
-                if (m.shifts && m.jam_absen && m.shifts.jam_masuk) {
-                    const diff = absensiService.timeToMinutes(m.jam_absen) - absensiService.timeToMinutes(m.shifts.jam_masuk);
-                    telatMins = diff > 0 ? diff : 0;
-                } else if (m.telat) {
-                    telatMins = parseInt(m.telat);
-                }
+                // Izin count
+                const countIzin = userCutis.filter(c => c.nama_cuti === 'Izin Masuk').length;
 
-                if (telatMins > tolerance) {
-                    totalMenitTelat += BigInt(telatMins - tolerance);
-                }
-            });
+                // Lateness
+                let totalMenitTelat = 0n;
+                const tolerance = user.batas_terlambat ? Number(user.batas_terlambat) : 0;
+                
+                userMappingShifts.forEach(m => {
+                    let telatMins = 0;
+                    if (m.shifts && m.jam_absen && m.shifts.jam_masuk) {
+                        const diff = absensiService.timeToMinutes(m.jam_absen) - absensiService.timeToMinutes(m.shifts.jam_masuk);
+                        telatMins = diff > 0 ? diff : 0;
+                    } else if (m.telat) {
+                        telatMins = parseInt(m.telat) || 0;
+                    }
 
-            const potonganPerMenit = user.terlambat || 1000n; 
-            const totalTerlambat = totalMenitTelat * potonganPerMenit;
-
-            // Presence Bonus (100% attendance only)
-            const jumlahKehadiranIndicator = (persentaseKehadiran === 100) ? 1n : 0n;
-            const totalKehadiranBonus = jumlahKehadiranIndicator * (user.kehadiran || 0n);
-
-            // Mangkir deduction
-            const uangMangkir = user.mangkir || 0n;
-            const totalMangkir = BigInt(totalAlfa) * uangMangkir;
-            
-            // Izin deduction
-            const uangIzin = user.izin || 0n;
-            const totalIzin = BigInt(countIzin) * uangIzin;
-
-            // Others
-            const gajiPokok = user.gaji_pokok || 0n;
-            const tMakan = user.tunjangan_makan || 0n;
-            const tTransport = user.tunjangan_transport || 0n;
-            const tBpjsKes = user.tunjangan_bpjs_kesehatan || 0n;
-            const tBpjsKet = user.tunjangan_bpjs_ketenagakerjaan || 0n;
-            const pBpjsKes = user.potongan_bpjs_kesehatan || 0n;
-            const pBpjsKet = user.potongan_bpjs_ketenagakerjaan || 0n;
-            const pKoperasi = user.potongan_koperasi || 0n;
-            const bPribadi = user.bonus_pribadi || 0n;
-            const bTeam = user.bonus_team || 0n;
-            const bJackpot = user.bonus_jackpot || 0n;
-            const totalThr = user.thr || 0n;
-
-            // Kasbon payment (half of balance)
-            const bayarKasbon = (user.saldo_kasbon || 0n) / 2n;
-
-            const totalPenjumlahan = gajiPokok
-                + totalReimbursementUang
-                + (tTransport * BigInt(hadir))
-                + (tMakan * BigInt(hadir))
-                + tBpjsKes + tBpjsKet
-                + totalLemburUang
-                + bPribadi + bTeam + bJackpot
-                + totalKehadiranBonus + totalThr;
-
-            const totalPengurangan = pBpjsKes + pBpjsKet + totalMangkir + totalIzin + totalTerlambat + bayarKasbon + pKoperasi;
-            const grandTotal = totalPenjumlahan - totalPengurangan;
-
-            const payrollData = {
-                user_id: user.id,
-                tanggal_mulai: startDate,
-                tanggal_akhir: endDate,
-                bulan,
-                tahun,
-                persentase_kehadiran: `${persentaseKehadiran.toFixed(0)}%`,
-                no_gaji: noGaji,
-                gaji_pokok: gajiPokok,
-                total_reimbursement: totalReimbursementUang,
-                jumlah_tunjangan_transport: BigInt(hadir),
-                uang_tunjangan_transport: tTransport,
-                total_tunjangan_transport: tTransport * BigInt(hadir),
-                jumlah_tunjangan_makan: BigInt(hadir),
-                uang_tunjangan_makan: tMakan,
-                total_tunjangan_makan: tMakan * BigInt(hadir),
-                total_tunjangan_bpjs_kesehatan: tBpjsKes,
-                total_tunjangan_bpjs_ketenagakerjaan: tBpjsKet,
-                total_potongan_bpjs_kesehatan: pBpjsKes,
-                total_potongan_bpjs_ketenagakerjaan: pBpjsKet,
-                jumlah_mangkir: BigInt(totalAlfa),
-                uang_mangkir: uangMangkir,
-                total_mangkir: totalMangkir,
-                jumlah_lembur: jamLembur,
-                uang_lembur: user.lembur || 0n,
-                total_lembur: totalLemburUang,
-                jumlah_izin: BigInt(countIzin),
-                uang_izin: uangIzin,
-                total_izin: totalIzin,
-                bonus_pribadi: bPribadi,
-                bonus_team: bTeam,
-                bonus_jackpot: bJackpot,
-                jumlah_terlambat: totalMenitTelat, 
-                uang_terlambat: potonganPerMenit,
-                total_terlambat: totalTerlambat,
-                jumlah_kehadiran: jumlahKehadiranIndicator,
-                uang_kehadiran: user.kehadiran || 0n,
-                total_kehadiran: totalKehadiranBonus,
-                saldo_kasbon: user.saldo_kasbon || 0n,
-                bayar_kasbon: bayarKasbon,
-                jumlah_thr: totalThr > 0n ? 1n : 0n,
-                uang_thr: totalThr,
-                total_thr: totalThr,
-                loss: 0n,
-                total_penjumlahan: totalPenjumlahan,
-                total_pengurangan: totalPengurangan,
-                grand_total: grandTotal,
-                potongan_koperasi: pKoperasi,
-                updated_at: new Date()
-            };
-
-            let newPayroll;
-            if (existing) {
-                newPayroll = await prisma.payrolls.update({
-                    where: { id: existing.id },
-                    data: payrollData
-                });
-            } else {
-                newPayroll = await prisma.payrolls.create({
-                    data: {
-                        ...payrollData,
-                        created_at: new Date()
+                    if (telatMins > tolerance) {
+                        totalMenitTelat += BigInt(telatMins - tolerance);
                     }
                 });
+
+                const potonganPerMenit = user.terlambat || 0n; 
+                const totalTerlambat = totalMenitTelat * potonganPerMenit;
+
+                const jumlahKehadiranIndicator = (persentaseKehadiran >= 100) ? 1n : 0n;
+                const totalKehadiranBonus = jumlahKehadiranIndicator * (user.kehadiran || 0n);
+
+                const uangMangkir = user.mangkir || 0n;
+                const totalMangkir = BigInt(totalAlfa) * uangMangkir;
+                
+                const uangIzin = user.izin || 0n;
+                const totalIzin = BigInt(countIzin) * uangIzin;
+
+                const gajiPokok = user.gaji_pokok || 0n;
+                const tMakan = user.tunjangan_makan || 0n;
+                const tTransport = user.tunjangan_transport || 0n;
+                const tBpjsKes = user.tunjangan_bpjs_kesehatan || 0n;
+                const tBpjsKet = user.tunjangan_bpjs_ketenagakerjaan || 0n;
+                const pBpjsKes = user.potongan_bpjs_kesehatan || 0n;
+                const pBpjsKet = user.potongan_bpjs_ketenagakerjaan || 0n;
+                const pKoperasi = user.potongan_koperasi || 0n;
+                const bPribadi = user.bonus_pribadi || 0n;
+                const bTeam = user.bonus_team || 0n;
+                const bJackpot = user.bonus_jackpot || 0n;
+                const totalThr = user.thr || 0n;
+
+                const bayarKasbon = (user.saldo_kasbon || 0n) / 2n;
+
+                const totalPenjumlahan = gajiPokok
+                    + totalReimbursementUang
+                    + (tTransport * BigInt(hadir))
+                    + (tMakan * BigInt(hadir))
+                    + tBpjsKes + tBpjsKet
+                    + totalLemburUang
+                    + bPribadi + bTeam + bJackpot
+                    + totalKehadiranBonus + totalThr;
+
+                const totalPengurangan = pBpjsKes + pBpjsKet + totalMangkir + totalIzin + totalTerlambat + bayarKasbon + pKoperasi;
+                const grandTotal = totalPenjumlahan - totalPengurangan;
+
+                const payrollData = {
+                    user_id: user.id,
+                    tanggal_mulai: startDate,
+                    tanggal_akhir: endDate,
+                    bulan,
+                    tahun: tahun.toString(),
+                    persentase_kehadiran: `${persentaseKehadiran.toFixed(0)}%`,
+                    no_gaji: noGaji,
+                    gaji_pokok: gajiPokok,
+                    total_reimbursement: totalReimbursementUang,
+                    jumlah_tunjangan_transport: BigInt(hadir),
+                    uang_tunjangan_transport: tTransport,
+                    total_tunjangan_transport: tTransport * BigInt(hadir),
+                    jumlah_tunjangan_makan: BigInt(hadir),
+                    uang_tunjangan_makan: tMakan,
+                    total_tunjangan_makan: tMakan * BigInt(hadir),
+                    total_tunjangan_bpjs_kesehatan: tBpjsKes,
+                    total_tunjangan_bpjs_ketenagakerjaan: tBpjsKet,
+                    total_potongan_bpjs_kesehatan: pBpjsKes,
+                    total_potongan_bpjs_ketenagakerjaan: pBpjsKet,
+                    jumlah_mangkir: BigInt(totalAlfa),
+                    uang_mangkir: uangMangkir,
+                    total_mangkir: totalMangkir,
+                    jumlah_lembur: jamLembur,
+                    uang_lembur: user.lembur || 0n,
+                    total_lembur: totalLemburUang,
+                    jumlah_izin: BigInt(countIzin),
+                    uang_izin: uangIzin,
+                    total_izin: totalIzin,
+                    bonus_pribadi: bPribadi,
+                    bonus_team: bTeam,
+                    bonus_jackpot: bJackpot,
+                    jumlah_terlambat: totalMenitTelat, 
+                    uang_terlambat: potonganPerMenit,
+                    total_terlambat: totalTerlambat,
+                    jumlah_kehadiran: jumlahKehadiranIndicator,
+                    uang_kehadiran: user.kehadiran || 0n,
+                    total_kehadiran: totalKehadiranBonus,
+                    saldo_kasbon: user.saldo_kasbon || 0n,
+                    bayar_kasbon: bayarKasbon,
+                    jumlah_thr: totalThr > 0n ? 1n : 0n,
+                    uang_thr: totalThr,
+                    total_thr: totalThr,
+                    loss: 0n,
+                    total_penjumlahan: totalPenjumlahan,
+                    total_pengurangan: totalPengurangan,
+                    grand_total: grandTotal,
+                    potongan_koperasi: pKoperasi,
+                    created_at: new Date(),
+                    updated_at: new Date()
+                };
+
+                const newPayroll = await tx.payrolls.create({ data: payrollData });
+
+                // Update user's bonuses and kasbon balance
+                await tx.users.update({
+                    where: { id: user.id },
+                    data: {
+                        saldo_kasbon: (user.saldo_kasbon || 0n) - bayarKasbon,
+                        bonus_pribadi: 0n,
+                        bonus_team: 0n,
+                        bonus_jackpot: 0n,
+                    }
+                });
+
+                results.push(this.serialize(newPayroll));
             }
 
-            // Update user's bonuses and kasbon balance
-            await prisma.users.update({
-                where: { id: user.id },
-                data: {
-                    saldo_kasbon: (user.saldo_kasbon || 0n) - bayarKasbon,
-                    bonus_pribadi: 0n,
-                    bonus_team: 0n,
-                    bonus_jackpot: 0n,
-                }
-            });
-
-            const serialized = this.serialize(newPayroll);
-            results.push(serialized);
-        }
-
-        return {
-            success: true,
-            message: `Berhasil men-generate ${results.length} data payroll baru`,
-            data: results
-        };
+            return {
+                success: true,
+                message: `Berhasil men-generate ${results.length} data payroll baru`,
+                data: results
+            };
+        });
     }
 
     async generate(userId, bulan, tahun, tanggalMulai, tanggalAkhir) {
@@ -545,7 +549,11 @@ class PayrollService {
             }
         });
 
-        const counter = await prisma.counters.findFirst({ where: { name: 'Gaji' } });
+        let counter = await prisma.counters.findFirst({ where: { name: 'Gaji' } });
+        if (!counter) {
+            counter = await prisma.counters.create({ data: { name: 'Gaji', counter: 0, text: 'GJ' } });
+        }
+
         let noGaji;
         if (existing) {
             noGaji = existing.no_gaji;

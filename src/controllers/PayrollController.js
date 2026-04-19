@@ -17,7 +17,7 @@ class PayrollController {
 
     async show(req, res) {
         try {
-            const result = await PayrollService.getWhere({ user_id: BigInt(req.params.id) }).first();
+            const result = await PayrollService.getById(req.params.id);
             if (!result.success) {
                 return res.status(404).json(result);
             }

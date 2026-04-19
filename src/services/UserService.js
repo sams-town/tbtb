@@ -483,11 +483,11 @@ class UserService {
             if (jab) userData.jabatan_id = jab.id;
         }
         if (data.lokasi_name && !userData.lokasi_id) {
-            const lok = await prisma.lokasi.findFirst({ where: { nama_lokasi: data.lokasi_name } });
+            const lok = await prisma.lokasis.findFirst({ where: { nama_lokasi: data.lokasi_name } });
             if (lok) userData.lokasi_id = lok.id;
         }
         if (data.status_pajak_name && !userData.status_pajak_id) {
-            const stp = await prisma.status_pajak.findFirst({ where: { name: data.status_pajak_name } });
+            const stp = await prisma.status_pajaks.findFirst({ where: { name: data.status_pajak_name } });
             if (stp) userData.status_pajak_id = stp.id;
         }
 
@@ -561,8 +561,6 @@ class UserService {
         });
         if (!existing) return null;
 
-        if (!existing) return null;
-
         // Pisahkan roles dari data, sisa data masuk ke sanitizeInput
         const { roles, jabatan, lokasi, status_pajak, ...userData } = data;
 
@@ -572,11 +570,11 @@ class UserService {
             if (jab) userData.jabatan_id = jab.id;
         }
         if (data.lokasi_name && !userData.lokasi_id) {
-            const lok = await prisma.lokasi.findFirst({ where: { nama_lokasi: data.lokasi_name } });
+            const lok = await prisma.lokasis.findFirst({ where: { nama_lokasi: data.lokasi_name } });
             if (lok) userData.lokasi_id = lok.id;
         }
         if (data.status_pajak_name && !userData.status_pajak_id) {
-            const stp = await prisma.status_pajak.findFirst({ where: { name: data.status_pajak_name } });
+            const stp = await prisma.status_pajaks.findFirst({ where: { name: data.status_pajak_name } });
             if (stp) userData.status_pajak_id = stp.id;
         }
 
@@ -648,9 +646,6 @@ class UserService {
             where: { id: userId },
         });
         if (!existing) return null;
-
-        if (!existing) return null;
-
         return await prisma.$transaction(async (tx) => {
             // 1. Nullify references (optional fields where the user is an approver/manager)
             await tx.cutis.updateMany({

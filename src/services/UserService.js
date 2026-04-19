@@ -897,8 +897,11 @@ class UserService {
 
             if (bigIntFields.includes(key)) {
                 // Handle null, undefined, empty string, and "null" string
-                if (value === null || value === undefined || value === "" || value === "null") {
+                if (value === null || value === undefined || value === "null") {
                     sanitized[key] = null;
+                } else if (value === "") {
+                    // Skip empty strings for BigInt fields to let defaults/current values work
+                    continue;
                 } else {
                     try {
                         sanitized[key] = BigInt(value);

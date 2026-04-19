@@ -475,7 +475,8 @@ class UserService {
   */
     async create(data) {
         // Pisahkan roles dari data user (sama seperti di update)
-        const { roles, jabatan, lokasi, status_pajak, ...userData } = data;
+        const { roles, role, jabatan, lokasi, status_pajak, ...userData } = data;
+        const effectiveRoles = roles || role;
 
         // Mapping name to IDs if provided (useful for import)
         if (data.jabatan_name && !userData.jabatan_id) {
@@ -520,12 +521,12 @@ class UserService {
 
         // Assign roles jika dikirim
         let roleList = [];
-        if (roles) {
-            if (typeof roles === "string") {
-                try { roleList = JSON.parse(roles); } // jika berupa '["admin"]'
-                catch { roleList = roles.split(",").map(r => r.trim()); } // jika berupa "admin,user"
-            } else if (Array.isArray(roles)) {
-                roleList = roles;
+        if (effectiveRoles) {
+            if (typeof effectiveRoles === "string") {
+                try { roleList = JSON.parse(effectiveRoles); } // jika berupa '["admin"]'
+                catch { roleList = effectiveRoles.split(",").map(r => r.trim()); } // jika berupa "admin,user"
+            } else if (Array.isArray(effectiveRoles)) {
+                roleList = effectiveRoles;
             }
         }
 
@@ -562,7 +563,8 @@ class UserService {
         if (!existing) return null;
 
         // Pisahkan roles dari data, sisa data masuk ke sanitizeInput
-        const { roles, jabatan, lokasi, status_pajak, ...userData } = data;
+        const { roles, role, jabatan, lokasi, status_pajak, ...userData } = data;
+        const effectiveRoles = roles || role;
 
         // Mapping name to IDs if provided (useful for import)
         if (data.jabatan_name && !userData.jabatan_id) {
@@ -590,16 +592,16 @@ class UserService {
 
         // Sync roles jika dikirim
         let roleList = [];
-        if (roles) {
-            if (typeof roles === "string") {
-                try { roleList = JSON.parse(roles); } // jika berupa '["admin"]'
-                catch { roleList = roles.split(",").map(r => r.trim()); } // jika berupa "admin,user"
-            } else if (Array.isArray(roles)) {
-                roleList = roles;
+        if (effectiveRoles) {
+            if (typeof effectiveRoles === "string") {
+                try { roleList = JSON.parse(effectiveRoles); } // jika berupa '["admin"]'
+                catch { roleList = effectiveRoles.split(",").map(r => r.trim()); } // jika berupa "admin,user"
+            } else if (Array.isArray(effectiveRoles)) {
+                roleList = effectiveRoles;
             }
         }
 
-        if (roleList.length > 0 || roles !== undefined) {
+        if (roleList.length > 0 || effectiveRoles !== undefined) {
             // Hapus roles lama
             await prisma.model_has_roles.deleteMany({
                 where: { model_id: BigInt(id) },

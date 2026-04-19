@@ -52,7 +52,7 @@ class UserService {
             { id: { notIn: excludedUserIds } }
         ];
 
-        if (!isSuperAdmin) {
+       // if (!isSuperAdmin) {
             // Non-superadmin or Public access
             andConditions.push({ id: { not: 1n } });
             
@@ -104,14 +104,14 @@ class UserService {
                     andConditions.push({ jabatan_id: null });
                 }
             }
-        } else if (isSuperAdmin) {
-            // Super Admin logic (Private access)
-            if (filterJabatanId) {
-                andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
-            } else if (showEmptyJabatan) {
-                andConditions.push({ jabatan_id: null });
-            }
-        }
+        // } else if (isSuperAdmin) {
+        //     // Super Admin logic (Private access)
+        //     if (filterJabatanId) {
+        //         andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
+        //     } else if (showEmptyJabatan) {
+        //         andConditions.push({ jabatan_id: null });
+        //     }
+        // }
 
         if (filterLokasiId) {
             andConditions.push({ lokasi_id: filterLokasiId });

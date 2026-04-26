@@ -846,6 +846,14 @@ class UserService {
             "lock_face",
             "cuti_melahirkan",
             "cuti_kematian",
+            "kode_pos",
+            "provinsi_domisili",
+            "kota_kabupaten_domisili",
+            "kecamatan_domisili",
+            "kelurahan_domisili",
+            "alamat_domisili",
+            "kode_pos_domisili",
+            "nama_ibu_kandung",
         ];
 
         const bigIntFields = [

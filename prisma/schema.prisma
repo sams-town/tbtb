@@ -803,6 +803,14 @@ model users {
   kota_kabupaten                     String?                @db.VarChar(120)
   kecamatan                          String?                @db.VarChar(120)
   kelurahan                          String?                @db.VarChar(120)
+  kode_pos                           String?                @db.VarChar(10)
+  provinsi_domisili                  String?                @db.VarChar(120)
+  kota_kabupaten_domisili            String?                @db.VarChar(120)
+  kecamatan_domisili                 String?                @db.VarChar(120)
+  kelurahan_domisili                 String?                @db.VarChar(120)
+  alamat_domisili                   String?                @db.Text
+  kode_pos_domisili                  String?                @db.VarChar(10)
+  nama_ibu_kandung                   String?                @db.VarChar(150)
   cuti_melahirkan                    BigInt?
   cuti_kematian                      BigInt?
   cutis                              cutis[]

@@ -39,11 +39,30 @@ class FaceRecognitionService {
         }
         try {
             const img = await canvas.loadImage(imagePath);
-            const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-            if (!detection) {
+            // Use detectAllFaces to check for multiple people
+            const detections = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
+            
+            if (detections.length === 0) {
                 console.warn("No face detected in:", imagePath);
                 return null;
             }
+            
+            if (detections.length > 1) {
+                console.warn("Multiple faces detected in:", imagePath);
+                // Return a special object or throw error to indicate multiple faces
+                return { error: "Terdeteksi lebih dari satu wajah. Pastikan hanya ada satu orang di dalam foto." };
+            }
+
+            const detection = detections[0];
+            
+            // Optional: Check if face is too small (e.g., less than 20% of image width)
+            const faceWidth = detection.detection.box.width;
+            const imgWidth = img.width;
+            if (faceWidth < imgWidth * 0.15) {
+                console.warn("Face too small in:", imagePath);
+                return { error: "Wajah terlalu jauh atau terlalu kecil. Silakan ambil foto lebih dekat." };
+            }
+
             return detection.descriptor;
         } catch (e) {
             console.error("Error getFaceDescriptor for", imagePath, e.message);
@@ -57,9 +76,13 @@ class FaceRecognitionService {
         if (!incomingDesc) {
             return { user: null, error: "Tidak ditemukan wajah pada foto absensi yang di-upload." };
         }
+        
+        if (incomingDesc.error) {
+            return { user: null, error: incomingDesc.error };
+        }
 
         let bestMatch = null;
-        let bestDistance = 0.55; // threshold for euclidean distance
+        let bestDistance = 0.45; // tightened threshold from 0.55 to 0.45
 
         for (const user of users) {
             if (!user.foto_face_recognition) continue;
@@ -101,6 +124,54 @@ class FaceRecognitionService {
         return { user: null, error: "Wajah tidak cocok dengan data referensi karyawan mana pun." };
     }
 
+    async verifyUserFace(incomingPath, user) {
+        await this.loadModels();
+        const incomingDesc = await this.getFaceDescriptor(incomingPath);
+        if (!incomingDesc) {
+            return { isMatch: false, error: "Tidak ditemukan wajah pada foto absensi." };
+        }
+
+        if (incomingDesc.error) {
+            return { isMatch: false, error: incomingDesc.error };
+        }
+
+        if (!user.foto_face_recognition) {
+            return { isMatch: false, error: "User tidak memiliki foto referensi wajah." };
+        }
+
+        const userIdStr = user.id.toString();
+        let userDesc = this.userDescriptorsCache[userIdStr];
+
+        if (!userDesc) {
+            let referencePath = "";
+            try {
+                const url = new URL(user.foto_face_recognition);
+                const cleanPath = url.pathname.startsWith('/') ? url.pathname.substring(1) : url.pathname;
+                referencePath = path.join(ROOT_DIR, "public", cleanPath);
+            } catch (e) {
+                const cleanRelativePath = user.foto_face_recognition.startsWith('/') ? user.foto_face_recognition.substring(1) : user.foto_face_recognition;
+                referencePath = path.join(ROOT_DIR, "public", cleanRelativePath);
+            }
+
+            userDesc = await this.getFaceDescriptor(referencePath);
+            if (userDesc) {
+                this.userDescriptorsCache[userIdStr] = userDesc;
+            }
+        }
+
+        if (!userDesc) {
+            return { isMatch: false, error: "Gagal memproses foto referensi wajah user." };
+        }
+
+        const distance = faceapi.euclideanDistance(incomingDesc, userDesc);
+        const threshold = 0.45; // tightened threshold
+        
+        if (distance < threshold) {
+            return { isMatch: true, distance };
+        }
+        return { isMatch: false, distance, error: "Wajah tidak cocok dengan data referensi." };
+    }
+
     // fallback kept for compatibility
     async compareFaces(referencePath, incomingPath) {
         try {
@@ -110,7 +181,7 @@ class FaceRecognitionService {
             if (!desc2) return { isMatch: false, error: "Tidak ditemukan wajah pada input" };
 
             const distance = faceapi.euclideanDistance(desc1, desc2);
-            return { isMatch: distance < 0.55, distance };
+            return { isMatch: distance < 0.45, distance };
         } catch (error) {
             return { isMatch: false, error: error.message };
         }

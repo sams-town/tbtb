@@ -110,26 +110,26 @@ class AbsensiController {
             let user = null;
             let matchResult = { user: null, distance: null };
 
-            // Jika user_id dikirim dari frontend, cek lock_face
+            // Jika user_id dikirim dari frontend, lakukan verifikasi 1:1 (lebih akurat & aman)
             if (payload.user_id) {
                 user = await userService.getById(payload.user_id);
-                if (user && user.lock_face === "0") {
-                    // Jika lock_face tidak aktif, lewati pencarian wajah dan gunakan user ini
+                if (!user) {
+                    return res.status(404).json({ success: false, message: "User tidak ditemukan." });
+                }
+
+                if (user.lock_face === "0" || user.lock_face === 0) {
                     console.log(`Bypassing face recognition for user ${user.name} (lock_face=0)`);
                 } else {
-                    // Jika lock_face aktif atau user tidak ditemukan, lakukan pencarian wajah
-                    const usersResult = await userService.getAll({ limit: 10000 });
-                    const allUsers = usersResult.data || [];
-                    matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
-                    
-                    if (!matchResult.user || matchResult.user.id.toString() !== payload.user_id.toString()) {
+                    const verifyResult = await faceRecognitionService.verifyUserFace(incomingPath, user);
+                    if (!verifyResult.isMatch) {
                         return res.status(400).json({ 
                             success: false, 
-                            message: "Absensi gagal. Wajah tidak cocok dengan identitas yang dipilih.",
-                            error: matchResult.error
+                            message: `Absensi gagal. Wajah tidak cocok dengan identitas ${user.name}.`,
+                            distance: verifyResult.distance,
+                            error: verifyResult.error
                         });
                     }
-                    user = matchResult.user;
+                    matchResult.distance = verifyResult.distance;
                 }
             } else {
                 // Jika tidak ada user_id, lakukan pencarian wajah ke semua user (Auto-ID)

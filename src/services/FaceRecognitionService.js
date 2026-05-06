@@ -109,11 +109,15 @@ class FaceRecognitionService {
                 }
             }
 
-            if (userDesc) {
-                const distance = faceapi.euclideanDistance(incomingDesc, userDesc);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestMatch = user;
+            if (userDesc && !userDesc.error) {
+                try {
+                    const distance = faceapi.euclideanDistance(incomingDesc, userDesc);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestMatch = user;
+                    }
+                } catch (err) {
+                    console.error(`Error comparing faces for user ${user.name}:`, err.message);
                 }
             }
         }
@@ -159,17 +163,22 @@ class FaceRecognitionService {
             }
         }
 
-        if (!userDesc) {
-            return { isMatch: false, error: "Gagal memproses foto referensi wajah user." };
+        if (!userDesc || userDesc.error) {
+            return { isMatch: false, error: userDesc?.error || "Gagal memproses foto referensi wajah user." };
         }
 
-        const distance = faceapi.euclideanDistance(incomingDesc, userDesc);
-        const threshold = 0.45; // tightened threshold
-        
-        if (distance < threshold) {
-            return { isMatch: true, distance };
+        try {
+            const distance = faceapi.euclideanDistance(incomingDesc, userDesc);
+            const threshold = 0.45; // tightened threshold
+            
+            if (distance < threshold) {
+                return { isMatch: true, distance };
+            }
+            return { isMatch: false, distance, error: "Wajah tidak cocok dengan data referensi." };
+        } catch (err) {
+            console.error(`Error comparing face for user ${user.name}:`, err.message);
+            return { isMatch: false, error: "Terjadi kesalahan teknis saat membandingkan wajah." };
         }
-        return { isMatch: false, distance, error: "Wajah tidak cocok dengan data referensi." };
     }
 
     // fallback kept for compatibility

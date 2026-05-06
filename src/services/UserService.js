@@ -4,29 +4,6 @@ import fileService from "./FileService.js";
 
 class UserService {
     /**
-     * Get only users who have face recognition data for efficient matching
-     */
-    async getAllForFaceRecognition() {
-        const users = await prisma.users.findMany({
-            where: {
-                foto_face_recognition: { not: null }
-            },
-            select: {
-                id: true,
-                name: true,
-                foto_face_recognition: true,
-                lock_face: true,
-                jabatan: {
-                    select: {
-                        nama_jabatan: true
-                    }
-                }
-            }
-        });
-        return users.map(u => this.serialize(u));
-    }
-
-    /**
      * Get all users with optional pagination & search
      */
     async getAll(query = {}, authUser = null) {
@@ -404,6 +381,36 @@ class UserService {
             } : undefined,
             total: dataWithRoles.length,
         };
+    }
+
+    /**
+     * Get all users who have face recognition data for attendance matching
+     */
+    async getAllForFaceRecognition() {
+        const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
+            select: { user_id: true }
+        });
+        const excludedUserIds = pegawaiKeluars
+            .map((pk) => pk.user_id)
+            .filter((id) => id !== null && id !== undefined);
+
+        const users = await prisma.users.findMany({
+            where: {
+                id: { notIn: excludedUserIds },
+                AND: [
+                    { foto_face_recognition: { not: null } },
+                    { foto_face_recognition: { not: "" } },
+                    { foto_face_recognition: { not: "null" } }
+                ]
+            },
+            include: { 
+                lokasi: true,
+                jabatan: true
+            },
+            orderBy: { name: "asc" }
+        });
+
+        return users.map(u => this.serialize(u));
     }
 
     /**

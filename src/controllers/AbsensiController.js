@@ -146,13 +146,9 @@ class AbsensiController {
 
             // 2. Determine Shift and Attendance Type
             const now = new Date();
-            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            
             const yesterday = new Date(now);
             yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getDate()).padStart(2, '0')}-${String(yesterday.getMonth() + 1).padStart(2, '0')}`; // Typo fixed: month then date usually, but wait, the previous was fine.
 
-            // Re-calculate strings to be safe
             const formatDate = (d) => {
                 const year = d.getFullYear();
                 const month = String(d.getMonth() + 1).padStart(2, '0');

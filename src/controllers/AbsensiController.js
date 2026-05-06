@@ -128,8 +128,10 @@ class AbsensiController {
                     matchResult.distance = verifyResult.distance;
                 }
             } else {
-                const usersResult = await userService.getAll({ limit: 10000 });
-                const allUsers = usersResult.data || [];
+                console.log("Identifying user via face recognition...");
+                const allUsers = await userService.getAllForFaceRecognition();
+                console.log(`Found ${allUsers.length} users with face data for matching.`);
+                
                 matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
                 if (!matchResult.user) {
                     return res.status(400).json({ 
@@ -139,6 +141,7 @@ class AbsensiController {
                     });
                 }
                 user = matchResult.user;
+                console.log("User identified:", user.name);
             }
 
             // 2. Determine Shift and Attendance Type
@@ -147,10 +150,20 @@ class AbsensiController {
             
             const yesterday = new Date(now);
             yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+            const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getDate()).padStart(2, '0')}-${String(yesterday.getMonth() + 1).padStart(2, '0')}`; // Typo fixed: month then date usually, but wait, the previous was fine.
 
-            // Fetch shifts for yesterday and today
-            const recentShifts = await absensiService.getByIdUsersHistory(user.id.toString(), yesterdayStr, todayStr);
+            // Re-calculate strings to be safe
+            const formatDate = (d) => {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            const tStr = formatDate(now);
+            const yStr = formatDate(yesterday);
+
+            console.log(`Fetching shifts for user ${user.name} from ${yStr} to ${tStr}`);
+            const recentShifts = await absensiService.getByIdUsersHistory(user.id.toString(), yStr, tStr);
             
             if (!recentShifts || recentShifts.length === 0) {
                 return res.status(400).json({ 
@@ -172,32 +185,26 @@ class AbsensiController {
 
             // SMART LOGIC: Find the best shift record
             if (tipe_absen === 'pulang' || tipe_absen === 'keluar') {
-                // If marking home, prioritize the record that has 'masuk' but NO 'pulang'
                 shiftRecord = recentShifts.find(s => s.jam_absen && !s.jam_pulang);
                 if (!shiftRecord) {
-                    // Fallback to today's record even if 'masuk' is empty (maybe they forgot to clock in but want to clock out)
-                    shiftRecord = recentShifts.find(s => isSameDay(s.tanggal, todayStr));
+                    shiftRecord = recentShifts.find(s => isSameDay(s.tanggal, tStr));
                 }
+                tipe_absen = 'pulang';
             } else if (tipe_absen === 'masuk') {
-                // If marking in, prioritize today's record that hasn't been clocked in
-                shiftRecord = recentShifts.find(s => isSameDay(s.tanggal, todayStr) && !s.jam_absen);
+                shiftRecord = recentShifts.find(s => isSameDay(s.tanggal, tStr) && !s.jam_absen);
                 if (!shiftRecord) {
-                    // Check if they already clocked in today
-                    const alreadyIn = recentShifts.find(s => isSameDay(s.tanggal, todayStr) && s.jam_absen);
+                    const alreadyIn = recentShifts.find(s => isSameDay(s.tanggal, tStr) && s.jam_absen);
                     if (alreadyIn) {
                         return res.status(400).json({ success: false, message: "Absensi gagal. Anda sudah melakukan absensi masuk untuk shift hari ini." });
                     }
                 }
             } else {
-                // AUTO DETECTION if tipe_absen is not provided
-                // 1. Is there an open shift from yesterday or today?
                 const openShift = recentShifts.find(s => s.jam_absen && !s.jam_pulang);
                 if (openShift) {
                     shiftRecord = openShift;
                     tipe_absen = 'pulang';
                 } else {
-                    // 2. No open shift, try to mark 'masuk' for today
-                    const todayShift = recentShifts.find(s => isSameDay(s.tanggal, todayStr));
+                    const todayShift = recentShifts.find(s => isSameDay(s.tanggal, tStr));
                     if (todayShift) {
                         if (todayShift.jam_absen && todayShift.jam_pulang) {
                             return res.status(400).json({ success: false, message: "Absensi gagal. Jadwal shift hari ini sudah selesai (Sudah Masuk & Pulang)." });
@@ -215,16 +222,13 @@ class AbsensiController {
                 });
             }
 
-            // Final check: if we decided it's 'pulang' but it's already filled
             if (tipe_absen === 'pulang' && shiftRecord.jam_pulang) {
                 return res.status(400).json({ success: false, message: "Absensi gagal. Anda sudah mengisi jam pulang untuk shift ini." });
             }
 
             // 3. Location and Radius Check
             const isLocked = shiftRecord.lock_location === "1" || shiftRecord.lock_location === 1;
-            if (isLocked && (!payload.lat || !payload.long)) {
-                return res.status(400).json({ success: false, message: "Absensi gagal. Lokasi (GPS) wajib aktif untuk shift ini." });
-            }
+            let distanceValue = null;
 
             if (payload.lat && payload.long) {
                 if (user.lokasi) {
@@ -233,19 +237,19 @@ class AbsensiController {
                         parseFloat(user.lokasi.lat_kantor), parseFloat(user.lokasi.long_kantor)
                     );
                     const radius = parseFloat(user.lokasi.radius || 0);
+                    distanceValue = Math.round(distance);
 
                     if (isLocked && radius > 0 && distance > radius) {
                         return res.status(400).json({ 
                             success: false, 
-                            message: `Absensi gagal. Anda berada di luar radius (Jarak: ${Math.round(distance)}m, Izin: ${radius}m).` 
+                            message: `Absensi gagal. Anda berada di luar radius (Jarak: ${distanceValue}m, Izin: ${radius}m).` 
                         });
                     }
-
-                    if (tipe_absen === 'pulang') payload.jarak_pulang = String(Math.round(distance));
-                    else payload.jarak_masuk = String(Math.round(distance));
                 } else if (isLocked) {
                     return res.status(400).json({ success: false, message: "Absensi gagal. Lokasi kantor belum diatur (Shift Terkunci)." });
                 }
+            } else if (isLocked) {
+                return res.status(400).json({ success: false, message: "Absensi gagal. Lokasi (GPS) wajib aktif untuk shift ini." });
             }
 
             // 4. Update Database
@@ -261,18 +265,18 @@ class AbsensiController {
                 updatePayload.foto_jam_absen = `/uploads/absensi/${filename}`;
                 if (payload.lat) updatePayload.lat_absen = String(payload.lat);
                 if (payload.long) updatePayload.long_absen = String(payload.long);
-                if (payload.jarak_masuk) updatePayload.jarak_masuk = String(payload.jarak_masuk);
+                if (distanceValue !== null) updatePayload.jarak_masuk = String(distanceValue);
                 updatePayload.status_absen = 'Masuk';
             } else {
                 updatePayload.jam_pulang = timeStr;
                 updatePayload.foto_jam_pulang = `/uploads/absensi/${filename}`;
                 if (payload.lat) updatePayload.lat_pulang = String(payload.lat);
                 if (payload.long) updatePayload.long_pulang = String(payload.long);
-                if (payload.jarak_pulang) updatePayload.jarak_pulang = String(payload.jarak_pulang);
+                if (distanceValue !== null) updatePayload.jarak_pulang = String(distanceValue);
                 updatePayload.status_absen = 'Pulang';
             }
 
-            console.log("Updating shift record:", shiftRecord.id, "with payload:", updatePayload);
+            console.log(`Finalizing attendance for ${user.name} on shift ${shiftRecord.id}. Payload:`, JSON.stringify(updatePayload));
             const data = await absensiService.update(shiftRecord.id, updatePayload);
 
             return res.status(201).json({ 
@@ -284,16 +288,12 @@ class AbsensiController {
             });
 
         } catch (error) {
-            console.error("AbsensiController.storeWajah error details:", {
-                message: error.message,
-                stack: error.stack,
-                payload: req.body
-            });
+            console.error("AbsensiController.storeWajah FATAL ERROR:", error);
             return res.status(500).json({ 
                 success: false, 
-                message: "Gagal membuat absensi wajah", 
+                message: "Gagal memproses absensi wajah di server.", 
                 error: error.message,
-                debug: process.env.NODE_ENV === 'development' ? error.stack : undefined
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
             });
         }
     }

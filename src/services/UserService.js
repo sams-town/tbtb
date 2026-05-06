@@ -4,6 +4,29 @@ import fileService from "./FileService.js";
 
 class UserService {
     /**
+     * Get only users who have face recognition data for efficient matching
+     */
+    async getAllForFaceRecognition() {
+        const users = await prisma.users.findMany({
+            where: {
+                foto_face_recognition: { not: null }
+            },
+            select: {
+                id: true,
+                name: true,
+                foto_face_recognition: true,
+                lock_face: true,
+                jabatan: {
+                    select: {
+                        nama_jabatan: true
+                    }
+                }
+            }
+        });
+        return users.map(u => this.serialize(u));
+    }
+
+    /**
      * Get all users with optional pagination & search
      */
     async getAll(query = {}, authUser = null) {

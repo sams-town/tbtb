@@ -254,20 +254,25 @@ class AbsensiController {
             };
 
             const filename = path.basename(incomingPath);
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
             if (tipe_absen === 'masuk') {
-                updatePayload.jam_absen = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                updatePayload.jam_absen = timeStr;
                 updatePayload.foto_jam_absen = `/uploads/absensi/${filename}`;
                 if (payload.lat) updatePayload.lat_absen = String(payload.lat);
                 if (payload.long) updatePayload.long_absen = String(payload.long);
+                if (payload.jarak_masuk) updatePayload.jarak_masuk = String(payload.jarak_masuk);
                 updatePayload.status_absen = 'Masuk';
             } else {
-                updatePayload.jam_pulang = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                updatePayload.jam_pulang = timeStr;
                 updatePayload.foto_jam_pulang = `/uploads/absensi/${filename}`;
                 if (payload.lat) updatePayload.lat_pulang = String(payload.lat);
                 if (payload.long) updatePayload.long_pulang = String(payload.long);
+                if (payload.jarak_pulang) updatePayload.jarak_pulang = String(payload.jarak_pulang);
                 updatePayload.status_absen = 'Pulang';
             }
 
+            console.log("Updating shift record:", shiftRecord.id, "with payload:", updatePayload);
             const data = await absensiService.update(shiftRecord.id, updatePayload);
 
             return res.status(201).json({ 
@@ -279,8 +284,17 @@ class AbsensiController {
             });
 
         } catch (error) {
-            console.error("AbsensiController.storeWajah error:", error);
-            return res.status(500).json({ success: false, message: "Gagal membuat absensi wajah", error: error.message });
+            console.error("AbsensiController.storeWajah error details:", {
+                message: error.message,
+                stack: error.stack,
+                payload: req.body
+            });
+            return res.status(500).json({ 
+                success: false, 
+                message: "Gagal membuat absensi wajah", 
+                error: error.message,
+                debug: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            });
         }
     }
 

@@ -95,11 +95,7 @@ class AbsensiController {
                     const theFile = uploadedFiles[0];
                     incomingPath = path.join(ROOT_DIR, "public", "uploads", "absensi", theFile.filename);
                     
-                    if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
-                        payload.foto_jam_pulang = `/uploads/absensi/${theFile.filename}`;
-                    } else {
-                        payload.foto_jam_absen = `/uploads/absensi/${theFile.filename}`;
-                    }
+                    // We will set the final photo path later after determining if it's 'masuk' or 'pulang'
                 }
             }
 
@@ -110,7 +106,7 @@ class AbsensiController {
             let user = null;
             let matchResult = { user: null, distance: null };
 
-            // Jika user_id dikirim dari frontend, lakukan verifikasi 1:1 (lebih akurat & aman)
+            // 1. Identify User
             if (payload.user_id) {
                 user = await userService.getById(payload.user_id);
                 if (!user) {
@@ -132,7 +128,6 @@ class AbsensiController {
                     matchResult.distance = verifyResult.distance;
                 }
             } else {
-                // Jika tidak ada user_id, lakukan pencarian wajah ke semua user (Auto-ID)
                 const usersResult = await userService.getAll({ limit: 10000 });
                 const allUsers = usersResult.data || [];
                 matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
@@ -145,119 +140,144 @@ class AbsensiController {
                 }
                 user = matchResult.user;
             }
-            
-            // Gunakan tanggal lokal server YYYY-MM-DD
+
+            // 2. Determine Shift and Attendance Type
             const now = new Date();
-            const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            const todayStr = payload.tanggal || localToday;
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
 
-            // 1. Cek Shift hari ini (Mapping Shift)
-            const existingRecords = await absensiService.getByIdUsersHistory(user.id.toString(), todayStr, todayStr);
-            if (!existingRecords || existingRecords.length === 0) {
+            // Fetch shifts for yesterday and today
+            const recentShifts = await absensiService.getByIdUsersHistory(user.id.toString(), yesterdayStr, todayStr);
+            
+            if (!recentShifts || recentShifts.length === 0) {
                 return res.status(400).json({ 
                     success: false, 
-                    message: "Absensi gagal. Anda belum mempunyai shift untuk hari ini." 
-                });
-            }
-            const shiftRecord = existingRecords[0];
-
-            // 1.1 Cek jika sudah absen masuk & pulang (Selesai)
-            if (shiftRecord.jam_absen && shiftRecord.jam_pulang) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Absensi gagal. Anda sudah melakukan absensi masuk dan pulang untuk hari ini." 
+                    message: "Absensi gagal. Anda tidak memiliki jadwal shift (Mapping Shift) untuk kemarin atau hari ini." 
                 });
             }
 
-            // 1.2 Cek spesifik sesuai tipe (Masuk atau Pulang)
-            if (payload.tipe_absen === 'masuk' && shiftRecord.jam_absen) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Absensi gagal. Anda sudah mengisi jam masuk untuk hari ini." 
-                });
+            const isSameDay = (dateInput, targetStr) => {
+                const d1 = new Date(dateInput);
+                const d2 = new Date(targetStr);
+                return d1.getFullYear() === d2.getFullYear() &&
+                       d1.getMonth() === d2.getMonth() &&
+                       d1.getDate() === d2.getDate();
+            };
+
+            let shiftRecord = null;
+            let tipe_absen = payload.tipe_absen; // 'masuk' or 'pulang'
+
+            // SMART LOGIC: Find the best shift record
+            if (tipe_absen === 'pulang' || tipe_absen === 'keluar') {
+                // If marking home, prioritize the record that has 'masuk' but NO 'pulang'
+                shiftRecord = recentShifts.find(s => s.jam_absen && !s.jam_pulang);
+                if (!shiftRecord) {
+                    // Fallback to today's record even if 'masuk' is empty (maybe they forgot to clock in but want to clock out)
+                    shiftRecord = recentShifts.find(s => isSameDay(s.tanggal, todayStr));
+                }
+            } else if (tipe_absen === 'masuk') {
+                // If marking in, prioritize today's record that hasn't been clocked in
+                shiftRecord = recentShifts.find(s => isSameDay(s.tanggal, todayStr) && !s.jam_absen);
+                if (!shiftRecord) {
+                    // Check if they already clocked in today
+                    const alreadyIn = recentShifts.find(s => isSameDay(s.tanggal, todayStr) && s.jam_absen);
+                    if (alreadyIn) {
+                        return res.status(400).json({ success: false, message: "Absensi gagal. Anda sudah melakukan absensi masuk untuk shift hari ini." });
+                    }
+                }
+            } else {
+                // AUTO DETECTION if tipe_absen is not provided
+                // 1. Is there an open shift from yesterday or today?
+                const openShift = recentShifts.find(s => s.jam_absen && !s.jam_pulang);
+                if (openShift) {
+                    shiftRecord = openShift;
+                    tipe_absen = 'pulang';
+                } else {
+                    // 2. No open shift, try to mark 'masuk' for today
+                    const todayShift = recentShifts.find(s => isSameDay(s.tanggal, todayStr));
+                    if (todayShift) {
+                        if (todayShift.jam_absen && todayShift.jam_pulang) {
+                            return res.status(400).json({ success: false, message: "Absensi gagal. Jadwal shift hari ini sudah selesai (Sudah Masuk & Pulang)." });
+                        }
+                        shiftRecord = todayShift;
+                        tipe_absen = todayShift.jam_absen ? 'pulang' : 'masuk';
+                    }
+                }
             }
-            if ((payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') && shiftRecord.jam_pulang) {
+
+            if (!shiftRecord) {
                 return res.status(400).json({ 
                     success: false, 
-                    message: "Absensi gagal. Anda sudah mengisi jam pulang untuk hari ini." 
+                    message: "Absensi gagal. Tidak ditemukan jadwal shift yang sesuai untuk melakukan absensi saat ini." 
                 });
             }
 
-            // 2. Cek Lokasi dan Radius
+            // Final check: if we decided it's 'pulang' but it's already filled
+            if (tipe_absen === 'pulang' && shiftRecord.jam_pulang) {
+                return res.status(400).json({ success: false, message: "Absensi gagal. Anda sudah mengisi jam pulang untuk shift ini." });
+            }
+
+            // 3. Location and Radius Check
             const isLocked = shiftRecord.lock_location === "1" || shiftRecord.lock_location === 1;
-
-            // Jika terkunci, WAJIB ada koordinat
             if (isLocked && (!payload.lat || !payload.long)) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Absensi gagal. Lokasi (GPS) wajib aktif untuk shift ini." 
-                });
+                return res.status(400).json({ success: false, message: "Absensi gagal. Lokasi (GPS) wajib aktif untuk shift ini." });
             }
 
             if (payload.lat && payload.long) {
                 if (user.lokasi) {
-                    const userLat = parseFloat(payload.lat);
-                    const userLong = parseFloat(payload.long);
-                    const officeLat = parseFloat(user.lokasi.lat_kantor);
-                    const officeLong = parseFloat(user.lokasi.long_kantor);
+                    const distance = this.calculateDistance(
+                        parseFloat(payload.lat), parseFloat(payload.long),
+                        parseFloat(user.lokasi.lat_kantor), parseFloat(user.lokasi.long_kantor)
+                    );
                     const radius = parseFloat(user.lokasi.radius || 0);
 
-                    if (officeLat && officeLong && radius > 0) {
-                        const distance = this.calculateDistance(userLat, userLong, officeLat, officeLong);
-                        
-                        // Cek radius HANYA jika isLocked adalah benar (1)
-                        if (isLocked && distance > radius) {
-                            return res.status(400).json({ 
-                                success: false, 
-                                message: `Absensi gagal. Anda berada di luar radius lokasi yang diizinkan (Jarak: ${Math.round(distance)}m, Izin: ${radius}m).` 
-                            });
-                        }
-
-                        // Simpan info jarak 
-                        if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
-                            payload.jarak_pulang = String(Math.round(distance));
-                        } else {
-                            payload.jarak_masuk = String(Math.round(distance));
-                        }
+                    if (isLocked && radius > 0 && distance > radius) {
+                        return res.status(400).json({ 
+                            success: false, 
+                            message: `Absensi gagal. Anda berada di luar radius (Jarak: ${Math.round(distance)}m, Izin: ${radius}m).` 
+                        });
                     }
+
+                    if (tipe_absen === 'pulang') payload.jarak_pulang = String(Math.round(distance));
+                    else payload.jarak_masuk = String(Math.round(distance));
                 } else if (isLocked) {
-                    // Jika ter-lock tapi user tidak punya lokasi kantor
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "Absensi gagal. Lokasi kantor belum diatur untuk Anda (Shift Locked)." 
-                    });
+                    return res.status(400).json({ success: false, message: "Absensi gagal. Lokasi kantor belum diatur (Shift Terkunci)." });
                 }
             }
 
-            // Jika valid, assign user_id dan lanjutkan pembuatan absensi
-            payload.user_id = user.id.toString();
+            // 4. Update Database
+            const updatePayload = {
+                user_id: user.id.toString()
+            };
 
-            // Mapping custom frontend fields to Prisma schema fields
-            if (payload.tipe_absen === 'masuk') {
-                if (payload.lat) payload.lat_absen = String(payload.lat);
-                if (payload.long) payload.long_absen = String(payload.long);
-                payload.status_absen = 'Masuk';
-            } else if (payload.tipe_absen === 'keluar' || payload.tipe_absen === 'pulang') {
-                if (payload.lat) payload.lat_pulang = String(payload.lat);
-                if (payload.long) payload.long_pulang = String(payload.long);
-                payload.status_absen = 'Pulang';
+            const filename = path.basename(incomingPath);
+            if (tipe_absen === 'masuk') {
+                updatePayload.jam_absen = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                updatePayload.foto_jam_absen = `/uploads/absensi/${filename}`;
+                if (payload.lat) updatePayload.lat_absen = String(payload.lat);
+                if (payload.long) updatePayload.long_absen = String(payload.long);
+                updatePayload.status_absen = 'Masuk';
+            } else {
+                updatePayload.jam_pulang = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                updatePayload.foto_jam_pulang = `/uploads/absensi/${filename}`;
+                if (payload.lat) updatePayload.lat_pulang = String(payload.lat);
+                if (payload.long) updatePayload.long_pulang = String(payload.long);
+                updatePayload.status_absen = 'Pulang';
             }
 
-            // Cleanup fields that Prisma mapping_shifts table doesn't have
-            delete payload.lat;
-            delete payload.long;
-            delete payload.tipe_absen;
-
-            // Update record shift yang sudah ada (allocation) atau gunakan yang lama
-            const data = await absensiService.update(shiftRecord.id, payload);
+            const data = await absensiService.update(shiftRecord.id, updatePayload);
 
             return res.status(201).json({ 
                 success: true, 
-                message: `Absensi wajah berhasil, dikenali sebagai: ${user.name}`, 
+                message: `Absensi ${tipe_absen} wajah berhasil: ${user.name}`, 
                 data, 
                 distance: matchResult.distance,
                 user: user
             });
+
         } catch (error) {
             console.error("AbsensiController.storeWajah error:", error);
             return res.status(500).json({ success: false, message: "Gagal membuat absensi wajah", error: error.message });

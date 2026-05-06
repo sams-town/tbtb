@@ -71,11 +71,8 @@ class AbsensiService {
         const start = new Date(tanggal_mulai);
         let end = new Date(tanggal_akhir);
 
-        // Jika tanggal mulai dan akhir sama, munculkan seluruh hari itu
-        if (start.toDateString() === end.toDateString()) {
-            end = new Date(start);
-            end.setDate(end.getDate() + 1);
-        }
+        // Always add 1 day to end date to make it inclusive (until end of that day)
+        end.setDate(end.getDate() + 1);
 
         const record = await prisma.mapping_shifts.findMany({
             where: {

@@ -3,35 +3,95 @@ import prisma from "../config/prisma.js";
 class AbsensiService {
     async getAll(query = {}) {
         const search = query.search || "";
+        const limit = parseInt(query.limit) || 10;
+        const page = parseInt(query.page) || 1;
+        const skip = (page - 1) * limit;
+
         const where = {
-            ... (search ? {
+            AND: []
+        };
+
+        if (search) {
+            where.AND.push({
                 OR: [
                     { status_absen: { contains: search } },
                     { keterangan_masuk: { contains: search } },
                     { keterangan_pulang: { contains: search } },
+                    { users: { name: { contains: search } } }
                 ]
-            } : {})
-        };
-        if (query.user_id && query.user_id !== "undefined") where.user_id = BigInt(query.user_id);
-        if (query.start_date && query.end_date) {
-            where.tanggal = {
-                gte: new Date(query.start_date),
-                lte: new Date(query.end_date)
-            };
+            });
         }
-        const data = await prisma.mapping_shifts.findMany({
-            where,
-            orderBy: { id: "desc" },
-            include: {
-                users: {
-                    include: {
-                        lokasi: true
-                    }
-                },
-                shifts: true
+
+        if (query.user_id && query.user_id !== "undefined") {
+            where.AND.push({ user_id: BigInt(query.user_id) });
+        }
+
+        if (query.lokasi_id && query.lokasi_id !== "undefined") {
+            where.AND.push({ users: { lokasi_id: BigInt(query.lokasi_id) } });
+        }
+
+        if (query.tanggal) {
+            const date = new Date(query.tanggal);
+            const startOfDay = new Date(date);
+            startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(date);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            where.AND.push({
+                tanggal: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                }
+            });
+        }
+
+        if (query.start_date && query.end_date) {
+            where.AND.push({
+                tanggal: {
+                    gte: new Date(query.start_date),
+                    lte: new Date(query.end_date)
+                }
+            });
+        }
+
+        if (query.has_logs === 'true') {
+            where.AND.push({
+                OR: [
+                    { jam_absen: { not: null } },
+                    { jam_pulang: { not: null } }
+                ]
+            });
+        }
+
+        const finalWhere = where.AND.length > 0 ? where : {};
+
+        const [data, total] = await Promise.all([
+            prisma.mapping_shifts.findMany({
+                where: finalWhere,
+                orderBy: { id: "desc" },
+                skip,
+                take: limit,
+                include: {
+                    users: {
+                        include: {
+                            lokasi: true
+                        }
+                    },
+                    shifts: true
+                }
+            }),
+            prisma.mapping_shifts.count({ where: finalWhere })
+        ]);
+
+        return { 
+            data: this.serializeList(data),
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
             }
-        });
-        return { data: this.serializeList(data) };
+        };
     }
 
     async getById(id) {

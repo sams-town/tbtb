@@ -31,18 +31,19 @@ class AbsensiService {
         }
 
         if (query.tanggal) {
-            const date = new Date(query.tanggal);
-            const startOfDay = new Date(date);
-            startOfDay.setHours(0, 0, 0, 0);
-            const endOfDay = new Date(date);
-            endOfDay.setHours(23, 59, 59, 999);
+            const dateParts = query.tanggal.split("-").map(Number);
+            if (dateParts.length === 3) {
+                // Create date in local time to match how bulkCreateRange stores it
+                const startOfDay = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0, 0);
+                const endOfDay = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 23, 59, 59, 999);
 
-            where.AND.push({
-                tanggal: {
-                    gte: startOfDay,
-                    lte: endOfDay
-                }
-            });
+                where.AND.push({
+                    tanggal: {
+                        gte: startOfDay,
+                        lte: endOfDay
+                    }
+                });
+            }
         }
 
         if (query.start_date && query.end_date) {

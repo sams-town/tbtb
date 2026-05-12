@@ -250,24 +250,40 @@ class AbsensiController {
 
             if (payload.lat && payload.long) {
                 if (user.lokasi) {
-                    const distance = this.calculateDistance(
-                        parseFloat(payload.lat), parseFloat(payload.long),
-                        parseFloat(user.lokasi.lat_kantor), parseFloat(user.lokasi.long_kantor)
-                    );
-                    const radius = parseFloat(user.lokasi.radius || 0);
-                    distanceValue = Math.round(distance);
+                    const officeLat = parseFloat(user.lokasi.lat_kantor);
+                    const officeLong = parseFloat(user.lokasi.long_kantor);
+                    
+                    // Validate office coordinates
+                    if (isNaN(officeLat) || isNaN(officeLong) || (Math.abs(officeLat) < 0.0001 && Math.abs(officeLong) < 0.0001)) {
+                        console.warn(`User ${user.name} has invalid office coordinates: ${officeLat}, ${officeLong}`);
+                        if (isLocked) {
+                            return res.status(400).json({ 
+                                success: false, 
+                                message: "Absensi gagal. Koordinat kantor tidak valid atau belum diatur dengan benar." 
+                            });
+                        }
+                    } else {
+                        const distance = this.calculateDistance(
+                            parseFloat(payload.lat), parseFloat(payload.long),
+                            officeLat, officeLong
+                        );
+                        const radius = parseFloat(user.lokasi.radius || 0);
+                        distanceValue = Math.round(distance);
 
-                    if (isLocked && radius > 0 && distance > radius) {
-                        return res.status(400).json({ 
-                            success: false, 
-                            message: `Absensi gagal. Anda berada di luar radius (Jarak: ${distanceValue}m, Izin: ${radius}m).` 
-                        });
+                        console.log(`[ABSEN] User: ${user.name}, Jarak: ${distanceValue}m, Radius: ${radius}m, Locked: ${isLocked}`);
+
+                        if (isLocked && radius > 0 && distance > radius) {
+                            return res.status(400).json({ 
+                                success: false, 
+                                message: `Absensi gagal. Anda berada di luar radius kantor.\nJarak Anda: ${distanceValue}m\nBatas Izin: ${radius}m\n\nSilakan mendekat ke lokasi kantor.` 
+                            });
+                        }
                     }
                 } else if (isLocked) {
-                    return res.status(400).json({ success: false, message: "Absensi gagal. Lokasi kantor belum diatur (Shift Terkunci)." });
+                    return res.status(400).json({ success: false, message: "Absensi gagal. Anda belum memiliki lokasi kantor yang ditugaskan (Shift Terkunci)." });
                 }
             } else if (isLocked) {
-                return res.status(400).json({ success: false, message: "Absensi gagal. Lokasi (GPS) wajib aktif untuk shift ini." });
+                return res.status(400).json({ success: false, message: "Absensi gagal. Izin lokasi (GPS) wajib aktif untuk melakukan absensi pada shift ini." });
             }
 
             // 4. Update Database

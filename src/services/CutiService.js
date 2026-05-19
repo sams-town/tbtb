@@ -169,8 +169,10 @@ class CutiService {
             if (amount > 0 && existing.user_id) {
                 const label = (existing.nama_cuti || "").toLowerCase();
                 let fieldToUpdate = "izin_lainnya";
-                if (label.includes("cuti")) fieldToUpdate = "izin_cuti";
-                else if (label.includes("telat")) fieldToUpdate = "izin_telat";
+                if (label.includes("melahirkan")) fieldToUpdate = "cuti_melahirkan";
+                else if (label.includes("kematian") || label.includes("meninggal")) fieldToUpdate = "cuti_kematian";
+                else if (label.includes("tahunan") || (label.includes("cuti") && !label.includes("menikah"))) fieldToUpdate = "izin_cuti";
+                else if (label.includes("telat") || label.includes("terlambat")) fieldToUpdate = "izin_telat";
                 else if (label.includes("pulang")) fieldToUpdate = "izin_pulang_cepat";
 
                 await tx.users.update({

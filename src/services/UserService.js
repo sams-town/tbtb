@@ -41,7 +41,13 @@ class UserService {
         }
 
         const andConditions = [
-            { id: { notIn: excludedUserIds } }
+            { id: { notIn: excludedUserIds } },
+            {
+                OR: [
+                    { is_admin: { not: 'admin' } },
+                    { is_admin: null }
+                ]
+            }
         ];
 
         if (filterJabatanId) {
@@ -121,9 +127,9 @@ class UserService {
             const label = (r.nama_cuti || "").toLowerCase();
             let type = "lainnya";
             if (label.includes("melahirkan")) type = "melahirkan";
-            else if (label.includes("kematian")) type = "kematian";
-            else if (label.includes("cuti")) type = "cuti";
-            else if (label.includes("telat")) type = "telat";
+            else if (label.includes("kematian") || label.includes("meninggal")) type = "kematian";
+            else if (label.includes("tahunan") || (label.includes("cuti") && !label.includes("menikah"))) type = "cuti";
+            else if (label.includes("telat") || label.includes("terlambat")) type = "telat";
             else if (label.includes("pulang")) type = "pulang_cepat";
             const t = r.tanggal || "";
             let amount = 1;
@@ -230,7 +236,14 @@ class UserService {
             }
         }
 
-        const andConditions = [];
+        const andConditions = [
+            {
+                OR: [
+                    { is_admin: { not: 'admin' } },
+                    { is_admin: null }
+                ]
+            }
+        ];
 
         if (filterJabatanId) {
             andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
@@ -311,9 +324,9 @@ class UserService {
             const label = (r.nama_cuti || "").toLowerCase();
             let type = "lainnya";
             if (label.includes("melahirkan")) type = "melahirkan";
-            else if (label.includes("kematian")) type = "kematian";
-            else if (label.includes("cuti")) type = "cuti";
-            else if (label.includes("telat")) type = "telat";
+            else if (label.includes("kematian") || label.includes("meninggal")) type = "kematian";
+            else if (label.includes("tahunan") || (label.includes("cuti") && !label.includes("menikah"))) type = "cuti";
+            else if (label.includes("telat") || label.includes("terlambat")) type = "telat";
             else if (label.includes("pulang")) type = "pulang_cepat";
             const t = r.tanggal || "";
             let amount = 1;
@@ -397,6 +410,10 @@ class UserService {
         const users = await prisma.users.findMany({
             where: {
                 id: { notIn: excludedUserIds },
+                OR: [
+                    { is_admin: { not: 'admin' } },
+                    { is_admin: null }
+                ],
                 AND: [
                     { foto_face_recognition: { not: null } },
                     { foto_face_recognition: { not: "" } },
@@ -442,9 +459,9 @@ class UserService {
             const label = (r.nama_cuti || "").toLowerCase();
             let type = "lainnya";
             if (label.includes("melahirkan")) type = "melahirkan";
-            else if (label.includes("kematian")) type = "kematian";
-            else if (label.includes("cuti")) type = "cuti";
-            else if (label.includes("telat")) type = "telat";
+            else if (label.includes("kematian") || label.includes("meninggal")) type = "kematian";
+            else if (label.includes("tahunan") || (label.includes("cuti") && !label.includes("menikah"))) type = "cuti";
+            else if (label.includes("telat") || label.includes("terlambat")) type = "telat";
             else if (label.includes("pulang")) type = "pulang_cepat";
             const t = r.tanggal || "";
             let amount = 1;

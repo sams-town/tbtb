@@ -3,8 +3,8 @@ import dashboardService from "../services/DashboardService.js";
 class DashboardController {
     async index(req, res) {
         try {
-            const { month, year } = req.query;
-            const stats = await dashboardService.getStats(month, year);
+            const { month, year, date } = req.query;
+            const stats = await dashboardService.getStats(month, year, date);
             return res.json({
                 success: true,
                 message: "Dashboard summary data retrieved successfully",

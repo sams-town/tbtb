@@ -44,7 +44,7 @@ class UserService {
             { id: { notIn: excludedUserIds } },
             {
                 OR: [
-                    { is_admin: { not: 'admin' } },
+                    { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }
                 ]
             }
@@ -239,7 +239,7 @@ class UserService {
         const andConditions = [
             {
                 OR: [
-                    { is_admin: { not: 'admin' } },
+                    { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }
                 ]
             }
@@ -411,7 +411,7 @@ class UserService {
             where: {
                 id: { notIn: excludedUserIds },
                 OR: [
-                    { is_admin: { not: 'admin' } },
+                    { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }
                 ],
                 AND: [

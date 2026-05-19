@@ -164,7 +164,10 @@ class PayrollService {
             // Get all users who are not admins
             const allUsers = await tx.users.findMany({
                 where: {
-                    is_admin: { not: "admin" }
+                    OR: [
+                        { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
+                        { is_admin: null }
+                    ]
                 },
                 include: {
                     jabatan: true

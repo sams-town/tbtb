@@ -17,7 +17,7 @@ class DashboardService {
         const totalPegawai = await prisma.users.count({
             where: {
                 OR: [
-                    { is_admin: { not: 'admin' } },
+                    { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }
                 ]
             }
@@ -36,7 +36,7 @@ class DashboardService {
                 },
                 users: {
                     OR: [
-                        { is_admin: { not: 'admin' } },
+                        { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                         { is_admin: null }
                     ]
                 }
@@ -78,7 +78,7 @@ class DashboardService {
                 },
                 users: {
                     OR: [
-                        { is_admin: { not: 'admin' } },
+                        { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                         { is_admin: null }
                     ]
                 }
@@ -141,7 +141,7 @@ class DashboardService {
             where: { 
                 id: { in: dlUserIds },
                 OR: [
-                    { is_admin: { not: 'admin' } },
+                    { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }
                 ]
             },
@@ -177,7 +177,7 @@ class DashboardService {
             where: {
                 id: { in: cutiUserIds },
                 OR: [
-                    { is_admin: { not: 'admin' } },
+                    { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }
                 ]
             },
@@ -232,7 +232,7 @@ class DashboardService {
                 status: 'Approved',
                 karyawan: {
                     OR: [
-                        { is_admin: { not: 'admin' } },
+                        { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                         { is_admin: null }
                     ]
                 }
@@ -260,7 +260,7 @@ class DashboardService {
             where: { 
                 tgl_lahir: { not: null },
                 OR: [
-                    { is_admin: { not: 'admin' } },
+                    { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }
                 ]
             },

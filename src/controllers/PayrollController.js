@@ -91,6 +91,17 @@ class PayrollController {
             return res.status(500).json({ success: false, message: "Gagal men-generate payroll", error: error.message });
         }
     }
+
+    async bulkImport(req, res) {
+        try {
+            const { bulan, tahun, payrolls } = req.body;
+            const result = await PayrollService.bulkImport(bulan, tahun, payrolls);
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error("PayrollController.bulkImport error:", error);
+            return res.status(500).json({ success: false, message: "Gagal meng-import payroll", error: error.message });
+        }
+    }
 }
 
 export default new PayrollController();

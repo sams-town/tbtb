@@ -1000,6 +1000,9 @@ class UserService {
                 serialized[key] = value;
             }
         }
+        if (!serialized.foto_karyawan && serialized.foto_face_recognition) {
+            serialized.foto_karyawan = serialized.foto_face_recognition;
+        }
         return serialized;
     }
 

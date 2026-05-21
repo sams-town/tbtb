@@ -252,7 +252,21 @@ router.delete("/documents/:id", (req, res) => fileController.destroy(req, res));
 // ========================
 // SETTING ROUTES
 // ========================
-const settingUpload = createUploadMiddleware("logos", "logo");
+const settingUpload = createUploadMiddleware(
+    "logos",
+    "logo",
+    [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "image/jpeg",
+        "image/png",
+        "image/jpg"
+    ],
+    10 * 1024 * 1024
+);
 router.get("/settings", (req, res) => settingController.index(req, res));
 router.get("/settings/:id", (req, res) => settingController.show(req, res));
 router.post("/settings", settingUpload.fields([{ name: "logo", maxCount: 1 }, { name: "form_cuti", maxCount: 1 }, { name: "slip_gaji", maxCount: 1 }, { name: "form_lembur", maxCount: 1 }]), (req, res) => settingController.store(req, res));
@@ -382,6 +396,7 @@ router.get("/payrolls/:id", (req, res) => payrollController.show(req, res));
 router.get("/payrolls_user/:id/:bulan/:tahun", (req, res) => payrollController.showUser(req, res));
 router.post("/payrolls/generate", (req, res) => payrollController.generate(req, res));
 router.post("/payrolls/generate-all", (req, res) => payrollController.generateAll(req, res));
+router.post("/payrolls/bulk-import", (req, res) => payrollController.bulkImport(req, res));
 router.put("/payrolls/:id", (req, res) => payrollController.update(req, res));
 router.delete("/payrolls/:id", (req, res) => payrollController.destroy(req, res));
 

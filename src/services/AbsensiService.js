@@ -69,7 +69,10 @@ class AbsensiService {
         const [data, total] = await Promise.all([
             prisma.mapping_shifts.findMany({
                 where: finalWhere,
-                orderBy: { id: "desc" },
+                orderBy: [
+                    { tanggal: "desc" },
+                    { id: "desc" }
+                ],
                 skip,
                 take: limit,
                 include: {
@@ -255,6 +258,7 @@ class AbsensiService {
                 id: true,
                 name: true,
                 foto_karyawan: true,
+                foto_face_recognition: true,
                 batas_terlambat: true
             }
         });
@@ -330,7 +334,7 @@ class AbsensiService {
                 user_id: user.id.toString(),
                 user: {
                     name: user.name,
-                    foto_karyawan: user.foto_karyawan
+                    foto_karyawan: user.foto_karyawan || user.foto_face_recognition
                 },
                 ...stats,
                 total_lembur: "0 Jam 0 Menit", // Placeholder for actual calculation

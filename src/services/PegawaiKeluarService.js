@@ -34,7 +34,7 @@ class PegawaiKeluarService {
         if (ids.length) {
             const users = await prisma.users.findMany({
                 where: { id: { in: ids } },
-                select: { id: true, name: true, email: true, foto_karyawan: true }
+                select: { id: true, name: true, email: true, foto_karyawan: true, foto_face_recognition: true }
             });
             usersMap = Object.fromEntries(users.map(u => [u.id, u]));
         }
@@ -62,7 +62,7 @@ class PegawaiKeluarService {
         if (record.user_id) {
             userInfo = await prisma.users.findUnique({
                 where: { id: record.user_id },
-                select: { id: true, name: true, email: true, foto_karyawan: true }
+                select: { id: true, name: true, email: true, foto_karyawan: true, foto_face_recognition: true }
             });
         }
         return this.serialize({ ...record, user: userInfo });
@@ -184,6 +184,9 @@ class PegawaiKeluarService {
                 email: serialized.users.email,
             };
             delete serialized.users;
+        }
+        if (serialized.user && !serialized.user.foto_karyawan && serialized.user.foto_face_recognition) {
+            serialized.user.foto_karyawan = serialized.user.foto_face_recognition;
         }
         return serialized;
     }

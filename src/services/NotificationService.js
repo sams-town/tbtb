@@ -38,19 +38,22 @@ class NotificationService {
         if (userIds.size > 0) {
             const users = await prisma.users.findMany({
                 where: { id: { in: Array.from(userIds) } },
-                select: { id: true, name: true, foto_karyawan: true }
+                select: { id: true, name: true, foto_karyawan: true, foto_face_recognition: true }
             });
             const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
-            usersMap = Object.fromEntries(users.map(u => [
-                u.id.toString(),
-                {
-                    id: u.id.toString(),
-                    name: u.name,
-                    foto_karyawan: u.foto_karyawan
-                        ? (u.foto_karyawan.startsWith('http') ? u.foto_karyawan : `${baseUrl}/uploads/profile/${u.foto_karyawan}`)
-                        : null
-                }
-            ]));
+            usersMap = Object.fromEntries(users.map(u => {
+                const photo = u.foto_karyawan || u.foto_face_recognition;
+                return [
+                    u.id.toString(),
+                    {
+                        id: u.id.toString(),
+                        name: u.name,
+                        foto_karyawan: photo
+                            ? (photo.startsWith('http') ? photo : `${baseUrl}/uploads/profile/${photo}`)
+                            : null
+                    }
+                ];
+            }));
         }
 
         // Attach user ke setiap notifikasi
@@ -80,16 +83,21 @@ class NotificationService {
         if (serialized.data?.user_id) {
             const user = await prisma.users.findUnique({
                 where: { id: BigInt(serialized.data.user_id) },
-                select: { id: true, name: true, foto_karyawan: true }
+                select: { id: true, name: true, foto_karyawan: true, foto_face_recognition: true }
             });
             const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
-            serialized.user = user ? {
-                id: user.id.toString(),
-                name: user.name,
-                foto_karyawan: user.foto_karyawan
-                    ? (user.foto_karyawan.startsWith('http') ? user.foto_karyawan : `${baseUrl}/uploads/profile/${user.foto_karyawan}`)
-                    : null
-            } : null;
+            if (user) {
+                const photo = user.foto_karyawan || user.foto_face_recognition;
+                serialized.user = {
+                    id: user.id.toString(),
+                    name: user.name,
+                    foto_karyawan: photo
+                        ? (photo.startsWith('http') ? photo : `${baseUrl}/uploads/profile/${photo}`)
+                        : null
+                };
+            } else {
+                serialized.user = null;
+            }
         } else {
             serialized.user = null;
         }

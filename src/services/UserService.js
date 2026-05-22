@@ -13,6 +13,7 @@ class UserService {
         const skip = (page - 1) * limit;
 
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
+            where: { status: 'APPROVED' },
             select: { user_id: true }
         });
         const excludedUserIds = pegawaiKeluars
@@ -206,6 +207,7 @@ class UserService {
         const search = query.search || "";
         
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
+            where: { status: 'APPROVED' },
             select: { user_id: true }
         });
         const keluarIdsSet = new Set(
@@ -401,6 +403,7 @@ class UserService {
      */
     async getAllForFaceRecognition() {
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
+            where: { status: 'APPROVED' },
             select: { user_id: true }
         });
         const excludedUserIds = pegawaiKeluars

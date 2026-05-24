@@ -78,22 +78,22 @@ class UserService {
 
         const where = { AND: andConditions };
 
-        if (query.role) {
-            const roleUsers = await prisma.model_has_roles.findMany({
-                where: {
-                    roles: {
-                        name: query.role
-                    }
-                },
-                select: { model_id: true }
-            });
-            const roleUserIds = roleUsers.map(ru => ru.model_id);
-            if (where.id) {
-                where.id = { ...where.id, in: roleUserIds };
-            } else {
-                where.id = { in: roleUserIds };
-            }
+        //  if (query.role) {
+        const roleUsers = await prisma.model_has_roles.findMany({
+            where: {
+                roles: {
+                    name: query.role
+                }
+            },
+            select: { model_id: true }
+        });
+        const roleUserIds = roleUsers.map(ru => ru.model_id);
+        if (where.id) {
+            where.id = { ...where.id, in: roleUserIds };
+        } else {
+            where.id = { in: roleUserIds };
         }
+        //   }
 
         const [data, total] = await Promise.all([
             prisma.users.findMany({
@@ -160,7 +160,7 @@ class UserService {
             const sisaMelahirkan = Number(user.cuti_melahirkan || 0n);
             const sisaKematian = Number(user.cuti_kematian || 0n);
             const used = usedMap[user.id] || { cuti: 0, telat: 0, pulang_cepat: 0, melahirkan: 0, kematian: 0, lainnya: 0 };
-            
+
             return {
                 ...this.serialize(user),
                 roles,
@@ -202,7 +202,7 @@ class UserService {
      */
     async getAllNoPaginate(query = {}, authUser = null) {
         const search = query.search || "";
-        
+
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
             where: { status: 'APPROVED' },
             select: { user_id: true }
@@ -346,7 +346,7 @@ class UserService {
             const roles = userRoles
                 .filter((ur) => ur.model_id === user.id)
                 .map((ur) => ur.roles.name);
-            
+
             const sisaCuti = Number(user.izin_cuti || 0n);
             const sisaTelat = Number(user.izin_telat || 0n);
             const sisaPulangCepat = Number(user.izin_pulang_cepat || 0n);
@@ -412,7 +412,7 @@ class UserService {
                     { foto_face_recognition: { not: "null" } }
                 ]
             },
-            include: { 
+            include: {
                 lokasi: true,
                 jabatan: true
             },

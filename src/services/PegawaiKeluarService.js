@@ -162,6 +162,30 @@ class PegawaiKeluarService {
         return true;
     }
 
+    async restore(id) {
+        const existing = await prisma.pegawai_keluars.findUnique({
+            where: { id: BigInt(id) },
+        });
+        if (!existing) return null;
+
+        await prisma.$transaction(async (tx) => {
+            await tx.pegawai_keluars.delete({ where: { id: BigInt(id) } });
+
+            await tx.kontraks.updateMany({
+                where: { 
+                    user_id: existing.user_id,
+                    keterangan: "TERMINATED"
+                },
+                data: {
+                    tanggal_selesai: null,
+                    keterangan: null,
+                },
+            });
+        });
+
+        return true;
+    }
+
     serialize(record) {
         const serialized = {};
         for (const [key, value] of Object.entries(record)) {

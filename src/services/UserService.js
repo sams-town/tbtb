@@ -689,9 +689,6 @@ class UserService {
         return this.serialize(user);
     }
 
-    /**
-     * Delete user by ID
-     */
     async delete(id, authUser = null) {
         const userId = BigInt(id);
         const existing = await prisma.users.findUnique({
@@ -699,75 +696,41 @@ class UserService {
         });
         if (!existing) return null;
         return await prisma.$transaction(async (tx) => {
-            // 1. Nullify references (optional fields where the user is an approver/manager)
-            await tx.cutis.updateMany({
-                where: { user_approval: userId },
-                data: { user_approval: null }
+            const existingResignation = await tx.pegawai_keluars.findFirst({
+                where: { user_id: userId }
             });
 
-            await tx.pengajuan_keuangans.updateMany({
-                where: { user_approval: userId },
-                data: { user_approval: null }
-            });
+            if (!existingResignation) {
+                await tx.pegawai_keluars.create({
+                    data: {
+                        user_id: userId,
+                        tanggal: new Date(),
+                        jenis: 'Pemutusan Hubungan Kerja (PHK)',
+                        alasan: 'Dihapus oleh admin dari daftar pegawai',
+                        approved_by: authUser ? BigInt(authUser.id) : null,
+                        tanggal_approval: new Date(),
+                        status: 'APPROVED',
+                        notes: 'Dipindahkan secara otomatis saat dihapus dari menu pegawai'
+                    }
+                });
+            } else {
+                await tx.pegawai_keluars.update({
+                    where: { id: existingResignation.id },
+                    data: {
+                        status: 'APPROVED',
+                        tanggal_approval: new Date(),
+                        approved_by: authUser ? BigInt(authUser.id) : null,
+                        notes: 'Diaktifkan status keluar saat dihapus dari menu pegawai'
+                    }
+                });
+            }
 
-            await tx.lemburs.updateMany({
-                where: { approved_by: userId },
-                data: { approved_by: null }
-            });
-
-            await tx.lokasis.updateMany({
-                where: { OR: [{ approved_by: userId }, { created_by: userId }] },
-                data: { approved_by: null, created_by: null }
-            });
-
-            await tx.mapping_shifts.updateMany({
-                where: { approved_by: userId },
-                data: { approved_by: null }
-            });
-
-            await tx.pegawai_keluars.updateMany({
-                where: { approved_by: userId },
-                data: { approved_by: null }
-            });
-
-            await tx.jabatans.updateMany({
-                where: { manager: userId },
-                data: { manager: null }
-            });
-
-            // 2. Delete data that belongs to the user (required/Cascade-like)
-            await tx.cutis.deleteMany({ where: { user_id: userId } });
-            await tx.files.deleteMany({ where: { user_id: userId } });
-            await tx.kasbons.deleteMany({ where: { user_id: userId } });
-            await tx.kontraks.deleteMany({ where: { user_id: userId } });
-            await tx.kunjungans.deleteMany({ where: { user_id: userId } });
-            await tx.laporan_kerjas.deleteMany({ where: { user_id: userId } });
-            await tx.laporan_kinerjas.deleteMany({ where: { user_id: userId } });
-            await tx.lemburs.deleteMany({ where: { user_id: userId } });
-            await tx.mapping_shifts.deleteMany({ where: { user_id: userId } });
-            await tx.pajaks.deleteMany({ where: { user_id: userId } });
-            await tx.patrolis.deleteMany({ where: { user_id: userId } });
-            await tx.payrolls.deleteMany({ where: { user_id: userId } });
-            await tx.pegawai_keluars.deleteMany({ where: { user_id: userId } });
-            await tx.pengajuan_keuangans.deleteMany({ where: { user_id: userId } });
-            await tx.rapat_notulens.deleteMany({ where: { user_id: userId } });
-            await tx.rapat_pegawais.deleteMany({ where: { user_id: userId } });
-            await tx.reimbursements.deleteMany({ where: { user_id: userId } });
-            await tx.reimbursements_items.deleteMany({ where: { user_id: userId } });
-            await tx.sips.deleteMany({ where: { user_id: userId } });
-            await tx.target_kinerja_teams.deleteMany({ where: { user_id: userId } });
-            await tx.model_has_roles.deleteMany({ where: { model_id: userId } });
-            await tx.model_has_permissions.deleteMany({ where: { model_id: userId } });
-            await tx.notifications.deleteMany({
-                where: { notifiable_id: userId, notifiable_type: "App\\Models\\User" },
-            });
-            await tx.personal_access_tokens.deleteMany({
-                where: { tokenable_id: userId, tokenable_type: "App\\Models\\User" },
-            });
-
-            // 3. Delete the user
-            await tx.users.delete({
-                where: { id: userId },
+            await tx.kontraks.updateMany({
+                where: { user_id: userId },
+                data: {
+                    tanggal_selesai: new Date(),
+                    keterangan: "TERMINATED",
+                },
             });
 
             return true;
@@ -784,46 +747,45 @@ class UserService {
 
         if (targetIds.length === 0) return false;
 
-        // Perform deletions in sequence or transaction
-        // For simplicity and to reuse the logic in delete(), we can use a loop or a more optimized transaction
         return await prisma.$transaction(async (tx) => {
-            // Nullify references for all targetIds at once
-            await tx.cutis.updateMany({ where: { user_approval: { in: targetIds } }, data: { user_approval: null } });
-            await tx.pengajuan_keuangans.updateMany({ where: { user_approval: { in: targetIds } }, data: { user_approval: null } });
-            await tx.lemburs.updateMany({ where: { approved_by: { in: targetIds } }, data: { approved_by: null } });
-            await tx.lokasis.updateMany({ where: { OR: [{ approved_by: { in: targetIds } }, { created_by: { in: targetIds } }] }, data: { approved_by: null, created_by: null } });
-            await tx.mapping_shifts.updateMany({ where: { approved_by: { in: targetIds } }, data: { approved_by: null } });
-            await tx.pegawai_keluars.updateMany({ where: { approved_by: { in: targetIds } }, data: { approved_by: null } });
-            await tx.jabatans.updateMany({ where: { manager: { in: targetIds } }, data: { manager: null } });
+            for (const userId of targetIds) {
+                const existingResignation = await tx.pegawai_keluars.findFirst({
+                    where: { user_id: userId }
+                });
 
-            // Delete related records for all targetIds at once
-            await tx.cutis.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.files.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.kasbons.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.kontraks.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.kunjungans.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.laporan_kerjas.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.laporan_kinerjas.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.lemburs.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.mapping_shifts.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.pajaks.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.patrolis.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.payrolls.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.pegawai_keluars.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.pengajuan_keuangans.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.rapat_notulens.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.rapat_pegawais.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.reimbursements.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.reimbursements_items.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.sips.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.target_kinerja_teams.deleteMany({ where: { user_id: { in: targetIds } } });
-            await tx.model_has_roles.deleteMany({ where: { model_id: { in: targetIds } } });
-            await tx.model_has_permissions.deleteMany({ where: { model_id: { in: targetIds } } });
-            await tx.notifications.deleteMany({ where: { notifiable_id: { in: targetIds }, notifiable_type: "App\\Models\\User" } });
-            await tx.personal_access_tokens.deleteMany({ where: { tokenable_id: { in: targetIds }, tokenable_type: "App\\Models\\User" } });
-            
-            // Delete users
-            await tx.users.deleteMany({ where: { id: { in: targetIds } } });
+                if (!existingResignation) {
+                    await tx.pegawai_keluars.create({
+                        data: {
+                            user_id: userId,
+                            tanggal: new Date(),
+                            jenis: 'Pemutusan Hubungan Kerja (PHK)',
+                            alasan: 'Dihapus oleh admin dari daftar pegawai',
+                            approved_by: authUser ? BigInt(authUser.id) : null,
+                            tanggal_approval: new Date(),
+                            status: 'APPROVED',
+                            notes: 'Dipindahkan secara otomatis saat dihapus dari menu pegawai secara massal'
+                        }
+                    });
+                } else {
+                    await tx.pegawai_keluars.update({
+                        where: { id: existingResignation.id },
+                        data: {
+                            status: 'APPROVED',
+                            tanggal_approval: new Date(),
+                            approved_by: authUser ? BigInt(authUser.id) : null,
+                            notes: 'Diaktifkan status keluar saat dihapus secara massal'
+                        }
+                    });
+                }
+
+                await tx.kontraks.updateMany({
+                    where: { user_id: userId },
+                    data: {
+                        tanggal_selesai: new Date(),
+                        keterangan: "TERMINATED",
+                    },
+                });
+            }
 
             return true;
         });

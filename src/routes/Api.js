@@ -137,6 +137,7 @@ router.get("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.show(req
 router.post("/pegawai-keluar", (req, res) => pegawaiKeluarController.store(req, res));
 router.put("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.update(req, res));
 router.put("/pegawai-keluar/:id/approve", upload.none(), (req, res) => pegawaiKeluarController.approve(req, res));
+router.put("/pegawai-keluar/:id/restore", authMiddleware, (req, res) => pegawaiKeluarController.restore(req, res));
 router.delete("/pegawai-keluar/:id", (req, res) => pegawaiKeluarController.destroy(req, res));
 
 // ========================

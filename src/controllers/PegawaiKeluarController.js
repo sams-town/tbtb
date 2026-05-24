@@ -178,6 +178,28 @@ class PegawaiKeluarController {
             });
         }
     }
+
+    async restore(req, res) {
+        try {
+            const ok = await pegawaiKeluarService.restore(req.params.id);
+            if (!ok) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Pegawai keluar tidak ditemukan",
+                });
+            }
+            return res.status(200).json({
+                success: true,
+                message: "Pegawai berhasil dipulangkan ke pegawai aktif",
+            });
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Gagal memulangkan pegawai keluar",
+                error: error.message,
+            });
+        }
+    }
 }
 
 export default new PegawaiKeluarController();

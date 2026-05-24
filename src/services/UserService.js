@@ -201,9 +201,6 @@ class UserService {
      * Get all users without pagination
      */
     async getAllNoPaginate(query = {}, authUser = null) {
-        const page = parseInt(query.page) || 1;
-        const limit = parseInt(query.limit) || 100;
-        const skip = (page - 1) * limit;
         const search = query.search || "";
         
         const pegawaiKeluars = await prisma.pegawai_keluars.findMany({
@@ -295,8 +292,6 @@ class UserService {
         const [data, total] = await Promise.all([
             prisma.users.findMany({
                 where,
-                skip: query.page ? skip : undefined,
-                take: query.page ? limit : undefined,
                 orderBy: { name: "asc" },
                 include: { jabatan: true, lokasi: true, status_pajak: true },
             }),
@@ -388,12 +383,6 @@ class UserService {
 
         return {
             data: dataWithRoles,
-            meta: query.page ? {
-                total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-            } : undefined,
             total: dataWithRoles.length,
         };
     }

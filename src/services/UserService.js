@@ -78,22 +78,22 @@ class UserService {
 
         const where = { AND: andConditions };
 
-        //  if (query.role) {
-        const roleUsers = await prisma.model_has_roles.findMany({
-            where: {
-                roles: {
-                    name: query.role
-                }
-            },
-            select: { model_id: true }
-        });
-        const roleUserIds = roleUsers.map(ru => ru.model_id);
-        if (where.id) {
-            where.id = { ...where.id, in: roleUserIds };
-        } else {
-            where.id = { in: roleUserIds };
+        if (query.role) {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        name: query.role
+                    }
+                },
+                select: { model_id: true }
+            });
+            const roleUserIds = roleUsers.map(ru => ru.model_id);
+            if (where.id) {
+                where.id = { ...where.id, in: roleUserIds };
+            } else {
+                where.id = { in: roleUserIds };
+            }
         }
-        //   }
 
         const [data, total] = await Promise.all([
             prisma.users.findMany({

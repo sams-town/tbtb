@@ -97,15 +97,21 @@ class KasbonService {
         // ==========================================================
         try {
             const pemohon = await prisma.users.findUnique({
-                where: { id: newItem.user_id }
+                where: { id: newItem.user_id },
+                include: { jabatan: true }
             });
 
             if (pemohon && pemohon.id.toString() !== "1") {
+                let managerId = "1";
+                if (pemohon.jabatan && pemohon.jabatan.manager) {
+                    managerId = pemohon.jabatan.manager.toString();
+                }
+
                 const notificationService = (await import("./NotificationService.js")).default;
                 await notificationService.create({
                     type: 'Pengajuan Kasbon',
                     notifiable_type: 'App\\Models\\User',
-                    notifiable_id: "1",
+                    notifiable_id: managerId,
                     data: {
                         message: `${pemohon.name} mengajukan kasbon sebesar Rp ${newItem.nominal.toLocaleString('id-ID')}`,
                         user_id: pemohon.id.toString(),

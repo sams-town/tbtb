@@ -108,15 +108,21 @@ class LemburService {
         // ==========================================================
         try {
             const pemohon = await prisma.users.findUnique({
-                where: { id: record.user_id }
+                where: { id: record.user_id },
+                include: { jabatan: true }
             });
 
             if (pemohon && pemohon.id.toString() !== "1") {
+                let managerId = "1";
+                if (pemohon.jabatan && pemohon.jabatan.manager) {
+                    managerId = pemohon.jabatan.manager.toString();
+                }
+
                 const notificationService = (await import("./NotificationService.js")).default;
                 await notificationService.create({
                     type: 'Pengajuan Lembur',
                     notifiable_type: 'App\\Models\\User',
-                    notifiable_id: "1",
+                    notifiable_id: managerId,
                     data: {
                         message: `${pemohon.name} mengajukan lembur tanggal: ${record.tanggal}`,
                         user_id: pemohon.id.toString(),

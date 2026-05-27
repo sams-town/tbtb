@@ -138,49 +138,7 @@ class LemburService {
         return this.serialize(record);
     }
 
-    async approve(id, data) {
-        const { status, approved_by, notes } = data;
-        const updateData = {
-            status: status || "Approved",
-            approved_by: BigInt(approved_by),
-        };
-        if (notes !== undefined) updateData.notes = notes;
 
-        const record = await prisma.lemburs.update({
-            where: { id: BigInt(id) },
-            data: updateData,
-            include: {
-                karyawan: true,
-                lokasi: true,
-                approver: true,
-            }
-        });
-
-        // ==========================================================
-        // KIRIM NOTIFIKASI KE PEMOHON
-        // ==========================================================
-        try {
-            if (record.user_id) {
-                await notificationService.create({
-                    type: 'Persetujuan Lembur',
-                    notifiable_type: 'App\\Models\\User',
-                    notifiable_id: record.user_id.toString(),
-                    data: {
-                        message: `Pengajuan lembur Anda pada tanggal ${record.tanggal} telah disetujui`,
-                        user_id: record.user_id.toString(),
-                        lembur_id: record.id.toString(),
-                        status: 'Approved'
-                    },
-                    created_at: new Date(),
-                    updated_at: new Date()
-                });
-            }
-        } catch (err) {
-            console.error("Gagal mengirim notifikasi persetujuan lembur:", err.message);
-        }
-
-        return this.serialize(record);
-    }
 
     async update(id, data, baseUrl = null) {
         const existing = await prisma.lemburs.findUnique({ where: { id: BigInt(id) } });
@@ -231,6 +189,126 @@ class LemburService {
             data: updateData
         });
         return this.serialize(record);
+    }
+
+    async approve(id, body = {}) {
+        return await prisma.$transaction(async (tx) => {
+            const existing = await tx.lemburs.findUnique({ 
+                where: { id: BigInt(id) }
+            });
+            if (!existing) return null;
+
+            let approver = null;
+            if (body.approved_by !== undefined && body.approved_by !== null) {
+                const val = String(body.approved_by).trim();
+                if (val !== "" && /^\d+$/.test(val)) {
+                    approver = BigInt(val);
+                } else {
+                    throw new Error("approved_by harus berupa angka");
+                }
+            } else {
+                throw new Error("Field 'approved_by' wajib diisi");
+            }
+
+            const pemohon = await tx.users.findUnique({
+                where: { id: existing.user_id },
+                include: { jabatan: true }
+            });
+
+            if (!pemohon) {
+                throw new Error("Karyawan pemohon tidak ditemukan");
+            }
+
+            const approverUser = await tx.users.findUnique({
+                where: { id: approver }
+            });
+
+            const isManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
+            const isAdmin = approverUser?.is_admin === 'admin' || approverUser?.is_admin === 'superadmin' || approver === 1n;
+
+            let newStatus = existing.status;
+            let shouldFinalize = false;
+
+            if (isManager && (existing.status === "Pending" || existing.status === "Menunggu")) {
+                newStatus = "Disetujui Manager";
+            } else if (isAdmin) {
+                if (existing.status === "Disetujui Manager" || existing.status === "Pending" || existing.status === "Menunggu") {
+                    newStatus = body.status || "Approved";
+                    shouldFinalize = true;
+                }
+            } else {
+                throw new Error("Anda tidak memiliki wewenang untuk menyetujui pengajuan ini pada tahap ini.");
+            }
+
+            if (newStatus === existing.status) {
+                throw new Error("Status pengajuan lembur tidak berubah atau Anda tidak berwenang pada tahap ini.");
+            }
+
+            const record = await tx.lemburs.update({
+                where: { id: BigInt(id) },
+                data: {
+                    approved_by: approver,
+                    status: newStatus,
+                    notes: body.notes || existing.notes
+                },
+                include: {
+                    karyawan: true,
+                    lokasi: true,
+                    approver: true,
+                }
+            });
+
+            // ==========================================================
+            // KIRIM NOTIFIKASI
+            // ==========================================================
+            try {
+                if (shouldFinalize) {
+                    if (existing.user_id) {
+                        await notificationService.create({
+                            type: 'Persetujuan Lembur',
+                            notifiable_type: 'App\\Models\\User',
+                            notifiable_id: existing.user_id.toString(),
+                            data: {
+                                message: `Pengajuan lembur Anda telah disetujui`,
+                                user_id: existing.user_id.toString(),
+                                lembur_id: existing.id.toString(),
+                                status: newStatus
+                            }
+                        });
+                    }
+                } else {
+                    // Notifikasi ke admin bahwa manager menyetujui
+                    const admins = await tx.users.findMany({
+                        where: {
+                            OR: [
+                                { is_admin: 'admin' },
+                                { is_admin: 'superadmin' },
+                                { id: 1n }
+                            ]
+                        },
+                        select: { id: true }
+                    });
+
+                    for (const admin of admins) {
+                        await notificationService.create({
+                            type: 'Pengajuan Lembur',
+                            notifiable_type: 'App\\Models\\User',
+                            notifiable_id: admin.id.toString(),
+                            data: {
+                                message: `${pemohon.name} mengajukan lembur: ${existing.tanggal} (Disetujui Manager)`,
+                                user_id: pemohon.id.toString(),
+                                lembur_id: existing.id.toString(),
+                                status: 'Disetujui Manager'
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Gagal mengirim notifikasi lembur:", err.message);
+            }
+
+            return this.serialize(record);
+        });
     }
 
     async delete(id) {

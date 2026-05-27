@@ -134,8 +134,7 @@ class CutiService {
     async approve(id, body = {}) {
         return await prisma.$transaction(async (tx) => {
             const existing = await tx.cutis.findUnique({ 
-                where: { id: BigInt(id) },
-                include: { users: true }
+                where: { id: BigInt(id) }
              });
             if (!existing) return null;
 
@@ -151,105 +150,171 @@ class CutiService {
                 throw new Error("Field 'user_approval' wajib diisi");
             }
 
-            // 1. Hitung jumlah hari cuti
-            let amount = 0;
-            const t = existing.tanggal || "";
-            if (t.includes(" - ")) {
-                const [start, end] = t.split(" - ");
-                const s = new Date(start);
-                const e = new Date(end);
-                const diff = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
-                amount = diff > 0 ? diff : 0;
-            } else if (t) {
-                amount = 1;
+            const pemohon = await tx.users.findUnique({
+                where: { id: existing.user_id },
+                include: { jabatan: true }
+            });
+
+            if (!pemohon) {
+                throw new Error("Karyawan pemohon tidak ditemukan");
             }
 
-            // 2. Update status cuti ke Diterima
+            const approverUser = await tx.users.findUnique({
+                where: { id: approver }
+            });
+
+            const isManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
+            const isAdmin = approverUser?.is_admin === 'admin' || approverUser?.is_admin === 'superadmin' || approver === 1n;
+
+            let newStatus = existing.status_cuti;
+            let shouldFinalize = false;
+
+            if (isManager && (existing.status_cuti === "Pending" || existing.status_cuti === "Menunggu")) {
+                newStatus = "Disetujui Manager";
+            } else if (isAdmin) {
+                if (existing.status_cuti === "Disetujui Manager" || existing.status_cuti === "Pending" || existing.status_cuti === "Menunggu") {
+                    newStatus = "Diterima";
+                    shouldFinalize = true;
+                }
+            } else {
+                throw new Error("Anda tidak memiliki wewenang untuk menyetujui pengajuan ini pada tahap ini.");
+            }
+
+            if (newStatus === existing.status_cuti) {
+                throw new Error("Status pengajuan cuti tidak berubah atau Anda tidak berwenang pada tahap ini.");
+            }
+
+            // 2. Update status cuti ke status baru
             const cuti = await tx.cutis.update({
                 where: { id: BigInt(id) },
-                data: { user_approval: approver, status_cuti: "Diterima", updated_at: new Date() },
+                data: { user_approval: approver, status_cuti: newStatus, updated_at: new Date() },
                 include: { users: { select: { id: true, name: true } } },
             });
 
-            // 3. Kurangi kuota cuti di tabel users
-            if (amount > 0 && existing.user_id) {
-                const label = (existing.nama_cuti || "").toLowerCase();
-                let fieldToUpdate = "izin_lainnya";
-                if (label.includes("melahirkan")) fieldToUpdate = "cuti_melahirkan";
-                else if (label.includes("kematian") || label.includes("meninggal")) fieldToUpdate = "cuti_kematian";
-                else if (label.includes("tahunan") || (label.includes("cuti") && !label.includes("menikah"))) fieldToUpdate = "izin_cuti";
-                else if (label.includes("telat") || label.includes("terlambat")) fieldToUpdate = "izin_telat";
-                else if (label.includes("pulang")) fieldToUpdate = "izin_pulang_cepat";
-
-                await tx.users.update({
-                    where: { id: existing.user_id },
-                    data: {
-                        [fieldToUpdate]: {
-                            decrement: BigInt(amount)
-                        }
-                    }
-                });
-
-                // 4. Update mapping_shifts menjadi "Cuti" agar tidak dianggap Alfa
+            // 1. Hitung jumlah hari cuti (hanya jika difinalisasi oleh Admin)
+            if (shouldFinalize) {
+                let amount = 0;
+                const t = existing.tanggal || "";
                 if (t.includes(" - ")) {
-                    const [startStr, endStr] = t.split(" - ");
-                    const start = new Date(startStr);
-                    const end = new Date(endStr);
-                    end.setDate(end.getDate() + 1); // include end date
-
-                    await tx.mapping_shifts.updateMany({
-                        where: {
-                            user_id: existing.user_id,
-                            tanggal: {
-                                gte: start,
-                                lt: end
-                            }
-                        },
-                        data: {
-                            status_absen: "Cuti"
-                        }
-                    });
+                    const [start, end] = t.split(" - ");
+                    const s = new Date(start);
+                    const e = new Date(end);
+                    const diff = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+                    amount = diff > 0 ? diff : 0;
                 } else if (t) {
-                    const start = new Date(t);
-                    const end = new Date(t);
-                    end.setDate(end.getDate() + 1);
+                    amount = 1;
+                }
 
-                    await tx.mapping_shifts.updateMany({
-                        where: {
-                            user_id: existing.user_id,
-                            tanggal: {
-                                gte: start,
-                                lt: end
-                            }
-                        },
+                // 3. Kurangi kuota cuti di tabel users
+                if (amount > 0 && existing.user_id) {
+                    const label = (existing.nama_cuti || "").toLowerCase();
+                    let fieldToUpdate = "izin_lainnya";
+                    if (label.includes("melahirkan")) fieldToUpdate = "cuti_melahirkan";
+                    else if (label.includes("kematian") || label.includes("meninggal")) fieldToUpdate = "cuti_kematian";
+                    else if (label.includes("tahunan") || (label.includes("cuti") && !label.includes("menikah"))) fieldToUpdate = "izin_cuti";
+                    else if (label.includes("telat") || label.includes("terlambat")) fieldToUpdate = "izin_telat";
+                    else if (label.includes("pulang")) fieldToUpdate = "izin_pulang_cepat";
+
+                    await tx.users.update({
+                        where: { id: existing.user_id },
                         data: {
-                            status_absen: "Cuti"
+                            [fieldToUpdate]: {
+                                decrement: BigInt(amount)
+                            }
                         }
                     });
+
+                    // 4. Update mapping_shifts menjadi "Cuti" agar tidak dianggap Alfa
+                    if (t.includes(" - ")) {
+                        const [startStr, endStr] = t.split(" - ");
+                        const start = new Date(startStr);
+                        const end = new Date(endStr);
+                        end.setDate(end.getDate() + 1); // include end date
+
+                        await tx.mapping_shifts.updateMany({
+                            where: {
+                                user_id: existing.user_id,
+                                tanggal: {
+                                    gte: start,
+                                    lt: end
+                                }
+                            },
+                            data: {
+                                status_absen: "Cuti"
+                            }
+                        });
+                    } else if (t) {
+                        const start = new Date(t);
+                        const end = new Date(t);
+                        end.setDate(end.getDate() + 1);
+
+                        await tx.mapping_shifts.updateMany({
+                            where: {
+                                user_id: existing.user_id,
+                                tanggal: {
+                                    gte: start,
+                                    lt: end
+                                }
+                            },
+                            data: {
+                                status_absen: "Cuti"
+                            }
+                        });
+                    }
                 }
             }
 
             // ==========================================================
-            // KIRIM NOTIFIKASI KE PEMOHON
+            // KIRIM NOTIFIKASI
             // ==========================================================
             try {
-                if (existing.user_id) {
-                    await notificationService.create({
-                        type: 'Persetujuan Cuti',
-                        notifiable_type: 'App\\Models\\User',
-                        notifiable_id: existing.user_id.toString(),
-                        data: {
-                            message: `Pengajuan cuti Anda telah disetujui`,
-                            user_id: existing.user_id.toString(),
-                            cuti_id: existing.id.toString(),
-                            status: '2'
+                if (shouldFinalize) {
+                    if (existing.user_id) {
+                        await notificationService.create({
+                            type: 'Persetujuan Cuti',
+                            notifiable_type: 'App\\Models\\User',
+                            notifiable_id: existing.user_id.toString(),
+                            data: {
+                                message: `Pengajuan cuti Anda telah disetujui`,
+                                user_id: existing.user_id.toString(),
+                                cuti_id: existing.id.toString(),
+                                status: '2'
+                            },
+                            created_at: new Date(),
+                            updated_at: new Date()
+                        });
+                    }
+                } else {
+                    // Notifikasi ke admin bahwa manager menyetujui
+                    const admins = await tx.users.findMany({
+                        where: {
+                            OR: [
+                                { is_admin: 'admin' },
+                                { is_admin: 'superadmin' },
+                                { id: 1n }
+                            ]
                         },
-                        created_at: new Date(),
-                        updated_at: new Date()
+                        select: { id: true }
                     });
+
+                    for (const admin of admins) {
+                        await notificationService.create({
+                            type: 'Pengajuan Cuti',
+                            notifiable_type: 'App\\Models\\User',
+                            notifiable_id: admin.id.toString(),
+                            data: {
+                                message: `${pemohon.name} mengajukan cuti: ${existing.tanggal} (Disetujui Manager)`,
+                                user_id: pemohon.id.toString(),
+                                cuti_id: existing.id.toString(),
+                                status: 'Disetujui Manager'
+                            },
+                            created_at: new Date(),
+                            updated_at: new Date()
+                        });
+                    }
                 }
             } catch (err) {
-                console.error("Gagal mengirim notifikasi persetujuan cuti:", err.message);
+                console.error("Gagal mengirim notifikasi cuti:", err.message);
             }
 
             return this.serialize(cuti);

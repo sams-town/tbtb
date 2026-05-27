@@ -10,6 +10,34 @@ class PayrollService {
         return JSON.parse(json);
     }
 
+    cleanNumeric(val) {
+        if (val === undefined || val === null) return 0;
+        if (typeof val === 'number') return val;
+        if (typeof val === 'bigint') return Number(val);
+        let str = String(val).trim().replace(/rp\.?/i, '').replace(/\s/g, '').replace(/[,.]00$/, '');
+        const dotCount = (str.match(/\./g) || []).length;
+        const commaCount = (str.match(/,/g) || []).length;
+        if (dotCount > 0 && commaCount === 0) {
+            if (dotCount > 1 || (dotCount === 1 && str.split('.')[1].length === 3)) {
+                str = str.replace(/\./g, '');
+            }
+        } else if (commaCount > 0 && dotCount === 0) {
+            if (commaCount > 1 || (commaCount === 1 && str.split(',')[1].length === 3)) {
+                str = str.replace(/,/g, '');
+            } else {
+                str = str.replace(/,/g, '.');
+            }
+        } else if (dotCount > 0 && commaCount > 0) {
+            if (str.indexOf('.') < str.indexOf(',')) {
+                str = str.replace(/\./g, '').replace(/,/g, '.');
+            } else {
+                str = str.replace(/,/g, '');
+            }
+        }
+        const parsed = parseFloat(str);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
     async getAll(query = {}) {
         const { bulan, tahun, search } = query;
         const where = {
@@ -794,27 +822,27 @@ class PayrollService {
                 const noGaji = `${counterRecord.text || 'GJ'}/${nextNumber}`;
 
                 // Parse and map numeric fields
-                const gajiPokok = BigInt(Math.round(parseFloat(item.gaji_pokok) || 0));
-                const totalReimbursement = BigInt(Math.round(parseFloat(item.total_reimbursement) || 0));
-                const totalTunjanganTransport = BigInt(Math.round(parseFloat(item.total_tunjangan_transport) || 0));
-                const totalTunjanganMakan = BigInt(Math.round(parseFloat(item.total_tunjangan_makan) || 0));
-                const totalTunjanganBpjsKesehatan = BigInt(Math.round(parseFloat(item.total_tunjangan_bpjs_kesehatan) || 0));
-                const totalTunjanganBpjsKetenagakerjaan = BigInt(Math.round(parseFloat(item.total_tunjangan_bpjs_ketenagakerjaan) || 0));
-                const totalPotonganBpjsKesehatan = BigInt(Math.round(parseFloat(item.total_potongan_bpjs_kesehatan) || 0));
-                const totalPotonganBpjsKetenagakerjaan = BigInt(Math.round(parseFloat(item.total_potongan_bpjs_ketenagakerjaan) || 0));
+                const gajiPokok = BigInt(Math.round(this.cleanNumeric(item.gaji_pokok) || 0));
+                const totalReimbursement = BigInt(Math.round(this.cleanNumeric(item.total_reimbursement) || 0));
+                const totalTunjanganTransport = BigInt(Math.round(this.cleanNumeric(item.total_tunjangan_transport) || 0));
+                const totalTunjanganMakan = BigInt(Math.round(this.cleanNumeric(item.total_tunjangan_makan) || 0));
+                const totalTunjanganBpjsKesehatan = BigInt(Math.round(this.cleanNumeric(item.total_tunjangan_bpjs_kesehatan) || 0));
+                const totalTunjanganBpjsKetenagakerjaan = BigInt(Math.round(this.cleanNumeric(item.total_tunjangan_bpjs_ketenagakerjaan) || 0));
+                const totalPotonganBpjsKesehatan = BigInt(Math.round(this.cleanNumeric(item.total_potongan_bpjs_kesehatan) || 0));
+                const totalPotonganBpjsKetenagakerjaan = BigInt(Math.round(this.cleanNumeric(item.total_potongan_bpjs_ketenagakerjaan) || 0));
                 
-                const totalLembur = BigInt(Math.round(parseFloat(item.total_lembur) || 0));
-                const bonusPribadi = BigInt(Math.round(parseFloat(item.bonus_pribadi) || 0));
-                const bonusTeam = BigInt(Math.round(parseFloat(item.bonus_team) || 0));
-                const bonusJackpot = BigInt(Math.round(parseFloat(item.bonus_jackpot) || 0));
-                const totalKehadiran = BigInt(Math.round(parseFloat(item.total_kehadiran) || 0));
-                const totalThr = BigInt(Math.round(parseFloat(item.total_thr) || 0));
+                const totalLembur = BigInt(Math.round(this.cleanNumeric(item.total_lembur) || 0));
+                const bonusPribadi = BigInt(Math.round(this.cleanNumeric(item.bonus_pribadi) || 0));
+                const bonusTeam = BigInt(Math.round(this.cleanNumeric(item.bonus_team) || 0));
+                const bonusJackpot = BigInt(Math.round(this.cleanNumeric(item.bonus_jackpot) || 0));
+                const totalKehadiran = BigInt(Math.round(this.cleanNumeric(item.total_kehadiran) || 0));
+                const totalThr = BigInt(Math.round(this.cleanNumeric(item.total_thr) || 0));
 
-                const totalTerlambat = BigInt(Math.round(parseFloat(item.total_terlambat) || 0));
-                const totalMangkir = BigInt(Math.round(parseFloat(item.total_mangkir) || 0));
-                const totalIzin = BigInt(Math.round(parseFloat(item.total_izin) || 0));
-                const bayarKasbon = BigInt(Math.round(parseFloat(item.bayar_kasbon) || 0));
-                const potonganKoperasi = BigInt(Math.round(parseFloat(item.potongan_koperasi) || 0));
+                const totalTerlambat = BigInt(Math.round(this.cleanNumeric(item.total_terlambat) || 0));
+                const totalMangkir = BigInt(Math.round(this.cleanNumeric(item.total_mangkir) || 0));
+                const totalIzin = BigInt(Math.round(this.cleanNumeric(item.total_izin) || 0));
+                const bayarKasbon = BigInt(Math.round(this.cleanNumeric(item.bayar_kasbon) || 0));
+                const potonganKoperasi = BigInt(Math.round(this.cleanNumeric(item.potongan_koperasi) || 0));
 
                 const totalPenjumlahan = gajiPokok
                     + totalReimbursement
@@ -858,40 +886,40 @@ class PayrollService {
                     no_gaji: noGaji,
                     gaji_pokok: gajiPokok,
                     total_reimbursement: totalReimbursement,
-                    jumlah_tunjangan_transport: BigInt(Math.round(parseFloat(item.jumlah_tunjangan_transport) || 0)),
-                    uang_tunjangan_transport: BigInt(Math.round(parseFloat(item.uang_tunjangan_transport) || 0)),
+                    jumlah_tunjangan_transport: BigInt(Math.round(this.cleanNumeric(item.jumlah_tunjangan_transport) || 0)),
+                    uang_tunjangan_transport: BigInt(Math.round(this.cleanNumeric(item.uang_tunjangan_transport) || 0)),
                     total_tunjangan_transport: totalTunjanganTransport,
-                    jumlah_tunjangan_makan: BigInt(Math.round(parseFloat(item.jumlah_tunjangan_makan) || 0)),
-                    uang_tunjangan_makan: BigInt(Math.round(parseFloat(item.uang_tunjangan_makan) || 0)),
+                    jumlah_tunjangan_makan: BigInt(Math.round(this.cleanNumeric(item.jumlah_tunjangan_makan) || 0)),
+                    uang_tunjangan_makan: BigInt(Math.round(this.cleanNumeric(item.uang_tunjangan_makan) || 0)),
                     total_tunjangan_makan: totalTunjanganMakan,
                     total_tunjangan_bpjs_kesehatan: totalTunjanganBpjsKesehatan,
                     total_tunjangan_bpjs_ketenagakerjaan: totalTunjanganBpjsKetenagakerjaan,
                     total_potongan_bpjs_kesehatan: totalPotonganBpjsKesehatan,
                     total_potongan_bpjs_ketenagakerjaan: totalPotonganBpjsKetenagakerjaan,
-                    jumlah_mangkir: BigInt(Math.round(parseFloat(item.jumlah_mangkir) || 0)),
-                    uang_mangkir: BigInt(Math.round(parseFloat(item.uang_mangkir) || 0)),
+                    jumlah_mangkir: BigInt(Math.round(this.cleanNumeric(item.jumlah_mangkir) || 0)),
+                    uang_mangkir: BigInt(Math.round(this.cleanNumeric(item.uang_mangkir) || 0)),
                     total_mangkir: totalMangkir,
-                    jumlah_lembur: BigInt(Math.round(parseFloat(item.jumlah_lembur) || 0)),
-                    uang_lembur: BigInt(Math.round(parseFloat(item.uang_lembur) || 0)),
+                    jumlah_lembur: BigInt(Math.round(this.cleanNumeric(item.jumlah_lembur) || 0)),
+                    uang_lembur: BigInt(Math.round(this.cleanNumeric(item.uang_lembur) || 0)),
                     total_lembur: totalLembur,
-                    jumlah_izin: BigInt(Math.round(parseFloat(item.jumlah_izin) || 0)),
-                    uang_izin: BigInt(Math.round(parseFloat(item.uang_izin) || 0)),
+                    jumlah_izin: BigInt(Math.round(this.cleanNumeric(item.jumlah_izin) || 0)),
+                    uang_izin: BigInt(Math.round(this.cleanNumeric(item.uang_izin) || 0)),
                     total_izin: totalIzin,
                     bonus_pribadi: bonusPribadi,
                     bonus_team: bonusTeam,
                     bonus_jackpot: bonusJackpot,
-                    jumlah_terlambat: BigInt(Math.round(parseFloat(item.jumlah_terlambat) || 0)),
-                    uang_terlambat: BigInt(Math.round(parseFloat(item.uang_terlambat) || 0)),
+                    jumlah_terlambat: BigInt(Math.round(this.cleanNumeric(item.jumlah_terlambat) || 0)),
+                    uang_terlambat: BigInt(Math.round(this.cleanNumeric(item.uang_terlambat) || 0)),
                     total_terlambat: totalTerlambat,
-                    jumlah_kehadiran: BigInt(Math.round(parseFloat(item.jumlah_kehadiran) || 0)),
-                    uang_kehadiran: BigInt(Math.round(parseFloat(item.uang_kehadiran) || 0)),
+                    jumlah_kehadiran: BigInt(Math.round(this.cleanNumeric(item.jumlah_kehadiran) || 0)),
+                    uang_kehadiran: BigInt(Math.round(this.cleanNumeric(item.uang_kehadiran) || 0)),
                     total_kehadiran: totalKehadiran,
                     saldo_kasbon: user.saldo_kasbon || 0n,
                     bayar_kasbon: bayarKasbon,
                     jumlah_thr: totalThr > 0n ? 1n : 0n,
                     uang_thr: totalThr,
                     total_thr: totalThr,
-                    loss: BigInt(Math.round(parseFloat(item.loss) || 0)),
+                    loss: BigInt(Math.round(this.cleanNumeric(item.loss) || 0)),
                     total_penjumlahan: totalPenjumlahan,
                     total_pengurangan: totalPengurangan,
                     grand_total: grandTotal,

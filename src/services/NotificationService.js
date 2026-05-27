@@ -2,6 +2,7 @@ import prisma from "../config/prisma.js";
 
 class NotificationService {
     async getAll(query = {}) {
+        await this.checkExpiringContracts();
         const search = query.search || "";
         const notifiableId = query.notifiable_id;
         const where = {};
@@ -170,6 +171,148 @@ class NotificationService {
             where: { id: parsedId },
             data: { notifiable_id: BigInt(0) }
         });
+    }
+
+    async checkExpiringContracts() {
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const thirtyDaysLater = new Date();
+            thirtyDaysLater.setDate(today.getDate() + 30);
+            thirtyDaysLater.setHours(23, 59, 59, 999);
+
+            // 1. Fetch admins
+            const admins = await prisma.users.findMany({
+                where: {
+                    OR: [
+                        { is_admin: 'admin' },
+                        { is_admin: 'superadmin' },
+                        { id: 1n }
+                    ]
+                },
+                select: { id: true }
+            });
+
+            if (admins.length === 0) return;
+
+            const formatDate = (date) => {
+                if (!date) return '';
+                const d = new Date(date);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                return `${day}-${month}-${year}`;
+            };
+
+            // 2. Scan expiring contracts in kontraks table
+            const expiringContracts = await prisma.kontraks.findMany({
+                where: {
+                    tanggal_selesai: {
+                        gte: today,
+                        lte: thirtyDaysLater
+                    }
+                }
+            });
+
+            if (expiringContracts.length > 0) {
+                const contractUserIds = expiringContracts.map(c => c.user_id);
+                const contractUsers = await prisma.users.findMany({
+                    where: {
+                        id: { in: contractUserIds }
+                    },
+                    select: { id: true, name: true }
+                });
+                const contractUserMap = new Map(contractUsers.map(u => [u.id.toString(), u.name]));
+
+                for (const contract of expiringContracts) {
+                    const userName = contractUserMap.get(contract.user_id.toString()) || "Karyawan";
+                    const tglSelesaiStr = formatDate(contract.tanggal_selesai);
+                    const msg = `Kontrak kerja ${userName} akan berakhir pada ${tglSelesaiStr}`;
+                    const contractIdStr = contract.id.toString();
+
+                    for (const admin of admins) {
+                        // Check if notification already exists
+                        const existingNotif = await prisma.notifications.findFirst({
+                            where: {
+                                type: 'Kontrak Berakhir',
+                                notifiable_id: admin.id,
+                                data: {
+                                    contains: `"contract_id":"${contractIdStr}"`
+                                }
+                            }
+                        });
+
+                        if (!existingNotif) {
+                            await prisma.notifications.create({
+                                data: {
+                                    type: 'Kontrak Berakhir',
+                                    notifiable_type: 'App\\Models\\User',
+                                    notifiable_id: admin.id,
+                                    data: JSON.stringify({
+                                        message: msg,
+                                        contract_id: contractIdStr,
+                                        user_id: contract.user_id.toString(),
+                                        tanggal_selesai: contract.tanggal_selesai
+                                    }),
+                                    created_at: new Date(),
+                                    updated_at: new Date()
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            // 3. Scan expiring PKWT contracts in users table
+            const expiringPKWTUsers = await prisma.users.findMany({
+                where: {
+                    tanggal_berakhir_pkwt: {
+                        gte: today,
+                        lte: thirtyDaysLater
+                    }
+                },
+                select: { id: true, name: true, tanggal_berakhir_pkwt: true }
+            });
+
+            for (const employee of expiringPKWTUsers) {
+                const tglSelesaiStr = formatDate(employee.tanggal_berakhir_pkwt);
+                const msg = `PKWT ${employee.name} akan berakhir pada ${tglSelesaiStr}`;
+                const employeeIdStr = employee.id.toString();
+
+                for (const admin of admins) {
+                    // Check if notification already exists
+                    const existingNotif = await prisma.notifications.findFirst({
+                        where: {
+                            type: 'Kontrak Berakhir',
+                            notifiable_id: admin.id,
+                            data: {
+                                contains: `"pkwt_user_id":"${employeeIdStr}"`
+                            }
+                        }
+                    });
+
+                    if (!existingNotif) {
+                        await prisma.notifications.create({
+                            data: {
+                                type: 'Kontrak Berakhir',
+                                notifiable_type: 'App\\Models\\User',
+                                notifiable_id: admin.id,
+                                data: JSON.stringify({
+                                    message: msg,
+                                    pkwt_user_id: employeeIdStr,
+                                    user_id: employeeIdStr,
+                                    tanggal_selesai: employee.tanggal_berakhir_pkwt
+                                }),
+                                created_at: new Date(),
+                                updated_at: new Date()
+                            }
+                        });
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Gagal melakukan pengecekan kontrak berakhir:", err.message);
+        }
     }
 
     serialize(record) {

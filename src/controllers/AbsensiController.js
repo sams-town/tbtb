@@ -159,34 +159,51 @@ class AbsensiController {
             let tipe_absen = payload.tipe_absen; // 'masuk' or 'pulang'
 
             if (user) {
-                // SMART LOGIC: Find the best shift record among ACTIVE shifts
-                if (tipe_absen === 'pulang' || tipe_absen === 'keluar') {
-                    shiftRecord = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
-                    if (!shiftRecord) {
-                        shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr));
+                // Check if there is an unfinished shift (like a night shift) from yesterday/recently
+                const openNightShift = activeShifts.find(s => {
+                    if (s.jam_absen && !s.jam_pulang) {
+                        const d = new Date(s.tanggal);
+                        const [h, m, sec] = s.jam_absen.split(':').map(Number);
+                        const checkInTime = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m, sec || 0);
+                        const elapsedHours = (now - checkInTime) / (1000 * 60 * 60);
+                        return elapsedHours > 0 && elapsedHours < 18;
                     }
+                    return false;
+                });
+
+                if (openNightShift) {
+                    shiftRecord = openNightShift;
                     tipe_absen = 'pulang';
-                } else if (tipe_absen === 'masuk') {
-                    shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr) && !s.jam_absen);
-                    if (!shiftRecord) {
-                        const alreadyIn = activeShifts.find(s => isSameDay(s.tanggal, tStr) && s.jam_absen);
-                        if (alreadyIn) {
-                            return res.status(400).json({ success: false, message: "Absensi gagal. Anda sudah melakukan absensi masuk untuk shift hari ini." });
-                        }
-                    }
                 } else {
-                    const openShift = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
-                    if (openShift) {
-                        shiftRecord = openShift;
+                    // SMART LOGIC: Find the best shift record among ACTIVE shifts
+                    if (tipe_absen === 'pulang' || tipe_absen === 'keluar') {
+                        shiftRecord = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
+                        if (!shiftRecord) {
+                            shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr));
+                        }
                         tipe_absen = 'pulang';
-                    } else {
-                        const todayShift = activeShifts.find(s => isSameDay(s.tanggal, tStr));
-                        if (todayShift) {
-                            if (todayShift.jam_absen && todayShift.jam_pulang) {
-                                return res.status(400).json({ success: false, message: "Absensi gagal. Jadwal shift hari ini sudah selesai." });
+                    } else if (tipe_absen === 'masuk') {
+                        shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr) && !s.jam_absen);
+                        if (!shiftRecord) {
+                            const alreadyIn = activeShifts.find(s => isSameDay(s.tanggal, tStr) && s.jam_absen);
+                            if (alreadyIn) {
+                                return res.status(400).json({ success: false, message: "Absensi gagal. Anda sudah melakukan absensi masuk untuk shift hari ini." });
                             }
-                            shiftRecord = todayShift;
-                            tipe_absen = todayShift.jam_absen ? 'pulang' : 'masuk';
+                        }
+                    } else {
+                        const openShift = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
+                        if (openShift) {
+                            shiftRecord = openShift;
+                            tipe_absen = 'pulang';
+                        } else {
+                            const todayShift = activeShifts.find(s => isSameDay(s.tanggal, tStr));
+                            if (todayShift) {
+                                if (todayShift.jam_absen && todayShift.jam_pulang) {
+                                    return res.status(400).json({ success: false, message: "Absensi gagal. Jadwal shift hari ini sudah selesai." });
+                                }
+                                shiftRecord = todayShift;
+                                tipe_absen = todayShift.jam_absen ? 'pulang' : 'masuk';
+                            }
                         }
                     }
                 }

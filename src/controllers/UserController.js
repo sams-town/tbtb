@@ -223,7 +223,7 @@ class UserController {
                 message: "Gagal menghapus user",
                 error: error.message,
             });
-    }
+        }
     }
 
     /**

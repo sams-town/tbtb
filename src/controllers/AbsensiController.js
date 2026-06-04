@@ -106,118 +106,14 @@ class AbsensiController {
             let user = null;
             let matchResult = { user: null, distance: null };
 
-            // 2. Identify User
+            // 2. Identify User (either by payload.user_id or by face matching)
             if (payload.user_id) {
                 user = await userService.getById(payload.user_id);
                 if (!user) {
                     return res.status(404).json({ success: false, message: "User tidak ditemukan." });
                 }
-            }
 
-            // 3. Determine Shift and Attendance Type (Check shift BEFORE face recognition)
-            const now = new Date();
-            const yesterday = new Date(now);
-            yesterday.setDate(yesterday.getDate() - 1);
-
-            const formatDate = (d) => {
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
-            
-            // Use date from payload if available, otherwise use server local date
-            const tStr = payload.tanggal || formatDate(now);
-            const yStr = formatDate(yesterday);
-
-            const isSameDay = (dateInput, targetStr) => {
-                if (!dateInput) return false;
-                const d = new Date(dateInput);
-                const dStr = formatDate(d);
-                return dStr === targetStr;
-            };
-
-            console.log(`Checking shifts for user ${user ? user.name : 'Unknown'} targeting ${tStr}`);
-            
-            let recentShifts = [];
-            if (user) {
-                // Fetch a range to handle yesterday's shifts that might still be open
-                recentShifts = await absensiService.getByIdUsersHistory(user.id.toString(), yStr, tStr);
-            }
-
-            // Filter out records that are "Off" days (no shift_id) if we want to strictly require a shift
-            const activeShifts = recentShifts.filter(s => s.shift_id);
-
-            if (payload.user_id && (!activeShifts || activeShifts.length === 0)) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Absensi gagal. Anda tidak memiliki jadwal shift (Mapping Shift) yang aktif untuk hari ini." 
-                });
-            }
-
-            let shiftRecord = null;
-            let tipe_absen = payload.tipe_absen; // 'masuk' or 'pulang'
-
-            if (user) {
-                // Check if there is an unfinished shift (like a night shift) from yesterday/recently
-                const openNightShift = activeShifts.find(s => {
-                    if (s.jam_absen && !s.jam_pulang) {
-                        const d = new Date(s.tanggal);
-                        const [h, m, sec] = s.jam_absen.split(':').map(Number);
-                        const checkInTime = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m, sec || 0);
-                        const elapsedHours = (now - checkInTime) / (1000 * 60 * 60);
-                        return elapsedHours > 0 && elapsedHours < 18;
-                    }
-                    return false;
-                });
-
-                if (openNightShift) {
-                    shiftRecord = openNightShift;
-                    tipe_absen = 'pulang';
-                } else {
-                    // SMART LOGIC: Find the best shift record among ACTIVE shifts
-                    if (tipe_absen === 'pulang' || tipe_absen === 'keluar') {
-                        shiftRecord = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
-                        if (!shiftRecord) {
-                            shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr));
-                        }
-                        tipe_absen = 'pulang';
-                    } else if (tipe_absen === 'masuk') {
-                        shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr) && !s.jam_absen);
-                        if (!shiftRecord) {
-                            const alreadyIn = activeShifts.find(s => isSameDay(s.tanggal, tStr) && s.jam_absen);
-                            if (alreadyIn) {
-                                return res.status(400).json({ success: false, message: "Absensi gagal. Anda sudah melakukan absensi masuk untuk shift hari ini." });
-                            }
-                        }
-                    } else {
-                        const openShift = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
-                        if (openShift) {
-                            shiftRecord = openShift;
-                            tipe_absen = 'pulang';
-                        } else {
-                            const todayShift = activeShifts.find(s => isSameDay(s.tanggal, tStr));
-                            if (todayShift) {
-                                if (todayShift.jam_absen && todayShift.jam_pulang) {
-                                    return res.status(400).json({ success: false, message: "Absensi gagal. Jadwal shift hari ini sudah selesai." });
-                                }
-                                shiftRecord = todayShift;
-                                tipe_absen = todayShift.jam_absen ? 'pulang' : 'masuk';
-                            }
-                        }
-                    }
-                }
-
-                if (!shiftRecord) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "Absensi gagal. Tidak ditemukan jadwal shift aktif yang sesuai untuk melakukan absensi saat ini." 
-                    });
-                }
-            }
-
-            // 4. Face Recognition (Only if shift check passed)
-            if (payload.user_id) {
+                // Verify face for this specific user
                 if (user.lock_face === "0" || user.lock_face === 0) {
                     console.log(`Bypassing face recognition for user ${user.name} (lock_face=0)`);
                 } else {
@@ -244,17 +140,112 @@ class AbsensiController {
                     });
                 }
                 user = matchResult.user;
-                
-                // Re-fetch shifts for the identified user
-                recentShifts = await absensiService.getByIdUsersHistory(user.id.toString(), yStr, tStr);
-                // (Need to repeat the shift find logic here if identified by face, 
-                // but usually mobile app always sends user_id)
-                const todayShift = recentShifts.find(s => isSameDay(s.tanggal, tStr));
-                if (!todayShift) {
-                     return res.status(400).json({ success: false, message: `Absensi gagal. ${user.name} tidak memiliki jadwal shift hari ini.` });
+            }
+
+            // 3. Determine Shift and Attendance Type (Check shift AFTER identification)
+            const getJakartaNow = () => {
+                const utc = new Date().getTime() + (new Date().getTimezoneOffset() * 60000);
+                return new Date(utc + (3600000 * 7));
+            };
+            const now = getJakartaNow();
+            const yesterday = new Date(now.getTime() - (24 * 3600 * 1000));
+
+            const formatShiftedDate = (d) => {
+                const year = d.getUTCFullYear();
+                const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(d.getUTCDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            const formatDatabaseDate = (d) => {
+                const shifted = new Date(d.getTime() + (3600000 * 7));
+                return formatShiftedDate(shifted);
+            };
+            
+            const tStr = payload.tanggal || formatShiftedDate(now);
+            const yStr = formatShiftedDate(yesterday);
+
+            const isSameDay = (dateInput, targetStr) => {
+                if (!dateInput) return false;
+                const d = new Date(dateInput);
+                return formatDatabaseDate(d) === targetStr;
+            };
+
+            const parseJakartaTime = (dateInput, timeStr) => {
+                const dStr = formatDatabaseDate(new Date(dateInput));
+                const [year, month, day] = dStr.split('-').map(Number);
+                const [h, m, sec] = timeStr.split(':').map(Number);
+                return new Date(Date.UTC(year, month - 1, day, h, m, sec || 0));
+            };
+
+            console.log(`Checking shifts for user ${user.name} targeting ${tStr}`);
+            
+            // Fetch a range to handle yesterday's shifts that might still be open
+            const recentShifts = await absensiService.getByIdUsersHistory(user.id.toString(), yStr, tStr);
+            const activeShifts = recentShifts.filter(s => s.shift_id);
+
+            if (!activeShifts || activeShifts.length === 0) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Absensi gagal. ${user.name} tidak memiliki jadwal shift (Mapping Shift) yang aktif untuk hari ini.` 
+                });
+            }
+
+            let shiftRecord = null;
+            let tipe_absen = payload.tipe_absen; // 'masuk' or 'pulang'
+
+            // Check if there is an unfinished shift (like a night shift) from yesterday/recently
+            const openNightShift = activeShifts.find(s => {
+                if (s.jam_absen && !s.jam_pulang) {
+                    const checkInTime = parseJakartaTime(s.tanggal, s.jam_absen);
+                    const elapsedHours = (now - checkInTime) / (1000 * 60 * 60);
+                    return elapsedHours > 0 && elapsedHours < 18;
                 }
-                shiftRecord = todayShift;
-                tipe_absen = shiftRecord.jam_absen ? 'pulang' : 'masuk';
+                return false;
+            });
+
+            if (openNightShift) {
+                shiftRecord = openNightShift;
+                tipe_absen = 'pulang';
+            } else {
+                // SMART LOGIC: Find the best shift record among ACTIVE shifts
+                if (tipe_absen === 'pulang' || tipe_absen === 'keluar') {
+                    shiftRecord = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
+                    if (!shiftRecord) {
+                        shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr));
+                    }
+                    tipe_absen = 'pulang';
+                } else if (tipe_absen === 'masuk') {
+                    shiftRecord = activeShifts.find(s => isSameDay(s.tanggal, tStr) && !s.jam_absen);
+                    if (!shiftRecord) {
+                        const alreadyIn = activeShifts.find(s => isSameDay(s.tanggal, tStr) && s.jam_absen);
+                        if (alreadyIn) {
+                            return res.status(400).json({ success: false, message: `Absensi gagal. ${user.name} sudah melakukan absensi masuk untuk shift hari ini.` });
+                        }
+                    }
+                } else {
+                    const openShift = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
+                    if (openShift) {
+                        shiftRecord = openShift;
+                        tipe_absen = 'pulang';
+                    } else {
+                        const todayShift = activeShifts.find(s => isSameDay(s.tanggal, tStr));
+                        if (todayShift) {
+                            if (todayShift.jam_absen && todayShift.jam_pulang) {
+                                return res.status(400).json({ success: false, message: `Absensi gagal. Jadwal shift hari ini untuk ${user.name} sudah selesai.` });
+                            }
+                            shiftRecord = todayShift;
+                            tipe_absen = todayShift.jam_absen ? 'pulang' : 'masuk';
+                        }
+                    }
+                }
+            }
+
+            if (!shiftRecord) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Absensi gagal. Tidak ditemukan jadwal shift aktif yang sesuai untuk melakukan absensi saat ini." 
+                });
             }
 
             if (tipe_absen === 'pulang' && shiftRecord.jam_pulang) {
@@ -309,7 +300,7 @@ class AbsensiController {
             };
 
             const filename = path.basename(incomingPath);
-            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            const timeStr = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}:${String(now.getUTCSeconds()).padStart(2, '0')}`;
 
             if (tipe_absen === 'masuk') {
                 updatePayload.jam_absen = timeStr;

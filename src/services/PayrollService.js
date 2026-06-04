@@ -318,8 +318,17 @@ class PayrollService {
                 counterRecord = await tx.counters.create({ data: { name: 'Gaji', counter: 0, text: 'GJ' } });
             }
 
+            // Optimize counters: update counter by total count in a single query
+            const startCounter = BigInt(counterRecord.counter);
+            const totalUsers = BigInt(allUsers.length);
+            await tx.counters.update({
+                where: { id: counterRecord.id },
+                data: { counter: startCounter + totalUsers }
+            });
+
             const jumlahHari = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
+            let userIndex = 0n;
             for (const user of allUsers) {
                 const userMappingShifts = shiftsByUser.get(user.id) || [];
                 const userCutis = cutisByUser.get(user.id) || [];
@@ -327,12 +336,10 @@ class PayrollService {
                 const userReimbursements = reimbursementsByUser.get(user.id) || [];
                 const userItems = itemsByUser.get(user.id) || [];
 
-                counterRecord = await tx.counters.update({
-                    where: { id: counterRecord.id },
-                    data: { counter: counterRecord.counter + 1 }
-                });
-                const nextNumber = counterRecord.counter.toString().padStart(6, '0');
+                const currentEmpCounter = startCounter + userIndex + 1n;
+                const nextNumber = currentEmpCounter.toString().padStart(6, '0');
                 const noGaji = `${counterRecord.text || 'GJ'}/${nextNumber}`;
+                userIndex += 1n;
 
                 // Attendance calculations
                 const hadir = userMappingShifts.filter(m => 
@@ -493,6 +500,9 @@ class PayrollService {
                 message: `Berhasil men-generate ${results.length} data payroll baru`,
                 data: results
             };
+        }, {
+            maxWait: 15000,
+            timeout: 90000
         });
     }
 
@@ -798,13 +808,9 @@ class PayrollService {
                 userMap.set(u.name.toLowerCase().trim(), u);
             });
 
-            let counterRecord = await tx.counters.findFirst({ where: { name: 'Gaji' } });
-            if (!counterRecord) {
-                counterRecord = await tx.counters.create({ data: { name: 'Gaji', counter: 0, text: 'GJ' } });
-            }
-
-            const results = [];
-
+            // Pre-process items to match users and validate
+            const validItems = [];
+            const matchedUserIds = [];
             for (const item of items) {
                 const nameKey = String(item.nama_pegawai || '').toLowerCase().trim();
                 if (!nameKey) continue;
@@ -813,13 +819,44 @@ class PayrollService {
                 if (!user) {
                     throw new Error(`Pegawai dengan nama "${item.nama_pegawai}" tidak ditemukan di database.`);
                 }
+                validItems.push({ item, user });
+                matchedUserIds.push(user.id);
+            }
 
-                counterRecord = await tx.counters.update({
-                    where: { id: counterRecord.id },
-                    data: { counter: counterRecord.counter + 1 }
+            // Clear existing payroll for all matched users in a single query to prevent duplicates
+            if (matchedUserIds.length > 0) {
+                await tx.payrolls.deleteMany({
+                    where: {
+                        user_id: { in: matchedUserIds },
+                        bulan: bulan,
+                        tahun: tahun.toString()
+                    }
                 });
-                const nextNumber = counterRecord.counter.toString().padStart(6, '0');
+            }
+
+            let counterRecord = await tx.counters.findFirst({ where: { name: 'Gaji' } });
+            if (!counterRecord) {
+                counterRecord = await tx.counters.create({ data: { name: 'Gaji', counter: 0, text: 'GJ' } });
+            }
+
+            // Optimize counters: update counter once
+            const startCounter = BigInt(counterRecord.counter);
+            const totalMatched = BigInt(validItems.length);
+            if (totalMatched > 0n) {
+                await tx.counters.update({
+                    where: { id: counterRecord.id },
+                    data: { counter: startCounter + totalMatched }
+                });
+            }
+
+            const results = [];
+            let loopIndex = 0n;
+
+            for (const { item, user } of validItems) {
+                const currentCounter = startCounter + loopIndex + 1n;
+                const nextNumber = currentCounter.toString().padStart(6, '0');
                 const noGaji = `${counterRecord.text || 'GJ'}/${nextNumber}`;
+                loopIndex += 1n;
 
                 // Parse and map numeric fields
                 const gajiPokok = BigInt(Math.round(this.cleanNumeric(item.gaji_pokok) || 0));
@@ -866,15 +903,6 @@ class PayrollService {
                     + potonganKoperasi;
 
                 const grandTotal = totalPenjumlahan - totalPengurangan;
-
-                // Clear existing payroll for this specific user in this period to prevent duplicates
-                await tx.payrolls.deleteMany({
-                    where: {
-                        user_id: user.id,
-                        bulan: bulan,
-                        tahun: tahun.toString()
-                    }
-                });
 
                 const payrollData = {
                     user_id: user.id,
@@ -930,11 +958,11 @@ class PayrollService {
 
                 const newPayroll = await tx.payrolls.create({ data: payrollData });
 
-                // Update user's bonuses and kasbon balance
+                // Update user's bonuses and kasbon balance - safe subtraction (explicit null check)
                 await tx.users.update({
                     where: { id: user.id },
                     data: {
-                        saldo_kasbon: { decrement: bayarKasbon },
+                        saldo_kasbon: (user.saldo_kasbon || 0n) - bayarKasbon,
                         bonus_pribadi: 0n,
                         bonus_team: 0n,
                         bonus_jackpot: 0n,
@@ -949,6 +977,9 @@ class PayrollService {
                 message: `Berhasil meng-import ${results.length} data payroll`,
                 data: results
             };
+        }, {
+            maxWait: 15000,
+            timeout: 90000
         });
     }
 }

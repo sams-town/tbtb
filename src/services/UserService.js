@@ -45,6 +45,36 @@ class UserService {
             { id: { notIn: [...excludedUserIds, 1n] } }
         ];
 
+        if (query.status_kerja === "pkwt") {
+            andConditions.push({
+                OR: [
+                    {
+                        AND: [
+                            { no_pkwt: { not: null } },
+                            { no_pkwt: { not: "" } }
+                        ]
+                    },
+                    {
+                        tanggal_berakhir_pkwt: { not: null }
+                    }
+                ]
+            });
+        } else if (query.status_kerja === "tetap") {
+            andConditions.push({
+                AND: [
+                    {
+                        OR: [
+                            { no_pkwt: null },
+                            { no_pkwt: "" }
+                        ]
+                    },
+                    {
+                        tanggal_berakhir_pkwt: null
+                    }
+                ]
+            });
+        }
+
         if (filterJabatanId) {
             andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
         } else if (showEmptyJabatan) {
@@ -236,6 +266,36 @@ class UserService {
         const andConditions = [
             { id: { notIn: [...excludedUserIds, 1n] } }
         ];
+
+        if (query.status_kerja === "pkwt") {
+            andConditions.push({
+                OR: [
+                    {
+                        AND: [
+                            { no_pkwt: { not: null } },
+                            { no_pkwt: { not: "" } }
+                        ]
+                    },
+                    {
+                        tanggal_berakhir_pkwt: { not: null }
+                    }
+                ]
+            });
+        } else if (query.status_kerja === "tetap") {
+            andConditions.push({
+                AND: [
+                    {
+                        OR: [
+                            { no_pkwt: null },
+                            { no_pkwt: "" }
+                        ]
+                    },
+                    {
+                        tanggal_berakhir_pkwt: null
+                    }
+                ]
+            });
+        }
 
         if (filterJabatanId) {
             andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });

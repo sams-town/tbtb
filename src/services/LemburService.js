@@ -226,11 +226,17 @@ class LemburService {
             const isManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
             const isAdmin = approverUser?.is_admin === 'admin' || approverUser?.is_admin === 'superadmin' || approver === 1n;
 
+            const isRejection = body.status === "Rejected" || body.status === "Ditolak";
             let newStatus = existing.status;
             let shouldFinalize = false;
 
             if (isManager && (existing.status === "Pending" || existing.status === "Menunggu")) {
-                newStatus = "Disetujui Manager";
+                if (isRejection) {
+                    newStatus = body.status;
+                    shouldFinalize = true;
+                } else {
+                    newStatus = "Disetujui Manager";
+                }
             } else if (isAdmin) {
                 if (existing.status === "Disetujui Manager" || existing.status === "Pending" || existing.status === "Menunggu") {
                     newStatus = body.status || "Approved";
@@ -269,7 +275,9 @@ class LemburService {
                             notifiable_type: 'App\\Models\\User',
                             notifiable_id: existing.user_id.toString(),
                             data: {
-                                message: `Pengajuan lembur Anda telah disetujui`,
+                                message: (newStatus === "Rejected" || newStatus === "Ditolak")
+                                    ? `Pengajuan lembur Anda telah ditolak`
+                                    : `Pengajuan lembur Anda telah disetujui`,
                                 user_id: existing.user_id.toString(),
                                 lembur_id: existing.id.toString(),
                                 status: newStatus

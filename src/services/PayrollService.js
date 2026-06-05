@@ -320,10 +320,10 @@ class PayrollService {
 
             // Optimize counters: update counter by total count in a single query
             const startCounter = BigInt(counterRecord.counter);
-            const totalUsers = BigInt(allUsers.length);
+            const totalUsers = allUsers.length;
             await tx.counters.update({
                 where: { id: counterRecord.id },
-                data: { counter: startCounter + totalUsers }
+                data: { counter: counterRecord.counter + totalUsers }
             });
 
             const jumlahHari = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -841,11 +841,11 @@ class PayrollService {
 
             // Optimize counters: update counter once
             const startCounter = BigInt(counterRecord.counter);
-            const totalMatched = BigInt(validItems.length);
-            if (totalMatched > 0n) {
+            const totalMatched = validItems.length;
+            if (totalMatched > 0) {
                 await tx.counters.update({
                     where: { id: counterRecord.id },
-                    data: { counter: startCounter + totalMatched }
+                    data: { counter: counterRecord.counter + totalMatched }
                 });
             }
 

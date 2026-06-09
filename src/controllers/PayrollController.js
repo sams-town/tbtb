@@ -94,12 +94,26 @@ class PayrollController {
 
     async bulkImport(req, res) {
         try {
-            const { bulan, tahun, payrolls } = req.body;
+            const { bulan, tahun, payrolls, rawKeys } = req.body;
+            
+            if (rawKeys && rawKeys.length > 0) {
+                const fs = await import('fs');
+                const append = fs.appendFileSync || fs.default.appendFileSync;
+                append('/Users/mac/Documents/programmer/backendjs/api-meandpay/excel_keys.txt', new Date().toISOString() + '\n' + JSON.stringify(rawKeys) + '\n\n');
+            }
+
             const result = await PayrollService.bulkImport(bulan, tahun, payrolls);
             return res.status(200).json(result);
         } catch (error) {
             console.error("PayrollController.bulkImport error:", error);
-            return res.status(500).json({ success: false, message: "Gagal meng-import payroll", error: error.message });
+            try {
+                const fs = await import('fs');
+                const append = fs.appendFileSync || fs.default.appendFileSync;
+                append('/Users/mac/Documents/programmer/backendjs/api-meandpay/error_log.txt', new Date().toISOString() + '\\n' + error.stack + '\\n\\n');
+            } catch (e) {
+                console.error("Failed to write to error_log.txt", e);
+            }
+            return res.status(500).json({ success: false, message: `Error: ${error.message} (Lihat Network Tab)` });
         }
     }
 }

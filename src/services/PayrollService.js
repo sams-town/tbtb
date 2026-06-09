@@ -501,8 +501,8 @@ class PayrollService {
                 data: results
             };
         }, {
-            maxWait: 15000,
-            timeout: 90000
+            maxWait: 60000,
+            timeout: 600000
         });
     }
 
@@ -892,6 +892,10 @@ class PayrollService {
                 const totalIzin = BigInt(Math.round(this.cleanNumeric(item.total_izin) || 0));
                 const bayarKasbon = BigInt(Math.round(this.cleanNumeric(item.bayar_kasbon) || 0));
                 const potonganKoperasi = BigInt(Math.round(this.cleanNumeric(item.potongan_koperasi) || 0));
+                
+                const insentifTetap = BigInt(Math.round(this.cleanNumeric(item.insentif_tetap) || 0));
+                const jasaSip = BigInt(Math.round(this.cleanNumeric(item.jasa_sip) || 0));
+                const obatBulanIni = BigInt(Math.round(this.cleanNumeric(item.obat_bulan_ini) || 0));
 
                 const totalPenjumlahan = gajiPokok
                     + totalReimbursement
@@ -904,7 +908,9 @@ class PayrollService {
                     + bonusTeam
                     + bonusJackpot
                     + totalKehadiran
-                    + totalThr;
+                    + totalThr
+                    + insentifTetap
+                    + jasaSip;
 
                 const totalPengurangan = totalPotonganBpjsKesehatan
                     + totalPotonganBpjsKetenagakerjaan
@@ -912,7 +918,8 @@ class PayrollService {
                     + totalIzin
                     + totalTerlambat
                     + bayarKasbon
-                    + potonganKoperasi;
+                    + potonganKoperasi
+                    + obatBulanIni;
 
                 const grandTotal = totalPenjumlahan > totalPengurangan
                     ? totalPenjumlahan - totalPengurangan
@@ -966,6 +973,9 @@ class PayrollService {
                     total_pengurangan: totalPengurangan,
                     grand_total: grandTotal,
                     potongan_koperasi: potonganKoperasi,
+                    insentif_tetap: insentifTetap,
+                    jasa_sip: jasaSip,
+                    obat_bulan_ini: obatBulanIni,
                     created_at: new Date(),
                     updated_at: new Date()
                 };
@@ -973,10 +983,13 @@ class PayrollService {
                 const newPayroll = await tx.payrolls.create({ data: payrollData });
 
                 // Update user's bonuses and kasbon balance - safe subtraction (explicit null check)
+                const currentSaldo = user.saldo_kasbon || 0n;
+                const newSaldo = currentSaldo > bayarKasbon ? currentSaldo - bayarKasbon : 0n;
+                
                 await tx.users.update({
                     where: { id: user.id },
                     data: {
-                        saldo_kasbon: (user.saldo_kasbon || 0n) - bayarKasbon,
+                        saldo_kasbon: newSaldo,
                         bonus_pribadi: 0n,
                         bonus_team: 0n,
                         bonus_jackpot: 0n,
@@ -996,8 +1009,8 @@ class PayrollService {
                 skipped: skippedItems
             };
         }, {
-            maxWait: 15000,
-            timeout: 90000
+            maxWait: 60000,
+            timeout: 600000
         });
     }
 }

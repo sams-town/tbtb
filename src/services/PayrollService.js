@@ -810,6 +810,7 @@ class PayrollService {
 
             // Pre-process items to match users and validate
             const validItems = [];
+            const skippedItems = [];
             const matchedUserIds = [];
             for (const item of items) {
                 const nameKey = String(item.nama_pegawai || '').toLowerCase().trim();
@@ -817,10 +818,21 @@ class PayrollService {
 
                 const user = userMap.get(nameKey);
                 if (!user) {
-                    throw new Error(`Pegawai dengan nama "${item.nama_pegawai}" tidak ditemukan di database.`);
+                    // Skip baris yang tidak cocok (sudah divalidasi di frontend, tapi jaga-jaga)
+                    console.warn(`[BulkImport] Skip: Pegawai "${item.nama_pegawai}" tidak ditemukan`);
+                    skippedItems.push(item.nama_pegawai);
+                    continue;
                 }
                 validItems.push({ item, user });
                 matchedUserIds.push(user.id);
+            }
+
+            if (validItems.length === 0) {
+                throw new Error(
+                    skippedItems.length > 0
+                        ? `Tidak ada data valid. Nama tidak cocok: ${skippedItems.slice(0, 5).join(', ')}${skippedItems.length > 5 ? ` dan ${skippedItems.length - 5} lainnya` : ''}`
+                        : 'Tidak ada data valid untuk diimport'
+                );
             }
 
             // Clear existing payroll for all matched users in a single query to prevent duplicates
@@ -902,7 +914,9 @@ class PayrollService {
                     + bayarKasbon
                     + potonganKoperasi;
 
-                const grandTotal = totalPenjumlahan - totalPengurangan;
+                const grandTotal = totalPenjumlahan > totalPengurangan
+                    ? totalPenjumlahan - totalPengurangan
+                    : 0n;
 
                 const payrollData = {
                     user_id: user.id,
@@ -972,10 +986,14 @@ class PayrollService {
                 results.push(this.serialize(newPayroll));
             }
 
+            const skippedCount = skippedItems.length;
             return {
                 success: true,
-                message: `Berhasil meng-import ${results.length} data payroll`,
-                data: results
+                message: skippedCount > 0
+                    ? `Berhasil meng-import ${results.length} data payroll (${skippedCount} dilewati karena nama tidak cocok)`
+                    : `Berhasil meng-import ${results.length} data payroll`,
+                data: results,
+                skipped: skippedItems
             };
         }, {
             maxWait: 15000,

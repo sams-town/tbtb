@@ -98,8 +98,9 @@ class PayrollController {
             
             if (rawKeys && rawKeys.length > 0) {
                 const fs = await import('fs');
+                const path = await import('path');
                 const append = fs.appendFileSync || fs.default.appendFileSync;
-                append('/Users/mac/Documents/programmer/backendjs/api-meandpay/excel_keys.txt', new Date().toISOString() + '\n' + JSON.stringify(rawKeys) + '\n\n');
+                append(path.resolve('excel_keys.txt'), new Date().toISOString() + '\n' + JSON.stringify(rawKeys) + '\n\n');
             }
 
             const result = await PayrollService.bulkImport(bulan, tahun, payrolls);
@@ -108,8 +109,9 @@ class PayrollController {
             console.error("PayrollController.bulkImport error:", error);
             try {
                 const fs = await import('fs');
+                const path = await import('path');
                 const append = fs.appendFileSync || fs.default.appendFileSync;
-                append('/Users/mac/Documents/programmer/backendjs/api-meandpay/error_log.txt', new Date().toISOString() + '\\n' + error.stack + '\\n\\n');
+                append(path.resolve('error_log.txt'), new Date().toISOString() + '\\n' + error.stack + '\\n\\n');
             } catch (e) {
                 console.error("Failed to write to error_log.txt", e);
             }

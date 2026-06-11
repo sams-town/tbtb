@@ -302,7 +302,8 @@ class AbsensiController {
             const filename = path.basename(incomingPath);
             // now sudah diset ke waktu Jakarta (UTC+7) menggunakan getJakartaNow() di atas
             // Format HH:MM (tanpa detik) sesuai kebutuhan tampilan jam absen
-            const timeStr = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}`;
+            // now sudah digeser ke WIB oleh getJakartaNow(), gunakan getHours()/getMinutes() (bukan getUTC*)
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             if (tipe_absen === 'masuk') {
                 updatePayload.jam_absen = timeStr;

@@ -208,7 +208,6 @@ class NotificationService {
             const expiringContracts = await prisma.kontraks.findMany({
                 where: {
                     tanggal_selesai: {
-                        gte: today,
                         lte: thirtyDaysLater
                     }
                 }
@@ -225,19 +224,23 @@ class NotificationService {
                 const contractUserMap = new Map(contractUsers.map(u => [u.id.toString(), u.name]));
 
                 for (const contract of expiringContracts) {
+                    if (!contract.tanggal_selesai) continue;
                     const userName = contractUserMap.get(contract.user_id.toString()) || "Karyawan";
                     const tglSelesaiStr = formatDate(contract.tanggal_selesai);
                     const msg = `Kontrak kerja ${userName} akan berakhir pada ${tglSelesaiStr}`;
                     const contractIdStr = contract.id.toString();
 
                     for (const admin of admins) {
-                        // Check if notification already exists
+                        // Check if notification already exists for this contract and expiration date
                         const existingNotif = await prisma.notifications.findFirst({
                             where: {
                                 type: 'Kontrak Berakhir',
                                 notifiable_id: admin.id,
                                 data: {
-                                    contains: `"contract_id":"${contractIdStr}"`
+                                    AND: [
+                                        { contains: `"contract_id":"${contractIdStr}"` },
+                                        { contains: `"tanggal_selesai":"${contract.tanggal_selesai.toISOString()}"` }
+                                    ]
                                 }
                             }
                         });
@@ -267,7 +270,6 @@ class NotificationService {
             const expiringPKWTUsers = await prisma.users.findMany({
                 where: {
                     tanggal_berakhir_pkwt: {
-                        gte: today,
                         lte: thirtyDaysLater
                     }
                 },
@@ -275,18 +277,22 @@ class NotificationService {
             });
 
             for (const employee of expiringPKWTUsers) {
+                if (!employee.tanggal_berakhir_pkwt) continue;
                 const tglSelesaiStr = formatDate(employee.tanggal_berakhir_pkwt);
                 const msg = `PKWT ${employee.name} akan berakhir pada ${tglSelesaiStr}`;
                 const employeeIdStr = employee.id.toString();
 
                 for (const admin of admins) {
-                    // Check if notification already exists
+                    // Check if notification already exists for this employee and expiration date
                     const existingNotif = await prisma.notifications.findFirst({
                         where: {
                             type: 'Kontrak Berakhir',
                             notifiable_id: admin.id,
                             data: {
-                                contains: `"pkwt_user_id":"${employeeIdStr}"`
+                                AND: [
+                                    { contains: `"pkwt_user_id":"${employeeIdStr}"` },
+                                    { contains: `"tanggal_selesai":"${employee.tanggal_berakhir_pkwt.toISOString()}"` }
+                                ]
                             }
                         }
                     });

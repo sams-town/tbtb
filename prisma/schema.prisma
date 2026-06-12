@@ -803,16 +803,16 @@ model users {
   kota_kabupaten                     String?                @db.VarChar(120)
   kecamatan                          String?                @db.VarChar(120)
   kelurahan                          String?                @db.VarChar(120)
-  kode_pos                           String?                @db.VarChar(10)
-  provinsi_domisili                  String?                @db.VarChar(120)
-  kota_kabupaten_domisili            String?                @db.VarChar(120)
-  kecamatan_domisili                 String?                @db.VarChar(120)
-  kelurahan_domisili                 String?                @db.VarChar(120)
-  alamat_domisili                   String?                @db.Text
-  kode_pos_domisili                  String?                @db.VarChar(10)
-  nama_ibu_kandung                   String?                @db.VarChar(150)
   cuti_melahirkan                    BigInt?
   cuti_kematian                      BigInt?
+  alamat_domisili                    String?                @db.Text
+  kecamatan_domisili                 String?                @db.VarChar(120)
+  kelurahan_domisili                 String?                @db.VarChar(120)
+  kode_pos                           String?                @db.VarChar(10)
+  kode_pos_domisili                  String?                @db.VarChar(10)
+  kota_kabupaten_domisili            String?                @db.VarChar(120)
+  nama_ibu_kandung                   String?                @db.VarChar(150)
+  provinsi_domisili                  String?                @db.VarChar(120)
   cutis                              cutis[]
   managed_jabatans                   jabatans[]             @relation("jabatans_manager")
   approved_lemburs                   lemburs[]              @relation("ApproverLembur")
@@ -821,10 +821,10 @@ model users {
   lokasis_lokasis_created_byTousers  lokasis[]              @relation("lokasis_created_byTousers")
   approved_mapping_shifts            mapping_shifts[]       @relation("ApprovedBy")
   mapping_shifts                     mapping_shifts[]
+  payrolls                           payrolls[]
   pegawai_keluars                    pegawai_keluars[]
   pengajuan_approver                 pengajuan_keuangans[]  @relation("ApproverFinance")
   target_kinerja_teams               target_kinerja_teams[]
-  payrolls                           payrolls[]
   jabatan                            jabatans?              @relation("users_jabatan", fields: [jabatan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lokasi                             lokasis?               @relation("users_lokasi", fields: [lokasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   status_pajak                       status_pajaks?         @relation("users_status_pajak", fields: [status_pajak_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

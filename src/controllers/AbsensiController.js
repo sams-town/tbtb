@@ -143,39 +143,30 @@ class AbsensiController {
             }
 
             // 3. Determine Shift and Attendance Type (Check shift AFTER identification)
-            const getJakartaNow = () => {
-                const utc = new Date().getTime() + (new Date().getTimezoneOffset() * 60000);
-                return new Date(utc + (3600000 * 7));
-            };
-            const now = getJakartaNow();
-            const yesterday = new Date(now.getTime() - (24 * 3600 * 1000));
-
-            const formatShiftedDate = (d) => {
-                const year = d.getUTCFullYear();
-                const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-                const day = String(d.getUTCDate()).padStart(2, '0');
+            const getJakartaDateString = (d) => {
+                const shifted = new Date(d.getTime() + (3600000 * 7));
+                const year = shifted.getUTCFullYear();
+                const month = String(shifted.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(shifted.getUTCDate()).padStart(2, '0');
                 return `${year}-${month}-${day}`;
             };
 
-            const formatDatabaseDate = (d) => {
-                const shifted = new Date(d.getTime() + (3600000 * 7));
-                return formatShiftedDate(shifted);
-            };
+            const now = new Date();
+            const yesterday = new Date(now.getTime() - (24 * 3600 * 1000));
             
-            const tStr = payload.tanggal || formatShiftedDate(now);
-            const yStr = formatShiftedDate(yesterday);
+            const tStr = payload.tanggal || getJakartaDateString(now);
+            const yStr = getJakartaDateString(yesterday);
 
             const isSameDay = (dateInput, targetStr) => {
                 if (!dateInput) return false;
-                const d = new Date(dateInput);
-                return formatDatabaseDate(d) === targetStr;
+                return getJakartaDateString(new Date(dateInput)) === targetStr;
             };
 
             const parseJakartaTime = (dateInput, timeStr) => {
-                const dStr = formatDatabaseDate(new Date(dateInput));
+                const dStr = getJakartaDateString(new Date(dateInput));
                 const [year, month, day] = dStr.split('-').map(Number);
                 const [h, m, sec] = timeStr.split(':').map(Number);
-                return new Date(Date.UTC(year, month - 1, day, h, m, sec || 0));
+                return new Date(Date.UTC(year, month - 1, day, h - 7, m, sec || 0));
             };
 
             console.log(`Checking shifts for user ${user.name} targeting ${tStr}`);
@@ -300,10 +291,8 @@ class AbsensiController {
             };
 
             const filename = path.basename(incomingPath);
-            // now sudah diset ke waktu Jakarta (UTC+7) menggunakan getJakartaNow() di atas
-            // Format HH:MM (tanpa detik) sesuai kebutuhan tampilan jam absen
-            // now sudah digeser ke WIB oleh getJakartaNow(), gunakan getHours()/getMinutes() (bukan getUTC*)
-            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const nowJakarta = new Date(now.getTime() + (3600000 * 7));
+            const timeStr = `${String(nowJakarta.getUTCHours()).padStart(2, '0')}:${String(nowJakarta.getUTCMinutes()).padStart(2, '0')}`;
 
             if (tipe_absen === 'masuk') {
                 updatePayload.jam_absen = timeStr;

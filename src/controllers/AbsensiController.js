@@ -185,15 +185,7 @@ class AbsensiController {
             let shiftRecord = null;
             let tipe_absen = payload.tipe_absen; // 'masuk' or 'pulang'
 
-            // Check if there is an unfinished shift (like a night shift) from yesterday/recently
-            const openNightShift = activeShifts.find(s => {
-                if (s.jam_absen && !s.jam_pulang) {
-                    const checkInTime = parseJakartaTime(s.tanggal, s.jam_absen);
-                    const elapsedHours = (now - checkInTime) / (1000 * 60 * 60);
-                    return elapsedHours > 0 && elapsedHours < 18;
-                }
-                return false;
-            });
+            const openNightShift = activeShifts.find(s => s.jam_absen && !s.jam_pulang);
 
             if (openNightShift) {
                 shiftRecord = openNightShift;

@@ -75,14 +75,16 @@ class MappingShiftService {
         const end = new Date(end_date);
         const createdRecords = [];
 
-        // Hapus data lama di rentang tersebut agar 'disesuaikan'
+        // Hapus data lama di rentang tersebut, KECUALI yang sudah ada data absensi
         await prisma.mapping_shifts.deleteMany({
             where: {
                 user_id: BigInt(user_id),
                 tanggal: {
                     gte: start,
                     lte: end
-                }
+                },
+                jam_absen: null,
+                jam_pulang: null
             }
         });
 
@@ -93,15 +95,36 @@ class MappingShiftService {
             const m = String(current.getUTCMonth() + 1).padStart(2, '0');
             const d = String(current.getUTCDate()).padStart(2, '0');
             const dateStr = `${y}-${m}-${d}`;
+            const currentDateUTC = new Date(dateStr);
 
-            const record = await prisma.mapping_shifts.create({
-                data: {
+            // Cek apakah data untuk tanggal ini sudah ada (mungkin tidak terhapus karena ada jam_absen)
+            const existing = await prisma.mapping_shifts.findFirst({
+                where: {
                     user_id: BigInt(user_id),
-                    shift_id: shift_id ? BigInt(shift_id) : null,
-                    tanggal: new Date(dateStr),
-                    lock_location: lock_location ? lock_location.toString() : "0"
+                    tanggal: currentDateUTC
                 }
             });
+
+            let record;
+            if (existing) {
+                // Update shift_id dan lock_location, pertahankan data absensi
+                record = await prisma.mapping_shifts.update({
+                    where: { id: existing.id },
+                    data: {
+                        shift_id: shift_id ? BigInt(shift_id) : null,
+                        lock_location: lock_location !== undefined ? lock_location.toString() : "0"
+                    }
+                });
+            } else {
+                record = await prisma.mapping_shifts.create({
+                    data: {
+                        user_id: BigInt(user_id),
+                        shift_id: shift_id ? BigInt(shift_id) : null,
+                        tanggal: currentDateUTC,
+                        lock_location: lock_location ? lock_location.toString() : "0"
+                    }
+                });
+            }
 
             createdRecords.push(this.serialize(record));
             current.setUTCDate(current.getUTCDate() + 1);

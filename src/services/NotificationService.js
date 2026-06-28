@@ -112,8 +112,8 @@ class NotificationService {
         if (payload.notifiable_id !== undefined) payload.notifiable_id = BigInt(payload.notifiable_id);
         if (payload.data && typeof payload.data === "object") payload.data = JSON.stringify(payload.data);
         if (payload.read_at) payload.read_at = new Date(payload.read_at);
-        if (payload.created_at) payload.created_at = new Date(payload.created_at);
-        if (payload.updated_at) payload.updated_at = new Date(payload.updated_at);
+        payload.created_at = payload.created_at ? new Date(payload.created_at) : new Date();
+        payload.updated_at = payload.updated_at ? new Date(payload.updated_at) : new Date();
 
         const record = await prisma.notifications.create({ data: payload });
         return this.getById(record.id);

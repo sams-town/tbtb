@@ -33,7 +33,8 @@ class CutiController {
     async store(req, res) {
         try {
             const roles = (req.user && req.user.roles) || [];
-            const canActOnBehalf = Array.isArray(roles) && roles.some(r => String(r).toLowerCase() === "admin" || String(r).toLowerCase() === "manager");
+            const isAdmin = req.user && (req.user.is_admin === 'admin' || req.user.is_admin === 'superadmin');
+            const canActOnBehalf = isAdmin || (Array.isArray(roles) && roles.some(r => ["admin", "manager", "superadmin"].includes(String(r).toLowerCase())));
             let effectiveUserId = req.user && req.user.id ? req.user.id : req.body.user_id;
             if (canActOnBehalf && req.body.user_id && /^\d+$/.test(String(req.body.user_id))) {
                 effectiveUserId = req.body.user_id;

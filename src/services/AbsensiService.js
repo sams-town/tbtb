@@ -33,9 +33,9 @@ class AbsensiService {
         if (query.tanggal) {
             const dateParts = query.tanggal.split("-").map(Number);
             if (dateParts.length === 3) {
-                // Create date in local time to match how bulkCreateRange stores it
-                const startOfDay = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0, 0);
-                const endOfDay = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 23, 59, 59, 999);
+                // Use UTC date to exactly match what MappingShiftService bulkCreateRange stores
+                const startOfDay = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0, 0));
+                const endOfDay = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2], 23, 59, 59, 999));
 
                 where.AND.push({
                     tanggal: {
@@ -136,7 +136,8 @@ class AbsensiService {
         let end = new Date(tanggal_akhir);
 
         // Always add 1 day to end date to make it inclusive (until end of that day)
-        end.setDate(end.getDate() + 1);
+        // Use setUTCDate to avoid timezone shifts
+        end.setUTCDate(end.getUTCDate() + 1);
 
         const record = await prisma.mapping_shifts.findMany({
             where: {

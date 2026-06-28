@@ -48,6 +48,21 @@ class KontrakService {
         if (data.kontrak_file_name !== undefined) payload.kontrak_file_name = data.kontrak_file_name;
 
         const kontrak = await prisma.kontraks.create({ data: payload });
+
+        if (data.user_id) {
+            const userUpdateData = {};
+            if (data.no_kontrak !== undefined) userUpdateData.no_kontrak = data.no_kontrak;
+            if (data.tanggal_mulai !== undefined) userUpdateData.tanggal_mulai_pkwt = data.tanggal_mulai ? new Date(data.tanggal_mulai) : null;
+            if (data.tanggal_selesai !== undefined) userUpdateData.tanggal_berakhir_pkwt = data.tanggal_selesai ? new Date(data.tanggal_selesai) : null;
+
+            if (Object.keys(userUpdateData).length > 0) {
+                await prisma.users.update({
+                    where: { id: BigInt(data.user_id) },
+                    data: userUpdateData
+                });
+            }
+        }
+
         return this.serialize(kontrak);
     }
 
@@ -72,6 +87,22 @@ class KontrakService {
             where: { id: BigInt(id) },
             data: updateData,
         });
+
+        if (updateData.user_id || existing.user_id) {
+            const finalUserId = updateData.user_id || existing.user_id;
+            const userUpdateData = {};
+            if (data.no_kontrak !== undefined) userUpdateData.no_kontrak = data.no_kontrak;
+            if (data.tanggal_mulai !== undefined) userUpdateData.tanggal_mulai_pkwt = data.tanggal_mulai ? new Date(data.tanggal_mulai) : null;
+            if (data.tanggal_selesai !== undefined) userUpdateData.tanggal_berakhir_pkwt = data.tanggal_selesai ? new Date(data.tanggal_selesai) : null;
+
+            if (Object.keys(userUpdateData).length > 0) {
+                await prisma.users.update({
+                    where: { id: finalUserId },
+                    data: userUpdateData
+                });
+            }
+        }
+
         return this.serialize(kontrak);
     }
 

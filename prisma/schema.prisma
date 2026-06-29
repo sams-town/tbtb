@@ -160,6 +160,7 @@ model kontraks {
   user_id                 BigInt    @db.UnsignedBigInt
   tanggal                 DateTime? @db.Date
   jenis_kontrak           String?
+  no_kontrak              String?
   tanggal_mulai           DateTime? @db.Date
   tanggal_selesai         DateTime? @db.Date
   masa_berlaku_sebelumnya DateTime? @db.Date

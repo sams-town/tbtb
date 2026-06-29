@@ -70,9 +70,9 @@ class AbsensiController {
         const R = 6371e3; // radius bumi dalam meter
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = 
+        const a =
             Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c; // jarak dalam meter
@@ -94,7 +94,7 @@ class AbsensiController {
                 if (uploadedFiles.length > 0) {
                     const theFile = uploadedFiles[0];
                     incomingPath = path.join(ROOT_DIR, "public", "uploads", "absensi", theFile.filename);
-                    
+
                     // We will set the final photo path later after determining if it's 'masuk' or 'pulang'
                 }
             }
@@ -119,8 +119,8 @@ class AbsensiController {
                 } else {
                     const verifyResult = await faceRecognitionService.verifyUserFace(incomingPath, user);
                     if (!verifyResult.isMatch) {
-                        return res.status(400).json({ 
-                            success: false, 
+                        return res.status(400).json({
+                            success: false,
                             message: `Absensi gagal. Wajah tidak cocok dengan identitas ${user.name}.`,
                             distance: verifyResult.distance,
                             error: verifyResult.error
@@ -133,8 +133,8 @@ class AbsensiController {
                 const allUsers = await userService.getAllForFaceRecognition();
                 matchResult = await faceRecognitionService.findMatchingUser(incomingPath, allUsers);
                 if (!matchResult.user) {
-                    return res.status(400).json({ 
-                        success: false, 
+                    return res.status(400).json({
+                        success: false,
                         message: "Absensi gagal. Wajah tidak dikenali atau tidak cocok dengan data karyawan mana pun.",
                         error: matchResult.error
                     });
@@ -155,7 +155,7 @@ class AbsensiController {
 
             const now = new Date();
             const yesterday = new Date(now.getTime() - (24 * 3600 * 1000));
-            
+
             const tStr = payload.tanggal || getJakartaDateString(now);
             const yStr = getJakartaDateString(yesterday);
 
@@ -172,15 +172,15 @@ class AbsensiController {
             };
 
             console.log(`Checking shifts for user ${user.name} targeting ${tStr}`);
-            
+
             // Fetch a range to handle yesterday's shifts that might still be open
             const recentShifts = await absensiService.getByIdUsersHistory(user.id.toString(), yStr, tStr);
             const activeShifts = recentShifts.filter(s => s.shift_id);
 
             if (!activeShifts || activeShifts.length === 0) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: `Absensi gagal. ${user.name} tidak memiliki jadwal shift (Mapping Shift) yang aktif untuk hari ini.` 
+                return res.status(400).json({
+                    success: false,
+                    message: `Absensi gagal. ${user.name} tidak memiliki jadwal shift (Mapping Shift) yang aktif untuk hari ini.`
                 });
             }
 
@@ -227,9 +227,9 @@ class AbsensiController {
             }
 
             if (!shiftRecord) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Absensi gagal. Tidak ditemukan jadwal shift aktif yang sesuai untuk melakukan absensi saat ini." 
+                return res.status(400).json({
+                    success: false,
+                    message: "Absensi gagal. Tidak ditemukan jadwal shift aktif yang sesuai untuk melakukan absensi saat ini."
                 });
             }
 
@@ -245,14 +245,14 @@ class AbsensiController {
                 if (user.lokasi) {
                     const officeLat = parseFloat(user.lokasi.lat_kantor);
                     const officeLong = parseFloat(user.lokasi.long_kantor);
-                    
+
                     // Validate office coordinates
                     if (isNaN(officeLat) || isNaN(officeLong) || (Math.abs(officeLat) < 0.0001 && Math.abs(officeLong) < 0.0001)) {
                         console.warn(`User ${user.name} has invalid office coordinates: ${officeLat}, ${officeLong}`);
                         if (isLocked) {
-                            return res.status(400).json({ 
-                                success: false, 
-                                message: "Absensi gagal. Koordinat kantor tidak valid atau belum diatur dengan benar." 
+                            return res.status(400).json({
+                                success: false,
+                                message: "Absensi gagal. Koordinat kantor tidak valid atau belum diatur dengan benar."
                             });
                         }
                     } else {
@@ -266,9 +266,9 @@ class AbsensiController {
                         console.log(`[ABSEN] User: ${user.name}, Jarak: ${distanceValue}m, Radius: ${radius}m, Locked: ${isLocked}`);
 
                         if (isLocked && radius > 0 && distance > radius) {
-                            return res.status(400).json({ 
-                                success: false, 
-                                message: `Absensi gagal. Anda berada di luar radius kantor.\nJarak Anda: ${distanceValue}m\nBatas Izin: ${radius}m\n\nSilakan mendekat ke lokasi kantor.` 
+                            return res.status(400).json({
+                                success: false,
+                                message: `Absensi gagal. Anda berada di luar radius kantor.\nJarak Anda: ${distanceValue}m\nBatas Izin: ${radius}m\n\nSilakan mendekat ke lokasi kantor.`
                             });
                         }
                     }
@@ -307,19 +307,19 @@ class AbsensiController {
             console.log(`Finalizing attendance for ${user.name} on shift ${shiftRecord.id}. Payload:`, JSON.stringify(updatePayload));
             const data = await absensiService.update(shiftRecord.id, updatePayload);
 
-            return res.status(201).json({ 
-                success: true, 
-                message: `Absensi ${tipe_absen} wajah berhasil: ${user.name}`, 
-                data, 
+            return res.status(201).json({
+                success: true,
+                message: `Absensi ${tipe_absen} wajah berhasil: ${user.name}`,
+                data,
                 distance: matchResult.distance,
                 user: user
             });
 
         } catch (error) {
             console.error("AbsensiController.storeWajah FATAL ERROR:", error);
-            return res.status(500).json({ 
-                success: false, 
-                message: "Gagal memproses absensi wajah di server.", 
+            return res.status(500).json({
+                success: false,
+                message: "Gagal memproses absensi wajah di server.",
                 error: error.message,
                 stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
             });

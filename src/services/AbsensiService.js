@@ -131,19 +131,15 @@ class AbsensiService {
     }
 
     async getByIdUsersHistory(id, tanggal_mulai, tanggal_akhir) {
-        const start = new Date(tanggal_mulai);
-        let end = new Date(tanggal_akhir);
-
-        // Always add 1 day to end date to make it inclusive (until end of that day)
-        // Use setUTCDate to avoid timezone shifts
-        end.setUTCDate(end.getUTCDate() + 1);
+        const start = new Date(tanggal_mulai + "T00:00:00.000");
+        const end = new Date(tanggal_akhir + "T23:59:59.999");
 
         const record = await prisma.mapping_shifts.findMany({
             where: {
                 user_id: BigInt(id),
                 tanggal: {
                     gte: start,
-                    lt: end
+                    lte: end
                 }
             },
             include: {

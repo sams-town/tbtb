@@ -33,9 +33,8 @@ class AbsensiService {
         if (query.tanggal) {
             const dateParts = query.tanggal.split("-").map(Number);
             if (dateParts.length === 3) {
-                // Use UTC date to exactly match what MappingShiftService bulkCreateRange stores
-                const startOfDay = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0, 0));
-                const endOfDay = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2], 23, 59, 59, 999));
+                const startOfDay = new Date(query.tanggal + "T00:00:00.000");
+                const endOfDay = new Date(query.tanggal + "T23:59:59.999");
 
                 where.AND.push({
                     tanggal: {
@@ -49,8 +48,8 @@ class AbsensiService {
         if (query.start_date && query.end_date) {
             where.AND.push({
                 tanggal: {
-                    gte: new Date(query.start_date),
-                    lte: new Date(query.end_date)
+                    gte: new Date(query.start_date + "T00:00:00.000"),
+                    lte: new Date(query.end_date + "T23:59:59.999")
                 }
             });
         }

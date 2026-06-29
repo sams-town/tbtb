@@ -41,8 +41,23 @@ class UserService {
             }
         }
 
+        const excludedUserIdsSet = new Set(excludedUserIds);
+        excludedUserIdsSet.add(1n);
+
+        if (query.exclude_role) {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        name: query.exclude_role
+                    }
+                },
+                select: { model_id: true }
+            });
+            roleUsers.forEach(ru => excludedUserIdsSet.add(ru.model_id));
+        }
+
         const andConditions = [
-            { id: { notIn: [...excludedUserIds, 1n] } }
+            { id: { notIn: Array.from(excludedUserIdsSet) } }
         ];
 
         if (query.status_kerja === "pkwt") {
@@ -263,8 +278,23 @@ class UserService {
             .map((pk) => pk.user_id)
             .filter((id) => id !== null && id !== undefined);
 
+        const excludedUserIdsSet = new Set(excludedUserIds);
+        excludedUserIdsSet.add(1n);
+
+        if (query.exclude_role) {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        name: query.exclude_role
+                    }
+                },
+                select: { model_id: true }
+            });
+            roleUsers.forEach(ru => excludedUserIdsSet.add(ru.model_id));
+        }
+
         const andConditions = [
-            { id: { notIn: [...excludedUserIds, 1n] } }
+            { id: { notIn: Array.from(excludedUserIdsSet) } }
         ];
 
         if (query.status_kerja === "pkwt") {

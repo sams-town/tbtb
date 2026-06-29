@@ -13,7 +13,16 @@ class NotificationService {
             ];
         }
         if (notifiableId !== undefined) {
-            where.notifiable_id = BigInt(notifiableId);
+            const requestedUser = await prisma.users.findUnique({
+                where: { id: BigInt(notifiableId) }
+            });
+            const isAdmin = requestedUser?.is_admin === 'admin' || requestedUser?.is_admin === 'superadmin' || requestedUser?.is_admin === 'super_admin' || requestedUser?.is_admin === 'super admin' || BigInt(notifiableId) === 1n;
+            
+            if (isAdmin) {
+                where.notifiable_id = { in: [BigInt(notifiableId), 1n] };
+            } else {
+                where.notifiable_id = BigInt(notifiableId);
+            }
         }
         const data = await prisma.notifications.findMany({
             where,

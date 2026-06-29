@@ -15,8 +15,8 @@ class MappingShiftService {
         if (query.user_id) where.user_id = BigInt(query.user_id);
         if (query.start_date && query.end_date) {
             where.tanggal = {
-                gte: new Date(query.start_date),
-                lte: new Date(query.end_date)
+                gte: new Date(query.start_date + "T00:00:00.000"),
+                lte: new Date(query.end_date + "T23:59:59.999")
             };
         }
 
@@ -140,8 +140,8 @@ class MappingShiftService {
             where: {
                 user_id: BigInt(user_id),
                 tanggal: {
-                    gte: new Date(start_date),
-                    lte: new Date(end_date)
+                    gte: new Date(start_date + "T00:00:00.000"),
+                    lte: new Date(end_date + "T23:59:59.999")
                 }
             },
             data: {
@@ -160,8 +160,8 @@ class MappingShiftService {
             where: {
                 user_id: BigInt(user_id),
                 tanggal: {
-                    gte: new Date(start_date),
-                    lte: new Date(end_date)
+                    gte: new Date(start_date + "T00:00:00.000"),
+                    lte: new Date(end_date + "T23:59:59.999")
                 }
             }
         });

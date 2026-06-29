@@ -27,7 +27,7 @@ class CutiService {
             });
             usersMap = Object.fromEntries(users.map(u => [u.id, u]));
         }
-        const enriched = data.map(d => ({ ...d, pemohon: usersMap[d.user_id] || null }));
+        const enriched = data.map(d => ({ ...d, pemohon: usersMap[String(d.user_id)] || null }));
         return { data: this.serializeList(enriched) };
     }
 

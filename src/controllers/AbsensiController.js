@@ -144,11 +144,13 @@ class AbsensiController {
 
             // 3. Determine Shift and Attendance Type (Check shift AFTER identification)
             const getJakartaDateString = (d) => {
-                const shifted = new Date(d.getTime() + (3600000 * 7));
-                const year = shifted.getUTCFullYear();
-                const month = String(shifted.getUTCMonth() + 1).padStart(2, '0');
-                const day = String(shifted.getUTCDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
+                const formatter = new Intl.DateTimeFormat('sv-SE', {
+                    timeZone: 'Asia/Jakarta',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+                return formatter.format(d);
             };
 
             const now = new Date();

@@ -14,8 +14,15 @@ class DashboardService {
         const currentYear = year.toString();
 
         // 1. Total Pegawai (Exclude Super Admins)
+        const doctors = await prisma.model_has_roles.findMany({
+            where: { roles: { name: 'dokter' } },
+            select: { model_id: true }
+        });
+        const doctorUserIds = doctors.map(d => d.model_id);
+
         const totalPegawai = await prisma.users.count({
             where: {
+                id: { notIn: [1n, ...doctorUserIds] },
                 OR: [
                     { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
                     { is_admin: null }

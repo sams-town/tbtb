@@ -38,7 +38,7 @@ class PegawaiKeluarService {
             });
             usersMap = Object.fromEntries(users.map(u => [u.id, u]));
         }
-        const enriched = data.map(d => ({ ...d, user: usersMap[d.user_id] || null }));
+        const enriched = data.map(d => ({ ...d, user: usersMap[String(d.user_id)] || null }));
         return { 
             data: this.serializeList(enriched),
             meta: {

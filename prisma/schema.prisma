@@ -432,6 +432,9 @@ model payrolls {
   created_at                           DateTime? @db.Timestamp(0)
   updated_at                           DateTime? @db.Timestamp(0)
   potongan_koperasi                    BigInt?
+  insentif_tetap                       BigInt?   @default(0)
+  jasa_sip                             BigInt?   @default(0)
+  obat_bulan_ini                       BigInt?   @default(0)
   employee                             users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payrolls_user_id_foreign")
 
   @@index([user_id], map: "payrolls_user_id_foreign")

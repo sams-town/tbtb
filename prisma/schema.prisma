@@ -750,7 +750,7 @@ model mbg_klaims {
   jam_klaim  String    @db.VarChar(10)
   harga      BigInt    @default(0)
   lat        String?   @db.VarChar(50)
-  long       String?   @db.VarChar(50)
+  lng        String?   @db.VarChar(50)
   jarak      String?   @db.VarChar(20)
   status     String    @default("Claimed")
   created_at DateTime? @db.Timestamp(0)

@@ -35,6 +35,7 @@ import kasbonController from "../controllers/KasbonController.js";
 import pajakController from "../controllers/PajakController.js";
 import payrollController from '../controllers/PayrollController.js';
 import dashboardController from '../controllers/DashboardController.js';
+import mbgController from '../controllers/MbgController.js';
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { upload, createUploadMiddleware } from "../middleware/uploadMiddleware.js";
 const router = express.Router();
@@ -405,5 +406,27 @@ router.delete("/payrolls/:id", (req, res) => payrollController.destroy(req, res)
 // DASHBOARD ROUTES
 // ========================
 router.get("/dashboard/stats", (req, res) => dashboardController.index(req, res));
+
+// ========================
+// MBG (MAKAN BERGIZI) ROUTES
+// ========================
+
+// Settings — admin atur harga
+router.get("/mbg/settings",        (req, res) => mbgController.getSetting(req, res));
+router.get("/mbg/settings/all",    (req, res) => mbgController.getAllSettings(req, res));
+router.post("/mbg/settings",       authMiddleware, (req, res) => mbgController.upsertSetting(req, res));
+
+// Klaim — karyawan
+router.post("/mbg/klaim",          (req, res) => mbgController.klaim(req, res));
+router.get("/mbg/status/:user_id", (req, res) => mbgController.statusHariIni(req, res));
+
+// Rekap JSON — admin panel
+router.get("/mbg/rekap/harian",            (req, res) => mbgController.rekapHarian(req, res));
+router.get("/mbg/rekap/bulanan",           (req, res) => mbgController.rekapBulanan(req, res));
+router.get("/mbg/rekap/user/:user_id",     (req, res) => mbgController.rekapPerUser(req, res));
+
+// CSV Export — laporan cetak/arsip
+router.get("/mbg/export/bulanan",  (req, res) => mbgController.exportCsvBulanan(req, res));
+router.get("/mbg/export/harian",   (req, res) => mbgController.exportCsvHarian(req, res));
 
 export default router;

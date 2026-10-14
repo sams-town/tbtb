@@ -17,6 +17,7 @@ const USERS_API_BASE = import.meta.env.VITE_API_MEANDPAY;
 interface UserOption {
   id: string;
   name: string;
+  no_kontrak?: string;
   foto_karyawan: string | null;
   jabatan?: { nama_jabatan: string } | null;
 }
@@ -34,7 +35,18 @@ interface Kontrak {
   kontrak_file_name: string | null;
   created_at: string | null;
   updated_at: string | null;
-  // joined from users (if available)
+  // Joined fields from API response
+  users?: {
+    id?: string;
+    name?: string;
+    nama_karyawan?: string;
+    foto_karyawan?: string | null;
+    jabatan?: { nama_jabatan: string } | null;
+    no_kontrak?: string;
+  } | null;
+  nama_karyawan?: string | null; // flat field kalau API return flat
+  jabatan?: string | null;       // flat field jabatan
+  // legacy
   user?: { name: string; avatar?: string };
 }
 
@@ -62,6 +74,14 @@ const EMPTY_FORM: KontrakForm = {
   file: null,
 };
 
+const JENIS_OPTIONS = [
+  'Perjanjian Kerja Waktu Tertentu (PKWT)',
+  'Perjanjian Kerja Waktu Tidak Tertentu (PKWTT)',
+  'Kontrak',
+  'Magang',
+  'Tenaga Harian Lepas (THL)',
+];
+
 // ─── HELPERS ───────────────────────────────────────────────────────────────────
 function getStatus(kontrak: Kontrak): Status {
   if (!kontrak.tanggal_selesai) return 'permanent';
@@ -79,7 +99,42 @@ function fmtDate(d: string | null) {
 }
 
 function avatarFallback(name: string) {
-  return name?.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() ?? '??';
+  return (name ?? '??').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+}
+
+/**
+ * Resolve nama karyawan dari berbagai kemungkinan field response API.
+ * API baru mengembalikan `users.name`, `users.nama_karyawan`, atau flat `nama_karyawan`.
+ */
+function resolveName(kontrak: Kontrak, userMap: Record<string, UserOption>): string {
+  // 1. Dari join users di response API
+  if (kontrak.users?.name) return kontrak.users.name;
+  if (kontrak.users?.nama_karyawan) return kontrak.users.nama_karyawan;
+  // 2. Flat field
+  if (kontrak.nama_karyawan) return kontrak.nama_karyawan;
+  // 3. Legacy user field
+  if (kontrak.user?.name) return kontrak.user.name;
+  // 4. Dari userMap (fetch terpisah)
+  if (userMap[kontrak.user_id]?.name) return userMap[kontrak.user_id].name;
+  return `User #${kontrak.user_id}`;
+}
+
+function resolveJabatan(kontrak: Kontrak, userMap: Record<string, UserOption>): string {
+  if (kontrak.users?.jabatan?.nama_jabatan) return kontrak.users.jabatan.nama_jabatan;
+  if (typeof kontrak.jabatan === 'string' && kontrak.jabatan) return kontrak.jabatan;
+  if (userMap[kontrak.user_id]?.jabatan?.nama_jabatan) return userMap[kontrak.user_id].jabatan!.nama_jabatan;
+  return '—';
+}
+
+function resolveNoKontrak(kontrak: Kontrak, userMap: Record<string, UserOption>): string {
+  if (kontrak.users?.no_kontrak) return kontrak.users.no_kontrak;
+  if (userMap[kontrak.user_id]?.no_kontrak) return userMap[kontrak.user_id].no_kontrak!;
+  return '—';
+}
+
+function resolveFoto(kontrak: Kontrak): string | null {
+  if (kontrak.users?.foto_karyawan) return kontrak.users.foto_karyawan;
+  return null;
 }
 
 // ─── API CALLS ─────────────────────────────────────────────────────────────────
@@ -91,11 +146,7 @@ async function apiFetch(path: string, options?: RequestInit) {
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...(options?.headers || {}),
   };
-
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-  });
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
@@ -113,22 +164,21 @@ async function fetchAllUsers(): Promise<UserOption[]> {
 function userPhotoUrl(foto: string | null) {
   if (!foto) return null;
   if (foto.startsWith('http')) return foto;
-  // handle paths like "foto_karyawan/xxx.jpg" or bare filenames
   return `${USERS_API_BASE}/storage/${foto}`;
 }
 
 // ─── USER AVATAR ───────────────────────────────────────────────────────────────
-function UserAvatar({ user, size = 'md' }: { user: UserOption; size?: 'sm' | 'md' }) {
+function UserAvatar({ name, foto, size = 'md' }: { name: string; foto?: string | null; size?: 'sm' | 'md' }) {
   const [imgError, setImgError] = React.useState(false);
-  const src = userPhotoUrl(user.foto_karyawan);
+  const src = userPhotoUrl(foto ?? null);
   const cls = size === 'sm' ? 'w-8 h-8 text-[10px]' : 'w-10 h-10 text-xs';
   if (src && !imgError) {
-    return <img src={src} alt={user.name} onError={() => setImgError(true)}
+    return <img src={src} alt={name} onError={() => setImgError(true)}
       className={cn("rounded-xl object-cover shrink-0", cls)} />;
   }
   return (
     <div className={cn("rounded-xl bg-[#96D1C6]/30 text-[#103552] flex items-center justify-center font-black shrink-0", cls)}>
-      {avatarFallback(user.name)}
+      {avatarFallback(name)}
     </div>
   );
 }
@@ -163,7 +213,7 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
           <><Loader2 className="w-4 h-4 animate-spin text-slate-400" /><span className="text-slate-400">Memuat pegawai...</span></>
         ) : selected ? (
           <>
-            <UserAvatar user={selected} size="sm" />
+            <UserAvatar name={selected.name} foto={selected.foto_karyawan} size="sm" />
             <div className="min-w-0 flex-1">
               <p className="font-bold text-slate-900 truncate text-sm">{selected.name}</p>
               {selected.jabatan && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">{selected.jabatan.nama_jabatan}</p>}
@@ -198,10 +248,10 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
                 : filtered.map(u => (
                   <button key={u.id} type="button"
                     onClick={() => { onChange(u.id); setOpen(false); setQuery(''); }}
-                    className={cn("w-full flex items-center gap-3 px-4 py-3 hover:bg-[#96D1C6]/20/60 transition-colors text-left",
+                    className={cn("w-full flex items-center gap-3 px-4 py-3 hover:bg-[#96D1C6]/10 transition-colors text-left",
                       value === u.id && "bg-[#96D1C6]/20")}
                   >
-                    <UserAvatar user={u} size="sm" />
+                    <UserAvatar name={u.name} foto={u.foto_karyawan} size="sm" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-slate-900 truncate">{u.name}</p>
                       {u.jabatan && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">{u.jabatan.nama_jabatan}</p>}
@@ -222,7 +272,6 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
 function Modal({
   open, onClose, title, children
 }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
@@ -247,10 +296,7 @@ function Modal({
           >
             <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100">
               <h2 className="text-xl font-black text-slate-900">{title}</h2>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all active:scale-90"
-              >
+              <button onClick={onClose} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-all active:scale-90">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -297,9 +343,7 @@ function KontrakFormFields({
           className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
         >
           <option value="">-- Pilih Jenis Kontrak --</option>
-          <option value="Perjanjian Kerja Waktu Tertentu (PKWT)">Perjanjian Kerja Waktu Tertentu (PKWT)</option>
-          <option value="Perjanjian Kerja Waktu Tidak Tertentu (PKWTT)">Perjanjian Kerja Waktu Tidak Tertentu (PKWTT)</option>
-          <option value="Tenaga Harian Lepas (THL)">Tenaga Harian Lepas (THL)</option>
+          {JENIS_OPTIONS.map(j => <option key={j} value={j}>{j}</option>)}
         </select>
       </div>
       {field('Tanggal Mulai', 'tanggal_mulai', 'date')}
@@ -328,9 +372,9 @@ function KontrakFormFields({
 }
 
 // ─── DELETE CONFIRM DIALOG ─────────────────────────────────────────────────────
-function DeleteDialog({
-  open, onClose, onConfirm, loading
-}: { open: boolean; onClose: () => void; onConfirm: () => void; loading: boolean }) {
+function DeleteDialog({ open, onClose, onConfirm, loading }: {
+  open: boolean; onClose: () => void; onConfirm: () => void; loading: boolean;
+}) {
   return (
     <Modal open={open} onClose={onClose} title="Konfirmasi Hapus">
       <div className="flex flex-col items-center text-center gap-6">
@@ -342,15 +386,8 @@ function DeleteDialog({
           <p className="text-sm text-slate-500">Tindakan ini tidak dapat dibatalkan. Data kontrak akan dihapus permanen.</p>
         </div>
         <div className="flex gap-3 w-full">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
-          >
-            Batal
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
+          <button onClick={onClose} className="flex-1 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">Batal</button>
+          <button onClick={onConfirm} disabled={loading}
             className="flex-1 py-3 bg-rose-600 text-white rounded-2xl text-sm font-bold hover:bg-rose-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
@@ -362,10 +399,21 @@ function DeleteDialog({
   );
 }
 
-// ─── DETAIL VIEW ───────────────────────────────────────────────────────────────
-function DetailModal({ open, onClose, kontrak }: { open: boolean; onClose: () => void; kontrak: Kontrak | null }) {
+// ─── DETAIL MODAL ──────────────────────────────────────────────────────────────
+function DetailModal({ open, onClose, kontrak, userMap }: {
+  open: boolean;
+  onClose: () => void;
+  kontrak: Kontrak | null;
+  userMap: Record<string, UserOption>;
+}) {
   if (!kontrak) return null;
-  const status = getStatus(kontrak);
+
+  const status   = getStatus(kontrak);
+  const nama     = resolveName(kontrak, userMap);
+  const jabatan  = resolveJabatan(kontrak, userMap);
+  const noKon    = resolveNoKontrak(kontrak, userMap);
+  const foto     = resolveFoto(kontrak) ?? userMap[kontrak.user_id]?.foto_karyawan ?? null;
+
   const fileUrl = kontrak.kontrak_file_path
     ? kontrak.kontrak_file_path.startsWith('http')
       ? kontrak.kontrak_file_path
@@ -373,53 +421,68 @@ function DetailModal({ open, onClose, kontrak }: { open: boolean; onClose: () =>
     : null;
 
   const fileNode = fileUrl ? (
-    <a href={fileUrl} target="_blank" rel="noreferrer" className="text-[#103552] hover:text-[#103552] hover:underline flex items-center gap-1.5 break-all">
+    <a href={fileUrl} target="_blank" rel="noreferrer"
+      className="text-[#103552] hover:underline flex items-center gap-1.5 break-all">
       <FileText className="w-4 h-4 shrink-0" />
       <span>{kontrak.kontrak_file_name || 'Buka File'}</span>
     </a>
   ) : '—';
 
   const rows: [string, React.ReactNode][] = [
-    ['ID', kontrak.id],
-    ['User ID', kontrak.user_id],
-    ['No Kontrak', userMap[kontrak.user_id]?.no_kontrak ?? '—'],
-    ['Jenis Kontrak', kontrak.jenis_kontrak ?? '—'],
-    ['Tanggal', fmtDate(kontrak.tanggal)],
-    ['Tanggal Mulai', fmtDate(kontrak.tanggal_mulai)],
+    ['Nama Pegawai', nama],
+    ['Jabatan',      jabatan],
+    ['No Kontrak',   noKon],
+    ['Jenis Kontrak',kontrak.jenis_kontrak ?? '—'],
+    ['Tanggal',      fmtDate(kontrak.tanggal)],
+    ['Tanggal Mulai',fmtDate(kontrak.tanggal_mulai)],
     ['Tanggal Selesai', kontrak.tanggal_selesai ? fmtDate(kontrak.tanggal_selesai) : 'Tidak terbatas'],
-    ['Keterangan', kontrak.keterangan ?? '—'],
-    ['File', fileNode],
+    ['Keterangan',   kontrak.keterangan ?? '—'],
+    ['File Kontrak', fileNode],
   ];
 
   return (
     <Modal open={open} onClose={onClose} title="Detail Kontrak">
       <div className="space-y-5">
-        <div className={cn(
-          "inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest",
-          status === 'active' ? 'bg-emerald-50 text-emerald-600' :
+        {/* Pegawai info card */}
+        <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <UserAvatar name={nama} foto={foto} size="md" />
+          <div>
+            <p className="text-sm font-black text-slate-900">{nama}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{jabatan}</p>
+          </div>
+          <div className={cn(
+            "ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest",
+            status === 'active'   ? 'bg-emerald-50 text-emerald-600' :
             status === 'expiring' ? 'bg-amber-50 text-amber-600' :
-              status === 'permanent' ? 'bg-[#96D1C6]/20 text-[#103552]' :
-                'bg-rose-50 text-rose-600'
-        )}>
-          <div className={cn("w-1.5 h-1.5 rounded-full", status === 'active' ? 'bg-emerald-500' : status === 'expiring' ? 'bg-amber-500' : status === 'permanent' ? 'bg-[#103552]' : 'bg-rose-500')} />
-          {status}
+            status === 'permanent'? 'bg-[#96D1C6]/20 text-[#103552]' :
+                                    'bg-rose-50 text-rose-600'
+          )}>
+            <div className={cn("w-1.5 h-1.5 rounded-full",
+              status === 'active'    ? 'bg-emerald-500' :
+              status === 'expiring'  ? 'bg-amber-500' :
+              status === 'permanent' ? 'bg-[#103552]' : 'bg-rose-500'
+            )} />
+            {status === 'active' ? 'Aktif' : status === 'expiring' ? 'Akan Berakhir' : status === 'permanent' ? 'Permanen' : 'Habis'}
+          </div>
         </div>
+
+        {/* Detail rows */}
         <div className="divide-y divide-slate-100 rounded-2xl border border-slate-100 overflow-hidden">
           {rows.map(([label, value]) => (
-            <div key={label} className="flex items-start gap-4 px-5 py-3.5">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 w-44 shrink-0 pt-0.5">{label}</span>
-              <div className="text-sm font-bold text-slate-700 break-all">{value}</div>
+            <div key={label as string} className="flex items-start gap-4 px-5 py-3.5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 w-40 shrink-0 pt-0.5">{label}</span>
+              <div className="text-sm font-bold text-slate-700 break-all flex-1">{value}</div>
             </div>
           ))}
         </div>
 
-        {/* File Preview */}
+        {/* File preview */}
         {fileUrl && (
-          <div className="mt-4 flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Preview Dokumen</span>
-            <div className="rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center">
+            <div className="rounded-2xl border border-slate-100 overflow-hidden bg-slate-50">
               {kontrak.kontrak_file_name?.match(/\.(jpg|jpeg|png)$/i) ? (
-                <img src={fileUrl} alt="Kontrak Preview" className="w-full h-auto object-contain max-h-[600px]" />
+                <img src={fileUrl} alt="Kontrak" className="w-full h-auto object-contain max-h-[600px]" />
               ) : (
                 <iframe src={fileUrl} className="w-full h-[600px] border-none" title="Preview Dokumen" />
               )}
@@ -434,10 +497,10 @@ function DetailModal({ open, onClose, kontrak }: { open: boolean; onClose: () =>
 // ─── STATUS BADGE ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: Status }) {
   const map: Record<Status, { bg: string; dot: string; label: string }> = {
-    active: { bg: 'bg-emerald-50 text-emerald-600', dot: 'bg-emerald-500', label: 'Aktif' },
-    expiring: { bg: 'bg-amber-50 text-amber-600', dot: 'bg-amber-500', label: 'Akan Berakhir' },
-    expired: { bg: 'bg-rose-50 text-rose-600', dot: 'bg-rose-500', label: 'Habis' },
-    permanent: { bg: 'bg-[#96D1C6]/20 text-[#103552]', dot: 'bg-[#103552]', label: 'Permanen' },
+    active:   { bg: 'bg-emerald-50 text-emerald-600',    dot: 'bg-emerald-500', label: 'Aktif' },
+    expiring: { bg: 'bg-amber-50 text-amber-600',        dot: 'bg-amber-500',   label: 'Akan Berakhir' },
+    expired:  { bg: 'bg-rose-50 text-rose-600',          dot: 'bg-rose-500',    label: 'Habis' },
+    permanent:{ bg: 'bg-[#96D1C6]/20 text-[#103552]',   dot: 'bg-[#103552]',   label: 'Permanen' },
   };
   const { bg, dot, label } = map[status];
   return (
@@ -449,7 +512,9 @@ function StatusBadge({ status }: { status: Status }) {
 }
 
 // ─── STAT CARD ─────────────────────────────────────────────────────────────────
-function StatCard({ label, value, icon: Icon, color, bg }: { label: string; value: number; icon: any; color: string; bg: string }) {
+function StatCard({ label, value, icon: Icon, color, bg }: {
+  label: string; value: number; icon: any; color: string; bg: string;
+}) {
   return (
     <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/30 flex items-center gap-6 group hover:scale-[1.02] transition-all">
       <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 group-hover:rotate-6 transition-transform shadow-inner", bg, color)}>
@@ -471,7 +536,15 @@ export function ContractsPage() {
   const [contracts, setContracts] = useState<Kontrak[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // search dengan debounce
+  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  // filter tambahan
+  const [filterJenis, setFilterJenis] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [page, setPage] = useState(1);
@@ -491,6 +564,16 @@ export function ContractsPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const { addToast, updateToast } = useToast();
 
+  // ── debounce search ──
+  const handleSearchInput = (val: string) => {
+    setSearchInput(val);
+    clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      setSearch(val);
+      setPage(1);
+    }, 300);
+  };
+
   // ── fetch ──
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -498,50 +581,61 @@ export function ContractsPage() {
     try {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
+      if (filterJenis) params.set('jenis_kontrak', filterJenis);
+      if (filterStatus) params.set('status_kontrak', filterStatus);
       const res = await apiFetch(`/kontraks?${params}`);
       setContracts(res.data ?? []);
-    } catch (e: any) {
+    } catch {
       setError('Gagal memuat data. Periksa koneksi ke server.');
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, [search, filterJenis, filterStatus]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // fetch users for dropdown once
   useEffect(() => {
     setLoadingUsers(true);
-    fetchAllUsers()
-      .then(setUsers)
-      .finally(() => setLoadingUsers(false));
+    fetchAllUsers().then(setUsers).finally(() => setLoadingUsers(false));
   }, []);
 
-  const userMap = React.useMemo(() =>
-    Object.fromEntries(users.map(u => [u.id, u])), [users]);
+  const userMap = React.useMemo(
+    () => Object.fromEntries(users.map(u => [u.id, u])),
+    [users]
+  );
 
-  // ── derived ──
+  // ── derived / client-side filters ──
   const filtered = contracts.filter(c => {
     if (dateFrom && c.tanggal_mulai && c.tanggal_mulai < dateFrom) return false;
     if (dateTo && c.tanggal_mulai && c.tanggal_mulai > dateTo) return false;
+    // Client-side status filter (jika API tidak handle)
+    if (filterStatus) {
+      const s = getStatus(c);
+      if (filterStatus === 'aktif'   && s !== 'active' && s !== 'expiring' && s !== 'permanent') return false;
+      if (filterStatus === 'berakhir'&& s !== 'expired') return false;
+    }
     return true;
   });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const stats = {
-    total: contracts.length,
-    active: contracts.filter(c => getStatus(c) === 'active').length,
+    total:    contracts.length,
+    active:   contracts.filter(c => getStatus(c) === 'active').length,
     expiring: contracts.filter(c => getStatus(c) === 'expiring').length,
-    expired: contracts.filter(c => getStatus(c) === 'expired').length,
+    expired:  contracts.filter(c => getStatus(c) === 'expired').length,
   };
 
   // ── handlers ──
   const handleFormChange = (k: keyof KontrakForm, v: any) =>
     setForm(f => ({ ...f, [k]: v }));
 
-  const openAdd = () => { setForm({ ...EMPTY_FORM, tanggal: new Date().toISOString().split('T')[0] }); setFormError(null); setShowAdd(true); };
+  const openAdd = () => {
+    setForm({ ...EMPTY_FORM, tanggal: new Date().toISOString().split('T')[0] });
+    setFormError(null);
+    setShowAdd(true);
+  };
 
   const openEdit = (c: Kontrak) => {
     setSelected(c);
@@ -549,7 +643,7 @@ export function ContractsPage() {
       user_id: c.user_id ?? '',
       tanggal: c.tanggal?.slice(0, 10) ?? new Date().toISOString().split('T')[0],
       jenis_kontrak: c.jenis_kontrak ?? '',
-      no_kontrak: userMap[c.user_id]?.no_kontrak ?? '',
+      no_kontrak: resolveNoKontrak(c, userMap),
       tanggal_mulai: c.tanggal_mulai?.slice(0, 10) ?? '',
       tanggal_selesai: c.tanggal_selesai?.slice(0, 10) ?? '',
       keterangan: c.keterangan ?? '',
@@ -577,7 +671,7 @@ export function ContractsPage() {
   };
 
   const handleAdd = async () => {
-    if (!form.user_id.trim()) { setFormError('User ID wajib diisi.'); return; }
+    if (!form.user_id.trim()) { setFormError('User wajib dipilih.'); return; }
     setSubmitting(true); setFormError(null);
     try {
       await apiFetch('/kontraks', { method: 'POST', body: buildPayload() });
@@ -611,122 +705,153 @@ export function ContractsPage() {
       await apiFetch(`/kontraks/${selected.id}`, { method: 'DELETE' });
       setShowDelete(false);
       fetchData();
-    } catch {
-      // ignore – could add toast
-    } finally {
-      setSubmitting(false);
-    }
+    } catch { /* ignore */ }
+    finally { setSubmitting(false); }
   };
 
-  const clearFilters = () => { setSearch(''); setDateFrom(''); setDateTo(''); setPage(1); };
+  const clearFilters = () => {
+    setSearchInput('');
+    setSearch('');
+    setFilterJenis('');
+    setFilterStatus('');
+    setDateFrom('');
+    setDateTo('');
+    setPage(1);
+  };
 
   const handleExportExcel = async () => {
     const toastId = addToast({ type: 'loading', title: 'Export Excel', message: 'Sedang menyiapkan data...' });
     try {
-      // Fetch all contracts for export (using a high limit if the API supports it)
       const res = await apiFetch('/kontraks?limit=100000');
       const allContracts: Kontrak[] = res.data ?? [];
-
-      const exportData = allContracts.map((c, index) => {
-        const userInfo = userMap[c.user_id];
-        return {
-          'No': index + 1,
-          'Nama Pegawai': userInfo?.name ?? `User #${c.user_id}`,
-          'No Kontrak': userInfo?.no_kontrak ?? '—',
-          'Jabatan': userInfo?.jabatan?.nama_jabatan ?? '—',
-          'Jenis Kontrak': c.jenis_kontrak ?? '—',
-          'Tanggal Kontrak': fmtDate(c.tanggal),
-          'Tanggal Mulai': fmtDate(c.tanggal_mulai),
-          'Tanggal Selesai': c.tanggal_selesai ? fmtDate(c.tanggal_selesai) : 'Permanen',
-          'Status': getStatus(c).toUpperCase(),
-          'Keterangan': c.keterangan ?? '—'
-        };
-      });
-
+      const exportData = allContracts.map((c, index) => ({
+        'No': index + 1,
+        'Nama Pegawai': resolveName(c, userMap),
+        'No Kontrak': resolveNoKontrak(c, userMap),
+        'Jabatan': resolveJabatan(c, userMap),
+        'Jenis Kontrak': c.jenis_kontrak ?? '—',
+        'Tanggal Kontrak': fmtDate(c.tanggal),
+        'Tanggal Mulai': fmtDate(c.tanggal_mulai),
+        'Tanggal Selesai': c.tanggal_selesai ? fmtDate(c.tanggal_selesai) : 'Permanen',
+        'Status': getStatus(c).toUpperCase(),
+        'Keterangan': c.keterangan ?? '—',
+      }));
       const ws = XLSX.utils.json_to_sheet(exportData);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Kontrak Kerja');
-
-      // Adjust column widths
       ws['!cols'] = [
-        { wch: 5 },  // No
-        { wch: 25 }, // Nama Pegawai
-        { wch: 20 }, // No Kontrak
-        { wch: 20 }, // Jabatan
-        { wch: 30 }, // Jenis Kontrak
-        { wch: 15 }, // Tanggal Kontrak
-        { wch: 15 }, // Tanggal Mulai
-        { wch: 15 }, // Tanggal Selesai
-        { wch: 12 }, // Status
-        { wch: 40 }, // Keterangan
+        { wch: 5 }, { wch: 25 }, { wch: 20 }, { wch: 20 }, { wch: 30 },
+        { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 40 },
       ];
-
       XLSX.writeFile(wb, `Data_Kontrak_${new Date().toISOString().split('T')[0]}.xlsx`);
       updateToast(toastId, { type: 'success', title: 'Berhasil', message: 'Data berhasil di-export ke Excel' });
     } catch (err: any) {
-      console.error('Export error:', err);
       updateToast(toastId, { type: 'error', title: 'Gagal', message: err.message || 'Gagal mengekspor data' });
     }
   };
 
   // ── render ──
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      className="max-w-7xl mx-auto space-y-8 pb-20"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      className="max-w-7xl mx-auto space-y-8 pb-20">
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">Kontrak Kerja</h1>
-          <p className="text-slate-500 font-medium">Manage and track employee employment contracts.</p>
+          <p className="text-slate-500 font-medium">Kelola dan pantau kontrak kerja karyawan.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={handleExportExcel}
-            className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
-          >
-            <Download className="w-4 h-4 text-emerald-600" />
-            Export Excel
+          <button onClick={handleExportExcel}
+            className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
+            <Download className="w-4 h-4 text-emerald-600" /> Export Excel
           </button>
-          <button
-            onClick={openAdd}
-            className="flex items-center gap-2 px-6 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552] transition-all active:scale-95 shadow-xl shadow-[#103552]/20"
-          >
-            <Plus className="w-4 h-4" />
-            Tambah Kontrak
+          <button onClick={openAdd}
+            className="flex items-center gap-2 px-6 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#0D4156] transition-all active:scale-95 shadow-xl shadow-[#103552]/20">
+            <Plus className="w-4 h-4" /> Tambah Kontrak
           </button>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard label="Total Kontrak" value={stats.total} icon={FileText} color="text-[#103552]" bg="bg-[#96D1C6]/20" />
-        <StatCard label="Aktif" value={stats.active} icon={CheckCircle2} color="text-emerald-600" bg="bg-emerald-50" />
-        <StatCard label="Akan Berakhir" value={stats.expiring} icon={Clock} color="text-amber-600" bg="bg-amber-50" />
-        <StatCard label="Habis Kontrak" value={stats.expired} icon={AlertCircle} color="text-rose-600" bg="bg-rose-50" />
+        <StatCard label="Total Kontrak"   value={stats.total}    icon={FileText}    color="text-[#103552]"   bg="bg-[#96D1C6]/20" />
+        <StatCard label="Aktif"           value={stats.active}   icon={CheckCircle2}color="text-emerald-600" bg="bg-emerald-50" />
+        <StatCard label="Akan Berakhir"   value={stats.expiring} icon={Clock}       color="text-amber-600"   bg="bg-amber-50" />
+        <StatCard label="Habis Kontrak"   value={stats.expired}  icon={AlertCircle} color="text-rose-600"    bg="bg-rose-50" />
       </div>
 
       {/* Table Card */}
       <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 overflow-hidden">
+
         {/* Filters */}
-        <div className="p-8 border-b border-slate-100 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-8 border-b border-slate-100 space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            {/* Search — debounce 300ms */}
             <div>
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Cari Kontrak</label>
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Jenis kontrak, no kontrak, keterangan..."
-                  value={search}
-                  onChange={e => { setSearch(e.target.value); setPage(1); }}
+                  placeholder="Nama, no kontrak, keterangan..."
+                  value={searchInput}
+                  onChange={e => handleSearchInput(e.target.value)}
                   className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                 />
               </div>
             </div>
+
+            {/* Filter Jenis Kontrak */}
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Tanggal Mulai</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Jenis Kontrak</label>
+              <select
+                value={filterJenis}
+                onChange={e => { setFilterJenis(e.target.value); setPage(1); }}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer"
+              >
+                <option value="">Semua Jenis</option>
+                <option value="PKWT">PKWT</option>
+                <option value="PKWTT">PKWTT</option>
+                <option value="Kontrak">Kontrak</option>
+                <option value="Magang">Magang</option>
+                {JENIS_OPTIONS.map(j => (
+                  <option key={j} value={j}>{j}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Filter Status Kontrak */}
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Status Kontrak</label>
+              <select
+                value={filterStatus}
+                onChange={e => { setFilterStatus(e.target.value); setPage(1); }}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer"
+              >
+                <option value="">Semua Status</option>
+                <option value="aktif">Aktif</option>
+                <option value="berakhir">Berakhir</option>
+              </select>
+            </div>
+
+            {/* Clear */}
+            <div className="flex items-end">
+              <button
+                onClick={clearFilters}
+                className="w-full py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all flex items-center justify-center gap-2"
+              >
+                <X className="w-4 h-4" />
+                Reset Filter
+              </button>
+            </div>
+          </div>
+
+          {/* Date range */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Mulai Dari</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1); }}
@@ -734,7 +859,7 @@ export function ContractsPage() {
               </div>
             </div>
             <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Tanggal Akhir</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Sampai</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(1); }}
@@ -742,12 +867,10 @@ export function ContractsPage() {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <button onClick={clearFilters} className="text-sm font-bold text-[#103552] hover:underline">Clear All</button>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-              Showing {paginated.length} of {filtered.length} records
-            </p>
-          </div>
+
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            Menampilkan {paginated.length} dari {filtered.length} data
+          </p>
         </div>
 
         {/* Table */}
@@ -757,9 +880,7 @@ export function ContractsPage() {
               <AlertCircle className="w-8 h-8 text-rose-400" />
             </div>
             <p className="text-sm font-bold text-slate-500">{error}</p>
-            <button onClick={fetchData} className="px-6 py-2 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552]">
-              Coba Lagi
-            </button>
+            <button onClick={fetchData} className="px-6 py-2 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#0D4156]">Coba Lagi</button>
           </div>
         ) : loading ? (
           <div className="flex items-center justify-center py-20">
@@ -786,11 +907,13 @@ export function ContractsPage() {
               <tbody className="divide-y divide-slate-50">
                 {paginated.map((c, i) => {
                   const status = getStatus(c);
-                  const userInfo = userMap[c.user_id];
-                  const displayName = userInfo?.name ?? `User #${c.user_id}`;
+                  const nama   = resolveName(c, userMap);
+                  const jabatan= resolveJabatan(c, userMap);
+                  const noKon  = resolveNoKontrak(c, userMap);
+                  const foto   = resolveFoto(c) ?? userMap[c.user_id]?.foto_karyawan ?? null;
+
                   return (
-                    <motion.tr
-                      key={c.id}
+                    <motion.tr key={c.id}
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }}
                       className="group hover:bg-slate-50/50 transition-colors"
@@ -802,17 +925,14 @@ export function ContractsPage() {
                       </td>
                       <td className="py-6 px-8">
                         <div className="flex items-center gap-4">
-                          {userInfo
-                            ? <UserAvatar user={userInfo} size="md" />
-                            : <div className="w-10 h-10 rounded-xl bg-[#96D1C6]/30 text-[#103552] flex items-center justify-center text-xs font-black shrink-0">{avatarFallback(displayName)}</div>
-                          }
+                          <UserAvatar name={nama} foto={foto} size="md" />
                           <div>
-                            <p className="text-sm font-black text-slate-900 leading-tight">{displayName}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{userInfo?.jabatan?.nama_jabatan ?? '—'}</p>
+                            <p className="text-sm font-black text-slate-900 leading-tight">{nama}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{jabatan}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-6 px-8 font-bold text-sm text-slate-600">{userInfo?.no_kontrak || '—'}</td>
+                      <td className="py-6 px-8 font-bold text-sm text-slate-600">{noKon}</td>
                       <td className="py-6 px-8">
                         <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
                           {c.jenis_kontrak ?? '—'}
@@ -826,18 +946,19 @@ export function ContractsPage() {
                           {c.tanggal_selesai ? fmtDate(c.tanggal_selesai) : '∞ Permanen'}
                         </span>
                       </td>
+                      <td className="py-6 px-8"><StatusBadge status={status} /></td>
                       <td className="py-6 px-8">
-                        <StatusBadge status={status} />
-                      </td>
-                      <td className="py-6 px-8">
-                        <div className="flex items-center justify-end gap-2  transition-opacity">
-                          <button onClick={() => openDetail(c)} className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => openDetail(c)} title="Detail"
+                            className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90">
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button onClick={() => openEdit(c)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all active:scale-90">
+                          <button onClick={() => openEdit(c)} title="Edit"
+                            className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all active:scale-90">
                             <Edit2 className="w-4 h-4" />
                           </button>
-                          <button onClick={() => openDelete(c)} className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90">
+                          <button onClick={() => openDelete(c)} title="Hapus"
+                            className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -853,13 +974,10 @@ export function ContractsPage() {
         {/* Pagination */}
         {!loading && !error && totalPages > 1 && (
           <div className="p-8 bg-slate-50/30 border-t border-slate-100 flex items-center justify-between">
-            <p className="text-xs font-bold text-slate-400">Page {page} of {totalPages}</p>
+            <p className="text-xs font-bold text-slate-400">Halaman {page} dari {totalPages}</p>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] transition-all disabled:opacity-40"
-              >
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] transition-all disabled:opacity-40">
                 <ChevronLeft className="w-5 h-5" />
               </button>
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -873,11 +991,8 @@ export function ContractsPage() {
                     )}>{n}</button>
                 );
               })}
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] transition-all disabled:opacity-40"
-              >
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] transition-all disabled:opacity-40">
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
@@ -886,54 +1001,38 @@ export function ContractsPage() {
       </div>
 
       {/* ── Modals ── */}
-
-      {/* Add */}
       <Modal open={showAdd} onClose={() => setShowAdd(false)} title="Tambah Kontrak">
         <div className="space-y-6">
           <KontrakFormFields form={form} onChange={handleFormChange} users={users} loadingUsers={loadingUsers} />
-          {formError && (
-            <p className="text-sm font-bold text-rose-500 bg-rose-50 px-4 py-3 rounded-2xl">{formError}</p>
-          )}
+          {formError && <p className="text-sm font-bold text-rose-500 bg-rose-50 px-4 py-3 rounded-2xl">{formError}</p>}
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setShowAdd(false)} className="flex-1 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
-              Batal
-            </button>
+            <button onClick={() => setShowAdd(false)} className="flex-1 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">Batal</button>
             <button onClick={handleAdd} disabled={submitting}
-              className="flex-1 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Simpan
+              className="flex-1 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#0D4156] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Simpan
             </button>
           </div>
         </div>
       </Modal>
 
-      {/* Edit */}
       <Modal open={showEdit} onClose={() => setShowEdit(false)} title="Edit Kontrak">
         <div className="space-y-6">
           <KontrakFormFields form={form} onChange={handleFormChange} users={users} loadingUsers={loadingUsers} />
-          {formError && (
-            <p className="text-sm font-bold text-rose-500 bg-rose-50 px-4 py-3 rounded-2xl">{formError}</p>
-          )}
+          {formError && <p className="text-sm font-bold text-rose-500 bg-rose-50 px-4 py-3 rounded-2xl">{formError}</p>}
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setShowEdit(false)} className="flex-1 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
-              Batal
-            </button>
+            <button onClick={() => setShowEdit(false)} className="flex-1 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">Batal</button>
             <button onClick={handleEdit} disabled={submitting}
-              className="flex-1 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Update
+              className="flex-1 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#0D4156] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Update
             </button>
           </div>
         </div>
       </Modal>
 
-      {/* Delete */}
       <DeleteDialog open={showDelete} onClose={() => setShowDelete(false)} onConfirm={handleDelete} loading={submitting} />
 
-      {/* Detail */}
-      <DetailModal open={showDetail} onClose={() => setShowDetail(false)} kontrak={selected} />
+      {/* Detail — pass userMap sebagai prop */}
+      <DetailModal open={showDetail} onClose={() => setShowDetail(false)} kontrak={selected} userMap={userMap} />
     </motion.div>
   );
 }

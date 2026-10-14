@@ -137,6 +137,27 @@ class JabatanController {
             });
         }
     }
+    /**
+     * GET /api/jabatans/by-role/:role
+     * Ambil jabatan yang hanya dipakai oleh user dengan role tertentu
+     * Contoh: /api/jabatans/by-role/dokter → hanya jabatan dokter
+     */
+    async byRole(req, res) {
+        try {
+            const result = await jabatanService.getByRole(req.params.role);
+            return res.status(200).json({
+                success: true,
+                message: `Jabatan untuk role '${req.params.role}' berhasil diambil`,
+                ...result,
+            });
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Gagal mengambil data jabatan",
+                error: error.message,
+            });
+        }
+    }
 }
 
 export default new JabatanController();

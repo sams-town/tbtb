@@ -86,6 +86,7 @@ router.delete("/lokasi/:id", (req, res) => lokasiController.destroy(req, res));
 // JABATAN ROUTES
 // ========================
 router.get("/jabatans", (req, res) => jabatanController.index(req, res));
+router.get("/jabatans/by-role/:role", (req, res) => jabatanController.byRole(req, res));
 router.get("/jabatans/:id", (req, res) => jabatanController.show(req, res));
 router.post("/jabatans", (req, res) => jabatanController.store(req, res));
 router.put("/jabatans/:id", (req, res) => jabatanController.update(req, res));

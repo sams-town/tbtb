@@ -154,6 +154,44 @@ class JabatanService {
     serializeList(jabatans) {
         return jabatans.map((jabatan) => this.serialize(jabatan));
     }
+    /**
+     * Get jabatans yang hanya dipakai oleh user dengan role tertentu
+     * Dipakai untuk filter divisi di halaman Data Dokter agar tidak campur dengan divisi lain
+     */
+    async getByRole(roleName) {
+        if (!roleName) return this.getAll();
+
+        // Ambil semua user_id yang punya role tersebut
+        const roleUsers = await prisma.model_has_roles.findMany({
+            where: { roles: { name: roleName } },
+            select: { model_id: true }
+        });
+        const userIds = roleUsers.map(r => r.model_id);
+
+        if (userIds.length === 0) return { data: [] };
+
+        // Ambil jabatan_id yang dipakai user-user tersebut
+        const users = await prisma.users.findMany({
+            where: {
+                id:         { in: userIds },
+                jabatan_id: { not: null }
+            },
+            select: { jabatan_id: true }
+        });
+
+        const jabatanIds = [...new Set(
+            users.map(u => u.jabatan_id).filter(Boolean)
+        )];
+
+        if (jabatanIds.length === 0) return { data: [] };
+
+        const data = await prisma.jabatans.findMany({
+            where: { id: { in: jabatanIds } },
+            orderBy: { nama_jabatan: 'asc' },
+        });
+
+        return { data: this.serializeList(data) };
+    }
 }
 
 export default new JabatanService();

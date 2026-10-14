@@ -8,7 +8,7 @@ import {
   Download, Upload, Plus, Stethoscope, Briefcase as BriefcaseIcon, ShieldCheck,
   Edit2, Trash2, Filter, ChevronLeft, ChevronRight, TrendingUp, UserCheck, UserX, X, QrCode,
   Key, Map, ScanFace, Loader2, RefreshCw, Eye, EyeOff, Lock, ScrollText, AlertTriangle,
-  FileSpreadsheet, CheckCircle2, ImageIcon
+  FileSpreadsheet, CheckCircle2, ImageIcon, ShieldAlert
 } from 'lucide-react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
@@ -99,6 +99,7 @@ interface Employee {
   potongan_koperasi?: number | string | null;
   cuti_melahirkan?: number | string | null;
   cuti_kematian?: number | string | null;
+  is_supervisor?: number | null;
 }
 
 interface Meta {
@@ -1231,6 +1232,39 @@ export function EmployeesPage() {
   const { addToast, updateToast } = useToast();
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
 
+  // Supervisor
+  const [supervisorLoadingId, setSupervisorLoadingId] = useState<string | null>(null);
+
+  const handleToggleSupervisor = async (emp: Employee) => {
+    const newVal = emp.is_supervisor === 1 ? 0 : 1;
+    setSupervisorLoadingId(emp.id);
+    try {
+      const res = await fetch(`${BASE_URL}/users/${emp.id}/supervisor`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ is_supervisor: newVal }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        addToast({
+          type: 'success',
+          title: newVal === 1 ? 'Dijadikan Supervisor' : 'Supervisor Dicopot',
+          message: `${emp.name} berhasil ${newVal === 1 ? 'dijadikan supervisor' : 'dicopot dari supervisor'}.`,
+        });
+        fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja);
+      } else {
+        addToast({ type: 'error', title: 'Gagal', message: json.message || 'Operasi gagal.' });
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', title: 'Error', message: err.message || 'Terjadi kesalahan sistem.' });
+    } finally {
+      setSupervisorLoadingId(null);
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (exportDropdownRef.current && !exportDropdownRef.current.contains(e.target as Node)) {
@@ -1763,6 +1797,11 @@ export function EmployeesPage() {
                           <div>
                             <p className="text-sm font-semibold text-slate-800 leading-tight">{emp.name}</p>
                             <p className="text-[11px] text-slate-400">@{emp.username}</p>
+                            {emp.is_supervisor === 1 && (
+                              <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-700 text-[9px] font-black uppercase tracking-widest">
+                                <ShieldAlert className="w-2.5 h-2.5" /> Supervisor
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -1803,6 +1842,22 @@ export function EmployeesPage() {
                           <button onClick={() => setContractEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Kontrak"><ScrollText className="w-4 h-4" /></button>
                           <button onClick={() => setMappingEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all" title="Mapping Dinas Luar"><FileText className="w-4 h-4" /></button>
                           <button onClick={() => setFaceRecEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-[#185B5A] hover:bg-[#96D1C6]/20 transition-all" title="Face Recognition"><ScanFace className="w-4 h-4" /></button>
+                          {/* Supervisor toggle */}
+                          <button
+                            onClick={() => handleToggleSupervisor(emp)}
+                            disabled={supervisorLoadingId === emp.id}
+                            title={emp.is_supervisor === 1 ? 'Hapus Supervisor' : 'Jadikan Supervisor'}
+                            className={cn(
+                              'p-1.5 rounded-lg transition-all disabled:opacity-50',
+                              emp.is_supervisor === 1
+                                ? 'text-amber-600 bg-amber-50 hover:bg-amber-100'
+                                : 'text-slate-400 hover:text-amber-600 hover:bg-amber-50',
+                            )}
+                          >
+                            {supervisorLoadingId === emp.id
+                              ? <Loader2 className="w-4 h-4 animate-spin" />
+                              : <ShieldAlert className="w-4 h-4" />}
+                          </button>
                           <button onClick={() => setDeleteConfirmEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Hapus"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       </td>

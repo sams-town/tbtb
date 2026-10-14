@@ -19,6 +19,7 @@ import { MobileProfilePage } from './components/MobileProfilePage';
 import { MobilePayrollPage } from './components/MobilePayrollPage';
 import { MobileNotificationsPage } from './components/MobileNotificationsPage';
 import { MobileMakanSiangPage } from './components/MobileMakanSiangPage';
+import { MobileSupervisorJadwalPage } from './components/MobileSupervisorJadwalPage';
 
 export function MobileRouter({ user, handleLogout, settings }: { user: any, handleLogout?: () => void, settings?: any }) {
   const location = useLocation();
@@ -40,6 +41,7 @@ export function MobileRouter({ user, handleLogout, settings }: { user: any, hand
   else if (location.pathname === '/payroll') content = <MobilePayrollPage />;
   else if (location.pathname === '/notifications') content = <MobileNotificationsPage />;
   else if (location.pathname === '/makan-siang') content = <MobileMakanSiangPage />;
+  else if (location.pathname === '/input-jadwal') content = <MobileSupervisorJadwalPage />;
   else if (['/finance-kasbon', '/finance-reimbursement', '/finance-pengajuan'].includes(location.pathname)) content = <MobileFinancePage />;
   else if (['/visit-kunjungan', '/visit-penugasan', '/visit-rapat', '/visit-dokter'].includes(location.pathname)) content = <MobileVisitPage />;
   else if (['/kinerja-pegawai', '/kinerja-laporan-kerja', '/finance-target-kinerja'].includes(location.pathname)) content = <MobileKinerjaPage />;

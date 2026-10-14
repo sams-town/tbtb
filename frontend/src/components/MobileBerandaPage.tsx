@@ -43,7 +43,8 @@ import {
   ArrowUpRight,
   TrendingUp,
   X,
-  UtensilsCrossed
+  UtensilsCrossed,
+  ClipboardList,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -151,7 +152,8 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
   const hasPermission = (permission: string) => {
     if (!permission) return true;
     if (userData?.is_admin === 'admin') return true;
-    
+    // Cek supervisor khusus
+    if (permission === '__supervisor__') return Number(userData?.is_supervisor) === 1;
     const perms = userData?.permissions || [];
     return perms.includes(permission) || perms.some((p: any) => p.name === permission);
   };
@@ -196,6 +198,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
     { label: 'Target Kinerja',     icon: Target,        color: 'bg-orange-50 text-orange-600', path: '/finance-target-kinerja', perm: 'target-kinerja.view' },
     { label: 'Laporan Kerja',      icon: ClipboardCheck,color: 'bg-blue-50 text-blue-600',     path: '/kinerja-laporan-kerja', perm: 'laporan-kerja.view' },
     { label: 'Makan Siang',        icon: UtensilsCrossed,color: 'bg-orange-50 text-orange-600', path: '/makan-siang', perm: '' },
+    { label: 'Input Jadwal',       icon: ClipboardList,  color: 'bg-[#185B5A] text-white',      path: '/input-jadwal', perm: '__supervisor__' },
     { label: 'Profile',            icon: User,          color: 'bg-rose-50 text-rose-600',     path: '/profile', perm: '' },
     { label: 'Petunjuk',           icon: Book,          color: 'bg-amber-50 text-amber-600',   path: '#', perm: 'petunjuk.view' },
     { label: 'Logout',             icon: LogOut,        color: 'bg-rose-50 text-rose-600',     path: 'logout', perm: '' },

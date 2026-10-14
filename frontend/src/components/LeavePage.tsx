@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Calendar,
   Search,
@@ -16,7 +16,8 @@ import {
   Filter,
   Loader2,
   CheckCircle,
-  Check
+  Check,
+  Download,
 } from 'lucide-react';
 import { cn, formatPhotoUrl } from '../lib/utils';
 import { useToast } from './Toast';
@@ -273,6 +274,49 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
     setDisplayedLeaves(result);
   };
 
+  const [isExporting, setIsExporting] = React.useState(false);
+
+  const handleExportCSV = async () => {
+    setIsExporting(true);
+    try {
+      const url = new URL(`${import.meta.env.VITE_API_MEANDPAY}/cutis/export`);
+      if (filterEmployeeId) url.searchParams.append('user_id', filterEmployeeId);
+      if (filterStartDate)  url.searchParams.append('start_date', filterStartDate);
+      if (filterEndDate)    url.searchParams.append('end_date', filterEndDate);
+
+      const res = await fetch(url.toString(), {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const contentType = res.headers.get('Content-Type') || '';
+      const disposition = res.headers.get('Content-Disposition') || '';
+
+      // Ekstrak nama file dari header, atau gunakan default
+      const match = disposition.match(/filename[^;=\n]*=([^;\n]*)/);
+      const filename = match
+        ? match[1].replace(/['"]/g, '').trim()
+        : `Rekap_Cuti_${new Date().toISOString().split('T')[0]}.csv`;
+
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+
+      addToast({ type: 'success', title: 'Berhasil', message: 'File CSV berhasil diunduh.' });
+    } catch (err: any) {
+      addToast({ type: 'error', title: 'Gagal Export', message: err.message || 'Terjadi kesalahan sistem.' });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -284,13 +328,25 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
           <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">Data Cuti Karyawan</h1>
           <p className="text-slate-500 font-medium">Review and manage employee leave requests and medical certificates.</p>
         </div>
-        <button
-          onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95"
-        >
-          <Plus className="w-5 h-5" />
-          Tambah
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportCSV}
+            disabled={isExporting}
+            className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl text-sm font-black transition-all shadow-sm hover:bg-slate-50 active:scale-95 disabled:opacity-60"
+          >
+            {isExporting
+              ? <Loader2 className="w-4 h-4 animate-spin" />
+              : <Download className="w-4 h-4 text-emerald-500" />}
+            Export CSV
+          </button>
+          <button
+            onClick={() => setIsAdding(true)}
+            className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95"
+          >
+            <Plus className="w-5 h-5" />
+            Tambah
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 overflow-hidden">

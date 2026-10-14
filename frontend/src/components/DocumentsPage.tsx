@@ -1,8 +1,14 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Plus, FileText, Download, Trash2, Clock, X, Loader2, FileUp, Calendar, User, Info, Pencil, AlertTriangle } from 'lucide-react';
+import { Search, Plus, FileText, Download, Trash2, Clock, X, Loader2, FileUp, Calendar, User, Info, Pencil, AlertTriangle, PackageSearch } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useToast } from './Toast';
+
+const JENIS_DOKUMEN = [
+  'KTP', 'Kartu Keluarga', 'NPWP', 'SIM',
+  'BPJS Kesehatan', 'BPJS Ketenagakerjaan',
+  'Ijazah', 'Sertifikat', 'Kontrak', 'Lainnya',
+];
 
 interface Document {
   id: string;
@@ -26,6 +32,10 @@ export function DocumentsPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [filterJenis, setFilterJenis] = useState('');
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkJenis, setBulkJenis] = useState('');
+  const [bulkLoading, setBulkLoading] = useState(false);
   const { addToast, updateToast } = useToast();
 
   // Modals
@@ -48,7 +58,10 @@ export function DocumentsPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/documents?search=${search}`, {
+      const url = new URL(`${import.meta.env.VITE_API_MEANDPAY}/documents`);
+      if (search) url.searchParams.append('search', search);
+      if (filterJenis) url.searchParams.append('jenis_file', filterJenis);
+      const res = await fetch(url.toString(), {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const json = await res.json();
@@ -97,7 +110,7 @@ export function DocumentsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, [search, filterJenis]);
 
   useEffect(() => {
     fetchEmployees();
@@ -169,6 +182,53 @@ export function DocumentsPage() {
     }
   };
 
+  const handleBulkDownload = async () => {
+    if (!bulkJenis) {
+      addToast({ type: 'error', title: 'Pilih Jenis', message: 'Pilih jenis dokumen terlebih dahulu.' });
+      return;
+    }
+    setBulkLoading(true);
+    try {
+      const url = new URL(`${import.meta.env.VITE_API_MEANDPAY}/documents/bulk-download`);
+      url.searchParams.append('jenis_file', bulkJenis);
+
+      const res = await fetch(url.toString(), {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const contentType = res.headers.get('Content-Type') || '';
+      const disposition  = res.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename[^;=\n]*=([^;\n]*)/);
+      const filename = match
+        ? match[1].replace(/['"]/g, '').trim()
+        : `Manifest_Dokumen_${bulkJenis.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+
+      setShowBulkModal(false);
+      addToast({
+        type: 'success',
+        title: 'Berhasil',
+        message: 'File CSV berisi link dokumen berhasil didownload. Buka di Excel untuk mengakses semua link.',
+        duration: 6000,
+      });
+    } catch (err: any) {
+      addToast({ type: 'error', title: 'Gagal', message: err.message || 'Gagal mendownload manifest dokumen.' });
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
   const handlePreview = (item: Document) => {
     if (item.url) {
       window.open(item.url, '_blank');
@@ -220,13 +280,22 @@ export function DocumentsPage() {
           <h1 className="text-4xl font-black text-slate-800 tracking-tight">Dokumen Pegawai</h1>
           <p className="text-slate-500 font-medium italic mt-1">Penyimpanan dokumen digital terpusat</p>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-[#10B981] text-white rounded-[20px] font-black uppercase tracking-widest text-xs shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          Upload Dokumen
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => { setBulkJenis(''); setShowBulkModal(true); }}
+            className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 text-slate-700 rounded-[20px] font-black uppercase tracking-widest text-xs shadow-sm hover:bg-slate-50 transition-all active:scale-95"
+          >
+            <PackageSearch className="w-4 h-4 text-[#185B5A]" />
+            Download Massal
+          </button>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-2 px-8 py-4 bg-[#10B981] text-white rounded-[20px] font-black uppercase tracking-widest text-xs shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            Upload Dokumen
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-[#103552]/20/5 overflow-hidden">
@@ -241,7 +310,17 @@ export function DocumentsPage() {
               className="w-full pl-14 pr-8 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 items-center flex-wrap">
+            <select
+              value={filterJenis}
+              onChange={(e) => setFilterJenis(e.target.value)}
+              className="appearance-none pl-4 pr-8 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-600 outline-none focus:ring-2 focus:ring-[#103552]/10 focus:border-[#96D1C6]/50 transition-all cursor-pointer"
+            >
+              <option value="">Semua Jenis Dokumen</option>
+              {JENIS_DOKUMEN.map((j) => (
+                <option key={j} value={j}>{j}</option>
+              ))}
+            </select>
             <button className="p-4.5 bg-slate-50 text-slate-400 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-all">
               <Clock className="w-5 h-5" />
             </button>
@@ -373,6 +452,15 @@ export function DocumentsPage() {
             document={deleteData}
             onConfirm={handleDelete}
             onCancel={() => setDeleteData(null)}
+          />
+        )}
+        {showBulkModal && (
+          <BulkDownloadModal
+            bulkJenis={bulkJenis}
+            setBulkJenis={setBulkJenis}
+            loading={bulkLoading}
+            onConfirm={handleBulkDownload}
+            onCancel={() => setShowBulkModal(false)}
           />
         )}
       </AnimatePresence>
@@ -657,3 +745,84 @@ function DeleteConfirmModal({ document, onConfirm, onCancel }: { document: Docum
 
 
 
+
+function BulkDownloadModal({
+  bulkJenis,
+  setBulkJenis,
+  loading,
+  onConfirm,
+  onCancel,
+}: {
+  bulkJenis: string;
+  setBulkJenis: (v: string) => void;
+  loading: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onCancel} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 30 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 30 }}
+        className="relative bg-white rounded-[40px] shadow-2xl w-full max-w-md overflow-hidden border border-slate-100"
+      >
+        <div className="flex items-center justify-between p-10 border-b border-slate-50">
+          <div>
+            <h3 className="text-xl font-black text-slate-800 tracking-tight">Download Massal</h3>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Pilih jenis dokumen yang ingin didownload</p>
+          </div>
+          <button onClick={onCancel} className="w-11 h-11 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:text-rose-500 transition-all">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-10 space-y-6">
+          <div>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">Jenis Dokumen</label>
+            <select
+              value={bulkJenis}
+              onChange={(e) => setBulkJenis(e.target.value)}
+              className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all cursor-pointer"
+            >
+              <option value="">-- Pilih Jenis Dokumen --</option>
+              {JENIS_DOKUMEN.map((j) => (
+                <option key={j} value={j}>{j}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-start gap-3 p-4 bg-sky-50 rounded-2xl border border-sky-100">
+            <PackageSearch className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" />
+            <p className="text-[11px] font-bold text-sky-700 leading-relaxed">
+              Sistem akan mengunduh file CSV berisi daftar semua URL dokumen dari jenis yang dipilih. Buka di Excel untuk mengakses semua link dokumen.
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 py-4 bg-slate-50 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 transition-all"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={loading || !bulkJenis}
+              className="flex-[2] py-4 bg-[#103552] text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-[#103552]/20 hover:bg-[#0D4156] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {loading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Memproses...</>
+              ) : (
+                <><Download className="w-4 h-4" /> Download CSV</>
+              )}
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}

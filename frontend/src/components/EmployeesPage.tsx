@@ -1222,6 +1222,8 @@ export function EmployeesPage() {
   const [selectedLokasi, setSelectedLokasi] = useState('');
   const [selectedJabatan, setSelectedJabatan] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [selectedStatusKerja, setSelectedStatusKerja] = useState('');
   const [locations, setLocations] = useState<any[]>([]);
   const [jabatans, setJabatans] = useState<any[]>([]);
@@ -1231,6 +1233,7 @@ export function EmployeesPage() {
   const exportDropdownRef = useRef<HTMLDivElement>(null);
   const { addToast, updateToast } = useToast();
   const searchTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const roleDropdownRef = useRef<HTMLDivElement>(null);
 
   // Supervisor
   const [supervisorLoadingId, setSupervisorLoadingId] = useState<string | null>(null);
@@ -1254,7 +1257,7 @@ export function EmployeesPage() {
           title: newVal === 1 ? 'Dijadikan Supervisor' : 'Supervisor Dicopot',
           message: `${emp.name} berhasil ${newVal === 1 ? 'dijadikan supervisor' : 'dicopot dari supervisor'}.`,
         });
-        fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja);
+        fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja);
       } else {
         addToast({ type: 'error', title: 'Gagal', message: json.message || 'Operasi gagal.' });
       }
@@ -1269,6 +1272,9 @@ export function EmployeesPage() {
     const handleClickOutside = (e: MouseEvent) => {
       if (exportDropdownRef.current && !exportDropdownRef.current.contains(e.target as Node)) {
         setShowExportDropdown(false);
+      }
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target as Node)) {
+        setShowRoleDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -1286,27 +1292,31 @@ export function EmployeesPage() {
     fetch(`${BASE_URL}/status-pajak`, { headers }).then(r => r.json()).then(j => j.success && setStatusPajaks(j.data));
   }, []);
 
-  const fetchEmployees = useCallback(async (currentPage: number, currentSearch: string, locId?: string, jabatanId?: string, role?: string, statusKerja?: string) => {
+  const fetchEmployees = useCallback(async (currentPage: number, currentSearch: string, locId?: string, jabatanId?: string, roleOrRoles?: string | string[], statusKerja?: string) => {
     setLoading(true); setError(null);
     try {
-      const activeUser = currentUser || JSON.parse(localStorage.getItem('user') || '{}');
-      const paramsObj: any = {
+      const paramsObj: Record<string, string> = {
         page: String(currentPage),
-        limit: '100'
+        limit: '100',
       };
       if (currentSearch) paramsObj.search = currentSearch;
       if (locId && locId !== 'null' && locId !== 'undefined') paramsObj.lokasi_id = locId;
       if (jabatanId && jabatanId !== 'null' && jabatanId !== 'undefined') paramsObj.jabatan_id = jabatanId;
-      if (role && role !== 'null' && role !== 'undefined') {
-        paramsObj.role = role;
-      } else {
-        paramsObj.exclude_role = 'dokter';
-      }
       if (statusKerja && statusKerja !== 'null' && statusKerja !== 'undefined') paramsObj.status_kerja = statusKerja;
 
-      const params = new URLSearchParams(paramsObj);
-      console.log('Fetch Employees URL:', `${BASE_URL}/users?${params}`);
-      const res = await fetch(`${BASE_URL}/users?${params}`, {
+      // Build query string manually to support repeated keys (roles[])
+      const baseParams = new URLSearchParams(paramsObj);
+      let queryString = baseParams.toString();
+
+      const rolesArr = Array.isArray(roleOrRoles) ? roleOrRoles : (roleOrRoles ? [roleOrRoles] : []);
+      if (rolesArr.length > 0) {
+        rolesArr.forEach(r => { queryString += `&roles[]=${encodeURIComponent(r)}`; });
+      } else {
+        queryString += `&exclude_role=dokter`;
+      }
+
+      console.log('Fetch Employees URL:', `${BASE_URL}/users?${queryString}`);
+      const res = await fetch(`${BASE_URL}/users?${queryString}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1340,17 +1350,17 @@ export function EmployeesPage() {
   }, []);
 
   useEffect(() => {
-    fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja);
+    fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja);
     setSelectedIds([]);
-  }, [page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja, fetchEmployees]);
+  }, [page, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja, fetchEmployees]);
 
   const handleSearchInput = (val: string) => {
     setSearchInput(val);
     clearTimeout(searchTimeout.current);
-    searchTimeout.current = setTimeout(() => { setPage(1); setSearch(val); }, 400);
+    searchTimeout.current = setTimeout(() => { setPage(1); setSearch(val); }, 300);
   };
 
-  const handleAddSuccess = () => { fetchEmployees(1, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja); setPage(1); };
+  const handleAddSuccess = () => { fetchEmployees(1, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja); setPage(1); };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -1421,19 +1431,20 @@ export function EmployeesPage() {
       if (search) paramsObj.search = search;
       if (selectedLokasi) paramsObj.lokasi_id = selectedLokasi;
       if (selectedJabatan) paramsObj.jabatan_id = selectedJabatan;
-      if (selectedRole) {
-        paramsObj.role = selectedRole;
-      } else {
-        paramsObj.exclude_role = 'dokter';
-      }
       if (type !== 'all') {
         paramsObj.status_kerja = type;
       } else if (selectedStatusKerja) {
         paramsObj.status_kerja = selectedStatusKerja;
       }
 
-      const params = new URLSearchParams(paramsObj);
-      const res = await fetch(`${BASE_URL}/users?${params}`, {
+      let exportQs = new URLSearchParams(paramsObj).toString();
+      if (selectedRoles.length > 0) {
+        selectedRoles.forEach(r => { exportQs += `&roles[]=${encodeURIComponent(r)}`; });
+      } else {
+        exportQs += `&exclude_role=dokter`;
+      }
+
+      const res = await fetch(`${BASE_URL}/users?${exportQs}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const json = await res.json();
@@ -1669,7 +1680,7 @@ export function EmployeesPage() {
               )}
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja)} className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">
+              <button onClick={() => fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja)} className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">
                 <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
               </button>
 
@@ -1704,19 +1715,71 @@ export function EmployeesPage() {
                 <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               </div>
 
-              <div className="relative">
-                <select
-                  value={selectedRole}
-                  onChange={(e) => { setSelectedRole(e.target.value); setPage(1); }}
-                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-[#103552]/60 min-w-[160px]"
+              <div className="relative" ref={roleDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                  className={cn(
+                    'flex items-center gap-2 pl-3 pr-3 py-2.5 bg-slate-50 border rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none min-w-[160px]',
+                    selectedRoles.length > 0 ? 'border-[#103552]/40 bg-[#96D1C6]/10' : 'border-slate-200',
+                  )}
                 >
-                  <option value="">Semua Role</option>
-                  {roles.map((r: any) => (
-                    <option key={r.id} value={r.name}>{r.name}</option>
-                  ))}
-                </select>
-                <ShieldCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <ShieldCheck className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span className="flex-1 text-left truncate">
+                    {selectedRoles.length === 0 ? 'Semua Role' : selectedRoles.length === 1 ? selectedRoles[0] : `${selectedRoles.length} Role`}
+                  </span>
+                  {selectedRoles.length > 0 && (
+                    <span className="bg-[#103552] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0">
+                      {selectedRoles.length}
+                    </span>
+                  )}
+                  <ChevronDown className={cn('w-4 h-4 text-slate-400 transition-transform shrink-0', showRoleDropdown && 'rotate-180')} />
+                </button>
+
+                <AnimatePresence>
+                  {showRoleDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                      transition={{ duration: 0.12 }}
+                      className="absolute left-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-2 overflow-hidden"
+                    >
+                      {/* Semua / Reset */}
+                      <button
+                        onClick={() => { setSelectedRoles([]); setPage(1); }}
+                        className={cn(
+                          'w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-colors',
+                          selectedRoles.length === 0 ? 'text-[#103552] bg-[#96D1C6]/10' : 'text-slate-500 hover:bg-slate-50',
+                        )}
+                      >
+                        <div className={cn('w-4 h-4 rounded border-2 flex items-center justify-center transition-all', selectedRoles.length === 0 ? 'bg-[#103552] border-[#103552]' : 'border-slate-300')}>
+                          {selectedRoles.length === 0 && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                        </div>
+                        Semua Role
+                      </button>
+                      <div className="h-px bg-slate-100 my-1" />
+                      {roles.map((r: any) => {
+                        const checked = selectedRoles.includes(r.name);
+                        return (
+                          <button
+                            key={r.id}
+                            onClick={() => {
+                              setSelectedRoles(prev => checked ? prev.filter(x => x !== r.name) : [...prev, r.name]);
+                              setPage(1);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-slate-50 text-slate-700"
+                          >
+                            <div className={cn('w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0', checked ? 'bg-[#103552] border-[#103552]' : 'border-slate-300')}>
+                              {checked && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                            </div>
+                            <span className="capitalize">{r.name}</span>
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className="relative">
@@ -1741,7 +1804,7 @@ export function EmployeesPage() {
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
                 <AlertCircle className="w-8 h-8 text-rose-400" />
                 <p className="text-sm font-semibold text-slate-600">{error}</p>
-                <button onClick={() => fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja)} className="text-[#103552] text-sm font-semibold hover:underline">Coba lagi</button>
+                <button onClick={() => fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja)} className="text-[#103552] text-sm font-semibold hover:underline">Coba lagi</button>
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center py-20 gap-3 text-slate-400">

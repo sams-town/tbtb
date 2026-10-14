@@ -104,6 +104,18 @@ class CutiController {
             return res.status(500).json({ success: false, message: "Gagal menghapus cuti", error: error.message });
         }
     }
+    /** GET /api/cutis/export — export CSV dengan filter */
+    async exportCsv(req, res) {
+        try {
+            const csv      = await cutiService.exportCsv(req.query);
+            const filename = `export-cuti-${new Date().toISOString().slice(0,10)}.csv`;
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            return res.status(200).send('\uFEFF' + csv); // BOM untuk Excel
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    }
 }
 
 export default new CutiController();

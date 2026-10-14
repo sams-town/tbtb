@@ -261,6 +261,29 @@ class UserController {
             });
         }
     }
+
+    /**
+     * PUT /api/users/:id/supervisor
+     * Admin toggle supervisor status
+     */
+    async setSupervisor(req, res) {
+        try {
+            const { id } = req.params;
+            const { is_supervisor } = req.body;
+
+            const user = await userService.setSupervisor(id, is_supervisor);
+            if (!user) {
+                return res.status(404).json({ success: false, message: "User tidak ditemukan" });
+            }
+            return res.status(200).json({
+                success: true,
+                message: is_supervisor ? "Berhasil menjadikan supervisor" : "Berhasil menghapus supervisor",
+                data: user
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    }
 }
 
 export default new UserController();

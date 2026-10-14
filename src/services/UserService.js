@@ -1045,6 +1045,19 @@ class UserService {
     serializeList(users) {
         return users.map((user) => this.serialize(user));
     }
+    /**
+     * Set/unset supervisor status
+     */
+    async setSupervisor(id, isSupervisor) {
+        const existing = await prisma.users.findUnique({ where: { id: BigInt(id) } });
+        if (!existing) return null;
+
+        const updated = await prisma.users.update({
+            where: { id: BigInt(id) },
+            data: { is_supervisor: isSupervisor ? 1 : 0 }
+        });
+        return this.serialize(updated);
+    }
 }
 
 export default new UserService();

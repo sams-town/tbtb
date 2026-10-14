@@ -363,6 +363,92 @@ class CutiService {
     serializeList(list) {
         return list.map((item) => this.serialize(item));
     }
+    /**
+     * Export data cuti ke CSV
+     * Filter: search, user_id, status_cuti, start_date, end_date
+     */
+    async exportCsv(query = {}) {
+        const where = {};
+
+        if (query.search) {
+            where.OR = [
+                { nama_cuti:   { contains: query.search } },
+                { alasan_cuti: { contains: query.search } },
+                { status_cuti: { contains: query.search } },
+            ];
+        }
+        if (query.user_id) {
+            where.user_id = BigInt(query.user_id);
+        }
+        if (query.status_cuti) {
+            where.status_cuti = query.status_cuti;
+        }
+        if (query.start_date && query.end_date) {
+            // tanggal di cutis adalah String, filter dengan LIKE atau bisa compare string
+            // Karena format bisa "YYYY-MM-DD" atau "YYYY-MM-DD - YYYY-MM-DD"
+            // kita filter berdasarkan created_at saja
+            where.created_at = {
+                gte: new Date(query.start_date + "T00:00:00.000"),
+                lte: new Date(query.end_date   + "T23:59:59.999"),
+            };
+        }
+
+        const data = await prisma.cutis.findMany({
+            where,
+            orderBy: { id: 'desc' },
+            include: { users: { select: { id: true, name: true } } },
+        });
+
+        // Ambil nama pemohon (user_id → name)
+        const ids = [...new Set(data.map(d => d.user_id).filter(Boolean))];
+        let usersMap = {};
+        if (ids.length) {
+            const users = await prisma.users.findMany({
+                where: { id: { in: ids } },
+                select: { id: true, name: true }
+            });
+            usersMap = Object.fromEntries(users.map(u => [u.id.toString(), u.name]));
+        }
+
+        // CSV escape helper
+        const e = (val) => {
+            const s = String(val ?? '');
+            if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                return `"${s.replace(/"/g, '""')}"`;
+            }
+            return s;
+        };
+
+        const diekspor = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+        const lines = [];
+
+        // Header info
+        lines.push(`Export Data Cuti`);
+        lines.push(`Diekspor pada,${diekspor}`);
+        lines.push(`Total Data,${data.length}`);
+        lines.push('');
+
+        // Kolom tabel
+        lines.push('No,Nama Karyawan,Jenis Cuti,Tanggal,Alasan,Status,Catatan,Tgl Pengajuan');
+
+        data.forEach((row, i) => {
+            const nama = usersMap[row.user_id?.toString()] ?? '-';
+            lines.push([
+                i + 1,
+                e(nama),
+                e(row.nama_cuti   ?? '-'),
+                e(row.tanggal     ?? '-'),
+                e(row.alasan_cuti ?? '-'),
+                e(row.status_cuti ?? '-'),
+                e(row.catatan     ?? '-'),
+                row.created_at
+                    ? new Date(row.created_at).toLocaleDateString('id-ID')
+                    : '-',
+            ].join(','));
+        });
+
+        return lines.join('\r\n');
+    }
 }
 
 export default new CutiService();

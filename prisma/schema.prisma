@@ -788,6 +788,7 @@ model users {
   izin_telat                         BigInt                 @default(0)
   izin_pulang_cepat                  BigInt                 @default(0)
   is_admin                           String?
+  is_supervisor                      Int?                   @default(0)
   masa_berlaku                       DateTime?              @db.Date
   status_pajak_id                    BigInt?                @db.UnsignedBigInt
   jabatan_id                         BigInt?                @db.UnsignedBigInt

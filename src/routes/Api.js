@@ -59,6 +59,7 @@ router.post("/users/face-recognition", authMiddleware, upload.single("foto_face_
 router.post("/users/:id/face-recognition", authMiddleware, upload.single("foto_face_recognition"), (req, res) => userController.faceRecognition(req, res));
 router.post("/users/bulk-delete", authMiddleware, (req, res) => userController.bulkDestroy(req, res));
 router.delete("/users/:id", authMiddleware, (req, res) => userController.destroy(req, res));
+router.put("/users/:id/supervisor", authMiddleware, (req, res) => userController.setSupervisor(req, res));
 
 // ========================
 // ROLE ROUTES
@@ -112,6 +113,7 @@ router.delete("/shifts/:id", (req, res) => shiftController.destroy(req, res));
 // CUTI ROUTES
 // ========================
 router.get("/cutis", (req, res) => cutiController.index(req, res));
+router.get("/cutis/export", (req, res) => cutiController.exportCsv(req, res));
 router.get("/cutis/:id", (req, res) => cutiController.show(req, res));
 router.get("/cutis/user/:userId", (req, res) => cutiController.showByUserId(req, res));
 const cutiUpload = createUploadMiddleware("cuti", "cuti");
@@ -191,6 +193,13 @@ router.get("/status-pajak/:id", (req, res) => statusPajakController.show(req, re
 router.post("/status-pajak", (req, res) => statusPajakController.store(req, res));
 router.put("/status-pajak/:id", (req, res) => statusPajakController.update(req, res));
 router.delete("/status-pajak/:id", (req, res) => statusPajakController.destroy(req, res));
+
+// ========================
+// SUPERVISOR ROUTES
+// ========================
+// Import jadwal shift oleh supervisor (hanya POST, tidak bisa edit/hapus)
+router.post("/supervisor/jadwal/import", authMiddleware, (req, res) => mappingShiftController.bulkStore(req, res));
+router.get("/supervisor/jadwal", authMiddleware, (req, res) => mappingShiftController.index(req, res));
 
 // ========================
 // MAPPING SHIFT ROUTES

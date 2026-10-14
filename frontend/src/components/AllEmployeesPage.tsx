@@ -1051,15 +1051,27 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (exportDropdownRef.current && !exportDropdownRef.current.contains(e.target as Node)) {
+        setShowExportDropdown(false);
+      }
+    };
+    // removed duplicate listener - handled above
+  }, []);
 
   useEffect(() => {
     const fetchFilters = async () => {
       const headers = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
       
       try {
+        // Kalau initialRole ada (misal "dokter"), fetch jabatan yang relevan saja
+        const jabatanUrl = initialRole
+          ? `${BASE_URL}/jabatans/by-role/${initialRole}`
+          : `${BASE_URL}/jabatans`;
+
         const [locRes, jabRes, roleRes] = await Promise.all([
           fetch(`${BASE_URL}/lokasi`, { headers }),
-          fetch(`${BASE_URL}/jabatans`, { headers }),
+          fetch(jabatanUrl, { headers }),
           fetch(`${BASE_URL}/roles`, { headers })
         ]);
         
@@ -1078,7 +1090,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
     };
     
     fetchFilters();
-  }, []);
+  }, [initialRole]);
 
   const fetchEmployees = useCallback(async (currentPage: number, currentSearch: string, locId?: string, jabId?: string, roleOrRoles?: string | string[], statusKerja?: string) => {
     setLoading(true);

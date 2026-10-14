@@ -52,6 +52,7 @@ router.put("/me", authMiddleware, (req, res) => authController.updateProfile(req
 // ========================
 router.get("/users", (req, res) => userController.index(req, res));
 router.get("/users/all", (req, res) => userController.all(req, res));
+router.get("/users/card/:id", (req, res) => userController.card(req, res));
 router.get("/users/:id", (req, res) => userController.show(req, res));
 router.post("/users", authMiddleware, upload.single("foto_karyawan"), (req, res) => userController.store(req, res));
 router.put("/users/:id", authMiddleware, upload.single("foto_karyawan"), (req, res) => userController.update(req, res));

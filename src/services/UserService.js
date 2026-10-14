@@ -1032,6 +1032,53 @@ class UserService {
         return users.map((user) => this.serialize(user));
     }
     /**
+     * Get minimal info untuk ID Card — dipanggil saat QR di-scan (publik)
+     */
+    async getCardInfo(id) {
+        const user = await prisma.users.findUnique({
+            where: { id: BigInt(id) },
+            select: {
+                id:               true,
+                name:             true,
+                username:         true,
+                email:            true,
+                telepon:          true,
+                foto_karyawan:    true,
+                tgl_join:         true,
+                no_pkwt:          true,
+                jabatan: {
+                    select: { nama_jabatan: true }
+                },
+                lokasi: {
+                    select: { nama_lokasi: true }
+                }
+            }
+        });
+
+        if (!user) return null;
+
+        const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+        const fotoUrl = user.foto_karyawan
+            ? (user.foto_karyawan.startsWith('http')
+                ? user.foto_karyawan
+                : `${baseUrl}${user.foto_karyawan.startsWith('/') ? '' : '/uploads/profile/'}${user.foto_karyawan}`)
+            : null;
+
+        return {
+            id:           user.id.toString(),
+            name:         user.name,
+            username:     user.username ?? '-',
+            email:        user.email ?? '-',
+            telepon:      user.telepon ?? '-',
+            foto_karyawan: fotoUrl,
+            jabatan:      user.jabatan?.nama_jabatan ?? '-',
+            lokasi:       user.lokasi?.nama_lokasi ?? '-',
+            tgl_join:     user.tgl_join ?? null,
+            no_pkwt:      user.no_pkwt ?? '-',
+        };
+    }
+
+    /**
      * Set/unset supervisor status
      */
     async setSupervisor(id, isSupervisor) {

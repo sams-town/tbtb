@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import {
@@ -127,7 +127,7 @@ function UserAvatar({ user, size = 'md' }: { user: UserOption; size?: 'sm' | 'md
       className={cn("rounded-xl object-cover shrink-0", cls)} />;
   }
   return (
-    <div className={cn("rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black shrink-0", cls)}>
+    <div className={cn("rounded-xl bg-[#96D1C6]/30 text-[#103552] flex items-center justify-center font-black shrink-0", cls)}>
       {avatarFallback(user.name)}
     </div>
   );
@@ -157,7 +157,7 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
     <div ref={ref} className="relative sm:col-span-2">
       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Pegawai *</label>
       <button type="button" onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all text-left"
       >
         {loadingUsers ? (
           <><Loader2 className="w-4 h-4 animate-spin text-slate-400" /><span className="text-slate-400">Memuat pegawai...</span></>
@@ -189,7 +189,7 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                 <input autoFocus type="text" placeholder="Cari nama pegawai..."
                   value={query} onChange={e => setQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#103552]/20" />
               </div>
             </div>
             <div className="max-h-60 overflow-y-auto divide-y divide-slate-50">
@@ -198,15 +198,15 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
                 : filtered.map(u => (
                   <button key={u.id} type="button"
                     onClick={() => { onChange(u.id); setOpen(false); setQuery(''); }}
-                    className={cn("w-full flex items-center gap-3 px-4 py-3 hover:bg-indigo-50/60 transition-colors text-left",
-                      value === u.id && "bg-indigo-50")}
+                    className={cn("w-full flex items-center gap-3 px-4 py-3 hover:bg-[#96D1C6]/20/60 transition-colors text-left",
+                      value === u.id && "bg-[#96D1C6]/20")}
                   >
                     <UserAvatar user={u} size="sm" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-slate-900 truncate">{u.name}</p>
                       {u.jabatan && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">{u.jabatan.nama_jabatan}</p>}
                     </div>
-                    {value === u.id && <CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />}
+                    {value === u.id && <CheckCircle2 className="w-4 h-4 text-[#185B5A] shrink-0" />}
                   </button>
                 ))
               }
@@ -279,7 +279,7 @@ function KontrakFormFields({
         value={(form[key] as string) || ''}
         onChange={e => onChange(key, e.target.value)}
         placeholder={placeholder}
-        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
       />
     </div>
   );
@@ -294,7 +294,7 @@ function KontrakFormFields({
         <select
           value={form.jenis_kontrak}
           onChange={e => onChange('jenis_kontrak', e.target.value)}
-          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
         >
           <option value="">-- Pilih Jenis Kontrak --</option>
           <option value="Perjanjian Kerja Waktu Tertentu (PKWT)">Perjanjian Kerja Waktu Tertentu (PKWT)</option>
@@ -310,7 +310,7 @@ function KontrakFormFields({
           type="file"
           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
           onChange={e => onChange('file', e.target.files?.[0] || null)}
-          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#96D1C6]/20 file:text-[#103552] hover:file:bg-[#96D1C6]/30"
         />
       </div>
       <div className="sm:col-span-2">
@@ -320,7 +320,7 @@ function KontrakFormFields({
           onChange={e => onChange('keterangan', e.target.value)}
           rows={3}
           placeholder="Keterangan kontrak..."
-          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none"
+          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all resize-none"
         />
       </div>
     </div>
@@ -373,7 +373,7 @@ function DetailModal({ open, onClose, kontrak }: { open: boolean; onClose: () =>
     : null;
 
   const fileNode = fileUrl ? (
-    <a href={fileUrl} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-700 hover:underline flex items-center gap-1.5 break-all">
+    <a href={fileUrl} target="_blank" rel="noreferrer" className="text-[#103552] hover:text-[#103552] hover:underline flex items-center gap-1.5 break-all">
       <FileText className="w-4 h-4 shrink-0" />
       <span>{kontrak.kontrak_file_name || 'Buka File'}</span>
     </a>
@@ -398,10 +398,10 @@ function DetailModal({ open, onClose, kontrak }: { open: boolean; onClose: () =>
           "inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest",
           status === 'active' ? 'bg-emerald-50 text-emerald-600' :
             status === 'expiring' ? 'bg-amber-50 text-amber-600' :
-              status === 'permanent' ? 'bg-indigo-50 text-indigo-600' :
+              status === 'permanent' ? 'bg-[#96D1C6]/20 text-[#103552]' :
                 'bg-rose-50 text-rose-600'
         )}>
-          <div className={cn("w-1.5 h-1.5 rounded-full", status === 'active' ? 'bg-emerald-500' : status === 'expiring' ? 'bg-amber-500' : status === 'permanent' ? 'bg-indigo-500' : 'bg-rose-500')} />
+          <div className={cn("w-1.5 h-1.5 rounded-full", status === 'active' ? 'bg-emerald-500' : status === 'expiring' ? 'bg-amber-500' : status === 'permanent' ? 'bg-[#103552]' : 'bg-rose-500')} />
           {status}
         </div>
         <div className="divide-y divide-slate-100 rounded-2xl border border-slate-100 overflow-hidden">
@@ -437,7 +437,7 @@ function StatusBadge({ status }: { status: Status }) {
     active: { bg: 'bg-emerald-50 text-emerald-600', dot: 'bg-emerald-500', label: 'Aktif' },
     expiring: { bg: 'bg-amber-50 text-amber-600', dot: 'bg-amber-500', label: 'Akan Berakhir' },
     expired: { bg: 'bg-rose-50 text-rose-600', dot: 'bg-rose-500', label: 'Habis' },
-    permanent: { bg: 'bg-indigo-50 text-indigo-600', dot: 'bg-indigo-500', label: 'Permanen' },
+    permanent: { bg: 'bg-[#96D1C6]/20 text-[#103552]', dot: 'bg-[#103552]', label: 'Permanen' },
   };
   const { bg, dot, label } = map[status];
   return (
@@ -691,7 +691,7 @@ export function ContractsPage() {
           </button>
           <button
             onClick={openAdd}
-            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95 shadow-xl shadow-indigo-600/20"
+            className="flex items-center gap-2 px-6 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552] transition-all active:scale-95 shadow-xl shadow-[#103552]/20"
           >
             <Plus className="w-4 h-4" />
             Tambah Kontrak
@@ -701,7 +701,7 @@ export function ContractsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard label="Total Kontrak" value={stats.total} icon={FileText} color="text-indigo-600" bg="bg-indigo-50" />
+        <StatCard label="Total Kontrak" value={stats.total} icon={FileText} color="text-[#103552]" bg="bg-[#96D1C6]/20" />
         <StatCard label="Aktif" value={stats.active} icon={CheckCircle2} color="text-emerald-600" bg="bg-emerald-50" />
         <StatCard label="Akan Berakhir" value={stats.expiring} icon={Clock} color="text-amber-600" bg="bg-amber-50" />
         <StatCard label="Habis Kontrak" value={stats.expired} icon={AlertCircle} color="text-rose-600" bg="bg-rose-50" />
@@ -721,7 +721,7 @@ export function ContractsPage() {
                   placeholder="Jenis kontrak, no kontrak, keterangan..."
                   value={search}
                   onChange={e => { setSearch(e.target.value); setPage(1); }}
-                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                 />
               </div>
             </div>
@@ -730,7 +730,7 @@ export function ContractsPage() {
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1); }}
-                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
               </div>
             </div>
             <div>
@@ -738,12 +738,12 @@ export function ContractsPage() {
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(1); }}
-                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
               </div>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <button onClick={clearFilters} className="text-sm font-bold text-indigo-600 hover:underline">Clear All</button>
+            <button onClick={clearFilters} className="text-sm font-bold text-[#103552] hover:underline">Clear All</button>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
               Showing {paginated.length} of {filtered.length} records
             </p>
@@ -757,13 +757,13 @@ export function ContractsPage() {
               <AlertCircle className="w-8 h-8 text-rose-400" />
             </div>
             <p className="text-sm font-bold text-slate-500">{error}</p>
-            <button onClick={fetchData} className="px-6 py-2 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700">
+            <button onClick={fetchData} className="px-6 py-2 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552]">
               Coba Lagi
             </button>
           </div>
         ) : loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#96D1C6]" />
           </div>
         ) : paginated.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -804,7 +804,7 @@ export function ContractsPage() {
                         <div className="flex items-center gap-4">
                           {userInfo
                             ? <UserAvatar user={userInfo} size="md" />
-                            : <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-black shrink-0">{avatarFallback(displayName)}</div>
+                            : <div className="w-10 h-10 rounded-xl bg-[#96D1C6]/30 text-[#103552] flex items-center justify-center text-xs font-black shrink-0">{avatarFallback(displayName)}</div>
                           }
                           <div>
                             <p className="text-sm font-black text-slate-900 leading-tight">{displayName}</p>
@@ -831,7 +831,7 @@ export function ContractsPage() {
                       </td>
                       <td className="py-6 px-8">
                         <div className="flex items-center justify-end gap-2  transition-opacity">
-                          <button onClick={() => openDetail(c)} className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90">
+                          <button onClick={() => openDetail(c)} className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90">
                             <Eye className="w-4 h-4" />
                           </button>
                           <button onClick={() => openEdit(c)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-slate-900 hover:text-white transition-all active:scale-90">
@@ -858,7 +858,7 @@ export function ContractsPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 transition-all disabled:opacity-40"
+                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] transition-all disabled:opacity-40"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -868,15 +868,15 @@ export function ContractsPage() {
                   <button key={n} onClick={() => setPage(n)}
                     className={cn("w-10 h-10 rounded-xl text-xs font-black transition-all",
                       n === page
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                        : 'bg-white border border-slate-200 text-slate-500 hover:border-indigo-100 hover:text-indigo-600'
+                        ? 'bg-[#103552] text-white shadow-lg shadow-[#103552]/20'
+                        : 'bg-white border border-slate-200 text-slate-500 hover:border-[#96D1C6]/30 hover:text-[#103552]'
                     )}>{n}</button>
                 );
               })}
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 transition-all disabled:opacity-40"
+                className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] transition-all disabled:opacity-40"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -899,7 +899,7 @@ export function ContractsPage() {
               Batal
             </button>
             <button onClick={handleAdd} disabled={submitting}
-              className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Simpan
@@ -920,7 +920,7 @@ export function ContractsPage() {
               Batal
             </button>
             <button onClick={handleEdit} disabled={submitting}
-              className="flex-1 py-3 bg-indigo-600 text-white rounded-2xl text-sm font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold hover:bg-[#103552] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Update

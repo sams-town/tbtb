@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LoginPage } from './components/LoginPage';
 import { MobileLoginPage } from './components/MobileLoginPage';
@@ -98,9 +98,9 @@ export default function App() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F0F0F0]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-[#96D1C6]/50 border-t-[#103552] rounded-full animate-spin"></div>
           <p className="text-sm font-bold text-slate-400 animate-pulse">Memverifikasi sesi...</p>
         </div>
       </div>

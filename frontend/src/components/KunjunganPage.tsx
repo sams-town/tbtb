@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import * as XLSX from 'xlsx';
 import { Search, ChevronDown, ArrowUpDown, Eye, Edit, Trash2, Download, Plus, MapPin } from 'lucide-react';
@@ -309,7 +309,7 @@ export function KunjunganPage() {
               <select
                 value={selectedUser}
                 onChange={e => setSelectedUser(e.target.value)}
-                className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+                className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer"
               >
                 <option value="">-- Pilih --</option>
                 {loadingEmployees ? (
@@ -350,7 +350,7 @@ export function KunjunganPage() {
             <textarea
               value={keterangan}
               onChange={e => setKeterangan(e.target.value)}
-              className="w-full min-h-[160px] resize-y bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="w-full min-h-[160px] resize-y bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
             />
           </div>
 
@@ -384,7 +384,7 @@ export function KunjunganPage() {
           </button>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2 text-sm"
+            className="px-6 py-2.5 bg-[#103552] text-white rounded-xl font-bold shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 flex items-center gap-2 text-sm"
           >
             <Plus className="w-4 h-4" />
             Tambah
@@ -396,7 +396,7 @@ export function KunjunganPage() {
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative min-w-[240px]">
-            <select className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer">
+            <select className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer">
               <option value="">Pilih Pegawai</option>
               {employees.map(emp => (
                 <option key={emp.id} value={emp.id}>{emp.name}</option>
@@ -411,14 +411,14 @@ export function KunjunganPage() {
               placeholder="Tanggal Mulai"
               onFocus={(e) => e.target.type = 'date'}
               onBlur={(e) => e.target.type = 'text'}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all w-48"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all w-48"
             />
             <input
               type="text"
               placeholder="Tanggal Akhir"
               onFocus={(e) => e.target.type = 'date'}
               onBlur={(e) => e.target.type = 'text'}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all w-48"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all w-48"
             />
           </div>
 
@@ -447,7 +447,7 @@ export function KunjunganPage() {
                 <tr>
                   <td colSpan={7} className="py-20 text-center">
                     <div className="flex justify-center items-center">
-                      <div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin"></div>
+                      <div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin"></div>
                     </div>
                   </td>
                 </tr>
@@ -467,14 +467,14 @@ export function KunjunganPage() {
                   <td className="py-4 px-8">
                     <span className={cn(
                       "px-2 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg",
-                      row.status === 'Selesai' ? "bg-emerald-50 text-emerald-600" : "bg-indigo-50 text-indigo-600"
+                      row.status === 'Selesai' ? "bg-emerald-50 text-emerald-600" : "bg-[#96D1C6]/20 text-[#103552]"
                     )}>
                       {row.status || 'Berlangsung'}
                     </span>
                   </td>
                   <td className="py-4 px-8">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setViewData(row)} className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors"><Eye className="w-4 h-4" /></button>
+                      <button onClick={() => setViewData(row)} className="p-1.5 text-slate-400 hover:text-[#103552] transition-colors"><Eye className="w-4 h-4" /></button>
                       <button onClick={() => setEditData(row)} className="p-1.5 text-slate-400 hover:text-amber-600 transition-colors"><Edit className="w-4 h-4" /></button>
                       <button onClick={() => setDeleteData(row)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 className="w-4 h-4" /></button>
                     </div>
@@ -510,7 +510,7 @@ export function KunjunganPage() {
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Status</label>
-                  <p className="mt-1"><span className={cn("px-2 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg", viewData.status === 'Selesai' ? "bg-emerald-50 text-emerald-600" : "bg-indigo-50 text-indigo-600")}>{viewData.status || 'Berlangsung'}</span></p>
+                  <p className="mt-1"><span className={cn("px-2 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg", viewData.status === 'Selesai' ? "bg-emerald-50 text-emerald-600" : "bg-[#96D1C6]/20 text-[#103552]")}>{viewData.status || 'Berlangsung'}</span></p>
                 </div>
               </div>
 
@@ -521,7 +521,7 @@ export function KunjunganPage() {
                     <p className="text-sm"><span className="text-slate-500 font-semibold">Jam:</span> <span className="font-bold">{viewData.visit_in || '-'}</span></p>
                     {viewData.foto_in && (
                       viewData.foto_in.toLowerCase().endsWith('.pdf') ? (
-                        <a href={viewData.foto_in} target="_blank" rel="noreferrer" className="flex flex-col gap-2 items-center justify-center w-full h-40 bg-indigo-50 text-indigo-600 font-bold rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-colors text-sm">
+                        <a href={viewData.foto_in} target="_blank" rel="noreferrer" className="flex flex-col gap-2 items-center justify-center w-full h-40 bg-[#96D1C6]/20 text-[#103552] font-bold rounded-xl border border-[#96D1C6]/30 hover:bg-[#96D1C6]/30 transition-colors text-sm">
                           <Download className="w-6 h-6" />
                           <span>Buka PDF / Dokumen</span>
                         </a>
@@ -550,7 +550,7 @@ export function KunjunganPage() {
                     <p className="text-sm"><span className="text-slate-500 font-semibold">Jam:</span> <span className="font-bold">{viewData.visit_out || '-'}</span></p>
                     {viewData.foto_out && (
                       viewData.foto_out.toLowerCase().endsWith('.pdf') ? (
-                        <a href={viewData.foto_out} target="_blank" rel="noreferrer" className="flex flex-col gap-2 items-center justify-center w-full h-40 bg-indigo-50 text-indigo-600 font-bold rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-colors text-sm">
+                        <a href={viewData.foto_out} target="_blank" rel="noreferrer" className="flex flex-col gap-2 items-center justify-center w-full h-40 bg-[#96D1C6]/20 text-[#103552] font-bold rounded-xl border border-[#96D1C6]/30 hover:bg-[#96D1C6]/30 transition-colors text-sm">
                           <Download className="w-6 h-6" />
                           <span>Buka PDF / Dokumen</span>
                         </a>
@@ -597,7 +597,7 @@ export function KunjunganPage() {
                   <textarea
                     value={editData.keterangan || ''}
                     onChange={e => setEditData({ ...editData, keterangan: e.target.value })}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500"
+                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]"
                   />
                 </div>
 
@@ -609,7 +609,7 @@ export function KunjunganPage() {
                       value={editData.visit_in || ''}
                       onChange={e => setEditData({ ...editData, visit_in: e.target.value })}
                       placeholder="HH:MM:SS"
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]"
                     />
                   </div>
                   <div>
@@ -619,7 +619,7 @@ export function KunjunganPage() {
                       value={editData.visit_out || ''}
                       onChange={e => setEditData({ ...editData, visit_out: e.target.value })}
                       placeholder="HH:MM:SS"
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]"
                     />
                   </div>
                 </div>
@@ -634,7 +634,7 @@ export function KunjunganPage() {
 
               <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
                 <button type="button" onClick={() => setEditData(null)} className="px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm">Batal</button>
-                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm disabled:opacity-70">
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-[#103552] text-white font-bold rounded-xl hover:bg-[#103552] transition-all text-sm disabled:opacity-70">
                   {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
               </div>

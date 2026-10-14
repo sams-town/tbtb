@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -116,11 +116,11 @@ export function MobileAttendancePage() {
   const clearFilter = () => { setDateFrom(today); setDateTo(today); };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans pb-28">
+    <div className="min-h-screen bg-[#F0F0F0] font-sans pb-28">
       {/* Premium Header */}
-      <div className="bg-indigo-700 pt-14 pb-20 px-6 rounded-b-[3rem] relative overflow-hidden shadow-2xl shadow-indigo-500/20">
+      <div className="bg-[#103552] pt-14 pb-20 px-6 rounded-b-[3rem] relative overflow-hidden shadow-2xl shadow-[#103552]/20/20">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl -ml-10 -mb-10" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#96D1C6]/20 rounded-full blur-2xl -ml-10 -mb-10" />
         
         <div className="relative z-10 flex items-center justify-between">
            <div className="flex items-center gap-4">
@@ -132,7 +132,7 @@ export function MobileAttendancePage() {
               </button>
               <div>
                 <h1 className="text-white text-xl font-black tracking-tight leading-tight">Riwayat Kehadiran</h1>
-                <p className="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mt-0.5">Logs & Analytics</p>
+                <p className="text-[#96D1C6]/60 text-[10px] font-bold uppercase tracking-widest mt-0.5">Logs & Analytics</p>
               </div>
            </div>
         </div>
@@ -144,7 +144,7 @@ export function MobileAttendancePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-[2rem] shadow-xl shadow-indigo-500/10 border border-white p-4"
+          className="bg-white rounded-[2rem] shadow-xl shadow-[#103552]/20/10 border border-white p-4"
         >
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
             <Calendar className="w-3 h-3" /> Filter Periode
@@ -156,7 +156,7 @@ export function MobileAttendancePage() {
                 type="date"
                 value={dateFrom}
                 onChange={e => setDateFrom(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#103552]/20 focus:border-[#103552]/60 transition-all"
               />
             </div>
             <div>
@@ -166,7 +166,7 @@ export function MobileAttendancePage() {
                 value={dateTo}
                 onChange={e => setDateTo(e.target.value)}
                 min={dateFrom || undefined}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#103552]/20 focus:border-[#103552]/60 transition-all"
               />
             </div>
           </div>
@@ -209,7 +209,7 @@ export function MobileAttendancePage() {
         <div className="space-y-5">
           {loading ? (
              <div className="flex flex-col items-center py-24 gap-4">
-                <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+                <Loader2 className="w-10 h-10 text-[#185B5A] animate-spin" />
                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Menyiapkan Arsip Kehadiran...</p>
              </div>
           ) : filteredRecords.length === 0 ? (
@@ -220,7 +220,7 @@ export function MobileAttendancePage() {
                 <h3 className="text-lg font-black text-slate-800">Tidak Ada Data</h3>
                 <p className="text-xs text-slate-400 font-bold mt-1">Belum ada catatan kehadiran untuk periode ini.</p>
                 {hasFilter && (
-                  <button onClick={clearFilter} className="mt-6 text-xs font-black text-indigo-600 uppercase underline tracking-widest">Lihat Semua</button>
+                  <button onClick={clearFilter} className="mt-6 text-xs font-black text-[#103552] uppercase underline tracking-widest">Lihat Semua</button>
                 )}
              </div>
           ) : (
@@ -236,7 +236,7 @@ export function MobileAttendancePage() {
                 <div className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                    <div className="flex items-center gap-3">
                       <div className="w-9 h-9 bg-white rounded-xl shadow-sm border border-slate-200 flex items-center justify-center">
-                         <p className="text-indigo-600 text-xs font-black leading-none">
+                         <p className="text-[#103552] text-xs font-black leading-none">
                             {new Date(record.tanggal).getDate()}
                          </p>
                       </div>
@@ -252,7 +252,7 @@ export function MobileAttendancePage() {
                    <div className={cn(
                       "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider",
                       record.status_absen === 'Masuk' ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
-                      record.status_absen === 'Libur' ? "bg-indigo-50 text-indigo-600 border border-indigo-100" :
+                      record.status_absen === 'Libur' ? "bg-[#96D1C6]/20 text-[#103552] border border-[#96D1C6]/30" :
                       "bg-rose-50 text-rose-500 border border-rose-100"
                    )}>
                       {record.status_absen || 'Belum Absen'}

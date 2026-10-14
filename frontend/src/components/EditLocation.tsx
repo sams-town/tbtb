@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Save, Loader2, MapPin } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -147,7 +147,7 @@ export function EditLocation({ locationId, onBack }: { locationId: string; onBac
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto pb-20 space-y-6">
             <div className="flex justify-between items-center">
                 <div className="flex gap-4 items-center"><button onClick={onBack} className="p-2.5 bg-white border rounded-xl shadow-sm"><ArrowLeft/></button><div><h1 className="text-xl font-bold">Edit Lokasi</h1><p className="text-sm text-slate-400">{form.nama_lokasi}</p></div></div>
-                <button onClick={handleSubmit} disabled={saving} className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold flex items-center gap-2">{saving ? <Loader2 className="animate-spin" /> : <Save />} Simpan</button>
+                <button onClick={handleSubmit} disabled={saving} className="px-6 py-2.5 bg-[#103552] text-white rounded-xl font-bold flex items-center gap-2">{saving ? <Loader2 className="animate-spin" /> : <Save />} Simpan</button>
             </div>
 
             <div className="grid grid-cols-5 gap-6 h-[500px]">

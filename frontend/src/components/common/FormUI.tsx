@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
     X, CheckCircle, AlertCircle, ChevronDown, Search,
@@ -11,7 +11,7 @@ import { cn } from '../../lib/utils';
 
 /* ─── Styles ──────────────────────────────────────────────── */
 export const inputCls = (hasIcon = true, disabled = false) => cn(
-    "w-full py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all",
+    "w-full py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-[#103552]/60 focus:ring-4 focus:ring-[#96D1C6]/20 transition-all",
     hasIcon ? "pl-10 pr-4" : "px-4",
     disabled && "opacity-50 cursor-not-allowed bg-slate-100"
 );
@@ -21,7 +21,7 @@ export function Card({ children, className }: { children: React.ReactNode; class
     return <div className={cn("bg-white rounded-2xl border border-slate-200 shadow-sm p-6", className)}>{children}</div>;
 }
 
-export function SectionTitle({ icon: Icon, title, color = "text-indigo-600", bg = "bg-indigo-50" }: any) {
+export function SectionTitle({ icon: Icon, title, color = "text-[#103552]", bg = "bg-[#96D1C6]/20" }: any) {
     return (
         <div className="flex items-center gap-3 mb-6">
             <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", bg)}>
@@ -85,7 +85,7 @@ export function LeaveCard({ label, name, unit, color, value, onChange }: any) {
             <div className="p-5">
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">{label}</p>
                 <div className="flex items-end gap-1.5">
-                    <input type="number" name={name} value={value} onChange={(e) => onChange(name, e.target.value)} className="w-16 text-2xl font-bold text-slate-900 bg-transparent border-none outline-none focus:text-indigo-600 transition-colors" />
+                    <input type="number" name={name} value={value} onChange={(e) => onChange(name, e.target.value)} className="w-16 text-2xl font-bold text-slate-900 bg-transparent border-none outline-none focus:text-[#103552] transition-colors" />
                     <span className="text-xs text-slate-400 mb-1">{unit}</span>
                 </div>
             </div>
@@ -108,7 +108,7 @@ export function SalaryInput({ label, name, period, isDeduction = false, value, o
                 <input
                     type="text" name={name} value={hideRp ? value : fmt(value)}
                     onChange={(e) => onChange(name, e.target.value.replace(/\D/g, ''))}
-                    className={cn("w-full pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 outline-none focus:border-indigo-400 text-right", hideRp ? "pl-3" : "pl-9")}
+                    className={cn("w-full pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 outline-none focus:border-[#103552]/60 text-right", hideRp ? "pl-3" : "pl-9")}
                 />
             </div>
         </div>
@@ -139,7 +139,7 @@ export function FormSearchSelect({ label, name, placeholder, options, icon: Icon
                         inputCls(!!Icon, disabled), 
                         "flex items-center justify-between cursor-pointer pr-10 truncate", 
                         error && "border-rose-300",
-                        open && "border-indigo-400 ring-4 ring-indigo-50 shadow-sm"
+                        open && "border-[#103552]/60 ring-4 ring-[#96D1C6]/20 shadow-sm"
                     )}
                 >
                     {Icon && <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />}
@@ -164,7 +164,7 @@ export function FormSearchSelect({ label, name, placeholder, options, icon: Icon
                                         placeholder="Ketik untuk mencari..." 
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        className="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+                                        className="w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 outline-none focus:border-[#103552]/60 transition-all placeholder:text-slate-300"
                                     />
                                     {search && (
                                         <button onClick={(e) => { e.stopPropagation(); setSearch(''); }} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-slate-500 transition-colors">
@@ -180,7 +180,7 @@ export function FormSearchSelect({ label, name, placeholder, options, icon: Icon
                                         onClick={() => { onChange(name, o.value); setOpen(false); setSearch(''); }}
                                         className={cn(
                                             "w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between group",
-                                            o.value === value ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-600 hover:bg-slate-50"
+                                            o.value === value ? "bg-[#103552] text-white shadow-lg shadow-[#96D1C6]/50" : "text-slate-600 hover:bg-slate-50"
                                         )}
                                     >
                                         <span className="truncate">{o.label}</span>

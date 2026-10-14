@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Camera, Info, QrCode } from 'lucide-react';
 import { Scanner } from '@yudiel/react-qr-scanner';
@@ -105,7 +105,7 @@ export function VisitDokterPage() {
         {/* Time Display */}
         <div className="flex gap-2">
           {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).split(':').map((unit, i) => (
-            <div key={i} className="w-12 h-10 bg-indigo-500 text-white rounded-lg flex items-center justify-center font-black text-lg shadow-lg shadow-indigo-500/20">
+            <div key={i} className="w-12 h-10 bg-[#103552] text-white rounded-lg flex items-center justify-center font-black text-lg shadow-lg shadow-[#103552]/20/20">
               {unit}
             </div>
           ))}
@@ -126,8 +126,8 @@ export function VisitDokterPage() {
           </div>
         )}
 
-        <div className="w-full bg-white p-1 rounded-[24px] border border-slate-100 shadow-xl shadow-indigo-500/5 relative">
-          <div className="absolute top-6 right-6 text-slate-400 hover:text-indigo-500 cursor-pointer transition-colors z-10">
+        <div className="w-full bg-white p-1 rounded-[24px] border border-slate-100 shadow-xl shadow-[#103552]/20/5 relative">
+          <div className="absolute top-6 right-6 text-slate-400 hover:text-[#185B5A] cursor-pointer transition-colors z-10">
             <Info className="w-5 h-5" />
           </div>
 
@@ -157,9 +157,9 @@ export function VisitDokterPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center space-y-6 w-full max-w-[280px] py-10">
-                <div className="w-24 h-24 bg-indigo-50 rounded-full flex flex-col items-center justify-center relative shadow-inner">
-                  <QrCode className="w-10 h-10 text-indigo-400" />
-                  <Camera className="w-5 h-5 text-indigo-600 absolute bottom-3 right-3 bg-white rounded-full box-content p-1.5 shadow-md" />
+                <div className="w-24 h-24 bg-[#96D1C6]/20 rounded-full flex flex-col items-center justify-center relative shadow-inner">
+                  <QrCode className="w-10 h-10 text-[#96D1C6]" />
+                  <Camera className="w-5 h-5 text-[#103552] absolute bottom-3 right-3 bg-white rounded-full box-content p-1.5 shadow-md" />
                 </div>
                 <div className="text-center space-y-2">
                   <h3 className="font-black text-slate-800 tracking-tight text-lg">Scanner Kunjungan</h3>
@@ -168,7 +168,7 @@ export function VisitDokterPage() {
                 <button
                   onClick={() => setIsScanning(true)}
                   disabled={!location}
-                  className="w-full py-3.5 bg-white border-2 border-slate-200 text-slate-600 font-bold rounded-xl shadow-sm hover:border-indigo-500 hover:text-indigo-600 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:text-slate-600"
+                  className="w-full py-3.5 bg-white border-2 border-slate-200 text-slate-600 font-bold rounded-xl shadow-sm hover:border-[#103552] hover:text-[#103552] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-200 disabled:hover:text-slate-600"
                 >
                   <Camera className="w-4 h-4" /> Buka Kamera Scanner
                 </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Search, Plus, Edit, Trash2, ArrowUpDown } from 'lucide-react';
 import { useToast } from './Toast';
@@ -167,7 +167,7 @@ export function JenisKinerjaPage() {
     >
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-800 tracking-tight">Jenis Kinerja</h1>
-        <button onClick={() => setIsAdding(true)} className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2 text-sm">
+        <button onClick={() => setIsAdding(true)} className="px-6 py-2.5 bg-[#103552] text-white rounded-xl font-bold shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 flex items-center gap-2 text-sm">
           <Plus className="w-4 h-4" />
           Tambah
         </button>
@@ -183,7 +183,7 @@ export function JenisKinerjaPage() {
               placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
             />
           </div>
           <button onClick={fetchData} className="p-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
@@ -215,7 +215,7 @@ export function JenisKinerjaPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin mx-auto"></div></td></tr>
+                <tr><td colSpan={5} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin mx-auto"></div></td></tr>
               ) : data.length === 0 ? (
                 <tr><td colSpan={5} className="py-12 text-center text-sm font-medium text-slate-400">Belum ada data Jenis Kinerja.</td></tr>
               ) : data.map((item, index) => (
@@ -230,7 +230,7 @@ export function JenisKinerjaPage() {
                   <td className="py-4 px-8 text-sm font-medium text-slate-500 max-w-sm truncate" title={item.detail}>{item.detail}</td>
                   <td className="py-4 px-8 text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => setEditData(item)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                      <button onClick={() => setEditData(item)} className="p-2 text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/20 rounded-lg transition-colors">
                         <Edit className="w-4 h-4" />
                       </button>
                       <button onClick={() => setDeleteData(item)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
@@ -256,20 +256,20 @@ export function JenisKinerjaPage() {
             <form onSubmit={handleCreateSubmit} className="p-6 space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Nama Kinerja</label>
-                <input type="text" name="nama" value={formData.nama} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" placeholder="Contoh: Telat Presensi" />
+                <input type="text" name="nama" value={formData.nama} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" placeholder="Contoh: Telat Presensi" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Bobot Penilaian</label>
-                <input type="number" name="bobot" value={formData.bobot} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" placeholder="Contoh: -10 atau 10" />
+                <input type="number" name="bobot" value={formData.bobot} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" placeholder="Contoh: -10 atau 10" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Detail Informasi</label>
-                <textarea name="detail" value={formData.detail} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 min-h-[100px]" placeholder="Keterangan mengenai kinerja..." />
+                <textarea name="detail" value={formData.detail} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] min-h-[100px]" placeholder="Keterangan mengenai kinerja..." />
               </div>
 
               <div className="pt-4 flex justify-end gap-3">
                 <button type="button" onClick={() => setIsAdding(false)} className="px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm">Batal</button>
-                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all text-sm disabled:opacity-70">
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-[#103552] text-white font-bold rounded-xl shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all text-sm disabled:opacity-70">
                   {isSubmitting ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
@@ -289,20 +289,20 @@ export function JenisKinerjaPage() {
             <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Nama Kinerja</label>
-                <input type="text" name="nama" value={editData.nama} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" />
+                <input type="text" name="nama" value={editData.nama} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Bobot Penilaian</label>
-                <input type="number" name="bobot" value={editData.bobot} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" />
+                <input type="number" name="bobot" value={editData.bobot} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Detail Informasi</label>
-                <textarea name="detail" value={editData.detail || ''} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 min-h-[100px]" />
+                <textarea name="detail" value={editData.detail || ''} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] min-h-[100px]" />
               </div>
 
               <div className="pt-4 flex justify-end gap-3">
                 <button type="button" onClick={() => setEditData(null)} className="px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm">Batal</button>
-                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all text-sm disabled:opacity-70">
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-[#103552] text-white font-bold rounded-xl shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all text-sm disabled:opacity-70">
                   {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
               </div>

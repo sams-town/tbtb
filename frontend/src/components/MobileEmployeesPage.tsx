@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
@@ -97,9 +97,9 @@ export function MobileEmployeesPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24">
       {/* Premium Header */}
-      <div className="bg-indigo-700 pt-12 pb-24 px-6 rounded-b-[3.5rem] relative overflow-hidden shadow-2xl shadow-indigo-500/20">
+      <div className="bg-[#103552] pt-12 pb-24 px-6 rounded-b-[3.5rem] relative overflow-hidden shadow-2xl shadow-[#103552]/20/20">
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-400/20 rounded-full blur-2xl -ml-16 -mb-16" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#96D1C6]/20 rounded-full blur-2xl -ml-16 -mb-16" />
         
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-8">
@@ -111,18 +111,18 @@ export function MobileEmployeesPage() {
             </button>
             <div>
               <h1 className="text-2xl font-black text-white tracking-tight">Pegawai</h1>
-              <p className="text-indigo-200 text-[10px] font-black uppercase tracking-[0.2em]">Daftar Rekan Kerja</p>
+              <p className="text-[#96D1C6]/60 text-[10px] font-black uppercase tracking-[0.2em]">Daftar Rekan Kerja</p>
             </div>
           </div>
 
           {/* Stats Bar */}
           <div className="flex items-center gap-6 text-white/90">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg border border-indigo-500/30">
+              <div className="w-10 h-10 bg-[#103552] rounded-xl flex items-center justify-center shadow-lg border border-[#103552]/30">
                 <Users className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300">Total</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#96D1C6]">Total</p>
                 <p className="text-sm font-black">{meta.total} Orang</p>
               </div>
             </div>
@@ -142,7 +142,7 @@ export function MobileEmployeesPage() {
 
       {/* Search Bar */}
       <div className="px-6 -mt-10 relative z-20">
-        <div className="bg-white rounded-[2rem] shadow-2xl shadow-indigo-500/5 p-2 border border-slate-100 flex items-center gap-3">
+        <div className="bg-white rounded-[2rem] shadow-2xl shadow-[#103552]/20/5 p-2 border border-slate-100 flex items-center gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input 
@@ -150,7 +150,7 @@ export function MobileEmployeesPage() {
               value={searchInput}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Cari nama atau username..."
-              className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all"
+              className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 transition-all"
             />
           </div>
         </div>
@@ -161,7 +161,7 @@ export function MobileEmployeesPage() {
         {loading && employees.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center">
-              <Loader2 className="w-7 h-7 text-indigo-500 animate-spin" />
+              <Loader2 className="w-7 h-7 text-[#185B5A] animate-spin" />
             </div>
             <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Memuat database...</p>
           </div>
@@ -182,12 +182,12 @@ export function MobileEmployeesPage() {
               className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/30 border border-slate-100 group active:scale-[0.98] transition-all relative overflow-hidden"
               onClick={() => {/* View detail maybe? */}}
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 group-hover:bg-indigo-100 transition-colors duration-500" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#96D1C6]/20 rounded-full -mr-16 -mt-16 group-hover:bg-[#96D1C6]/30 transition-colors duration-500" />
               
               <div className="relative z-10 flex items-start gap-5">
                 {/* Avatar */}
                 <div className="shrink-0">
-                  <div className="w-16 h-16 rounded-2xl bg-indigo-50 border-2 border-white shadow-xl overflow-hidden relative">
+                  <div className="w-16 h-16 rounded-2xl bg-[#96D1C6]/20 border-2 border-white shadow-xl overflow-hidden relative">
                     {emp.foto_karyawan ? (
                       <img 
                         src={getPhotoUrl(emp.foto_karyawan)!} 
@@ -195,7 +195,7 @@ export function MobileEmployeesPage() {
                         alt={emp.name}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-indigo-300">
+                      <div className="w-full h-full flex items-center justify-center text-[#96D1C6]">
                         <User className="w-8 h-8" />
                       </div>
                     )}
@@ -229,7 +229,7 @@ export function MobileEmployeesPage() {
 
                 {/* Arrow */}
                 <div className="shrink-0 self-center">
-                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all transform group-hover:translate-x-1">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-[#103552] group-hover:text-white transition-all transform group-hover:translate-x-1">
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>

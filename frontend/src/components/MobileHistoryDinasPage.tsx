@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -105,9 +105,9 @@ export function MobileHistoryDinasPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24">
       {/* Premium Header */}
-      <div className="bg-indigo-700 pt-12 pb-20 px-6 rounded-b-[3rem] relative overflow-hidden shadow-xl shadow-indigo-500/20">
+      <div className="bg-[#103552] pt-12 pb-20 px-6 rounded-b-[3rem] relative overflow-hidden shadow-xl shadow-[#103552]/20/20">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl -ml-10 -mb-10" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#96D1C6]/20 rounded-full blur-2xl -ml-10 -mb-10" />
         
         <div className="relative z-10 flex items-center gap-4">
           <button 
@@ -122,13 +122,13 @@ export function MobileHistoryDinasPage() {
 
       {/* Filter Card */}
       <div className="px-6 -mt-10 relative z-20">
-        <div className="bg-white rounded-3xl shadow-xl shadow-indigo-500/5 p-4 border border-slate-100 flex items-center gap-3">
+        <div className="bg-white rounded-3xl shadow-xl shadow-[#103552]/20/5 p-4 border border-slate-100 flex items-center gap-3">
           <div className="flex-1 space-y-1">
             <input 
               type="date" 
               value={filterStart}
               onChange={(e) => setFilterStart(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold text-slate-600 outline-none focus:border-indigo-500 transition-all"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold text-slate-600 outline-none focus:border-[#103552] transition-all"
               placeholder="Tanggal Mulai"
             />
           </div>
@@ -137,7 +137,7 @@ export function MobileHistoryDinasPage() {
               type="date" 
               value={filterEnd}
               onChange={(e) => setFilterEnd(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold text-slate-600 outline-none focus:border-indigo-500 transition-all"
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold text-slate-600 outline-none focus:border-[#103552] transition-all"
               placeholder="Tanggal Akhir"
             />
           </div>
@@ -170,7 +170,7 @@ export function MobileHistoryDinasPage() {
                   <tr>
                     <td colSpan={9} className="py-20">
                       <div className="flex flex-col items-center gap-3">
-                        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                        <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
                         <p className="text-xs font-black text-slate-400 tracking-widest uppercase">Memuat data...</p>
                       </div>
                     </td>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import * as XLSX from 'xlsx';
@@ -281,7 +281,7 @@ export function DataAbsenPage({ initialFilters }: { initialFilters?: { userId?: 
               type="date"
               value={filterStartDate}
               onChange={(e) => setFilterStartDate(e.target.value)}
-              className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm shadow-indigo-500/5"
+              className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all shadow-sm shadow-[#103552]/20/5"
               placeholder="Tanggal Mulai" />
           </div>
           <div className="w-64">
@@ -290,13 +290,13 @@ export function DataAbsenPage({ initialFilters }: { initialFilters?: { userId?: 
               type="date"
               value={filterEndDate}
               onChange={(e) => setFilterEndDate(e.target.value)}
-              className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm shadow-indigo-500/5"
+              className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all shadow-sm shadow-[#103552]/20/5"
               placeholder="Tanggal Akhir" />
           </div>
           <div className="flex-1 min-w-fit">
             <button
               onClick={handleResetFilters}
-              className="px-8 py-3.5 bg-indigo-50 text-indigo-600 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-all active:scale-95 border border-indigo-100/50 shadow-sm shadow-indigo-500/5"
+              className="px-8 py-3.5 bg-[#96D1C6]/20 text-[#103552] rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-[#96D1C6]/30 transition-all active:scale-95 border border-[#96D1C6]/30/50 shadow-sm shadow-[#103552]/20/5"
             >
               Tampilkan Semua
             </button>
@@ -326,7 +326,7 @@ export function DataAbsenPage({ initialFilters }: { initialFilters?: { userId?: 
                 <tr>
                   <td colSpan={12} className="py-20 text-center">
                     <div className="flex justify-center items-center">
-                      <div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin"></div>
+                      <div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin"></div>
                     </div>
                   </td>
                 </tr>
@@ -345,11 +345,11 @@ export function DataAbsenPage({ initialFilters }: { initialFilters?: { userId?: 
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3 min-w-[180px]">
-                        <div className="size-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center overflow-hidden shadow-sm">
+                        <div className="size-8 rounded-full bg-[#96D1C6]/20 border border-[#96D1C6]/30 flex items-center justify-center overflow-hidden shadow-sm">
                           {item.users?.foto_karyawan || item.users?.foto_face_recognition ? (
                             <img src={formatPhotoUrl(item.users.foto_karyawan || item.users.foto_face_recognition)} className="size-full object-cover" />
                           ) : (
-                            <span className="text-[10px] font-bold text-indigo-400">{getInitials(item.users?.name || '')}</span>
+                            <span className="text-[10px] font-bold text-[#96D1C6]">{getInitials(item.users?.name || '')}</span>
                           )}
                         </div>
                         <div>
@@ -438,7 +438,7 @@ export function DataAbsenPage({ initialFilters }: { initialFilters?: { userId?: 
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => setEditModal({ isOpen: true, data: item, type: 'masuk' })} className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"><Edit2 size={14}/></button>
+                        <button onClick={() => setEditModal({ isOpen: true, data: item, type: 'masuk' })} className="p-1.5 rounded-lg text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/20 transition-all"><Edit2 size={14}/></button>
                         <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"><Trash2 size={14}/></button>
                       </div>
                     </td>
@@ -453,7 +453,7 @@ export function DataAbsenPage({ initialFilters }: { initialFilters?: { userId?: 
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-8 py-4 border-t border-slate-100 bg-slate-50/50">
             <p className="text-sm font-bold text-slate-500">
-              Menampilkan <span className="text-indigo-600">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> hingga <span className="text-indigo-600">{Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)}</span> dari <span className="text-indigo-600">{filteredData.length}</span> data
+              Menampilkan <span className="text-[#103552]">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> hingga <span className="text-[#103552]">{Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)}</span> dari <span className="text-[#103552]">{filteredData.length}</span> data
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -475,7 +475,7 @@ export function DataAbsenPage({ initialFilters }: { initialFilters?: { userId?: 
                         className={cn(
                           "w-10 h-10 rounded-xl text-sm font-bold transition-all",
                           currentPage === page
-                            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+                            ? "bg-[#103552] text-white shadow-lg shadow-[#103552]/20/30"
                             : "text-slate-500 hover:bg-slate-200"
                         )}
                       >
@@ -607,7 +607,7 @@ function StatusBadge({ value }: { value: string }) {
       "px-3 py-1 rounded-[8px] text-[10px] font-bold uppercase tracking-widest border transition-all inline-block whitespace-nowrap",
       isRed ? "bg-rose-50/50 border-rose-200 text-rose-600" :
         isGreen ? "bg-emerald-50/50 border-emerald-200 text-emerald-600" :
-          isBlue ? "bg-indigo-50/50 border-indigo-200 text-indigo-600" :
+          isBlue ? "bg-[#96D1C6]/20/50 border-[#96D1C6]/50 text-[#103552]" :
             isYellow ? "bg-amber-50/50 border-amber-200 text-amber-600" :
               "bg-slate-50 border-slate-200 text-slate-500"
     )}>
@@ -723,7 +723,7 @@ function EditAbsenModal({
               type="time"
               value={jam}
               onChange={(e) => setJam(e.target.value)}
-              className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
               required
             />
           </div>
@@ -731,10 +731,10 @@ function EditAbsenModal({
           <div className="space-y-2">
             <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
               Update Foto (Opsional)
-              {type === 'masuk' && data.foto_jam_absen && <span className="text-indigo-500 lowercase normal-case tracking-normal">ada foto ✅</span>}
-              {type === 'pulang' && data.foto_jam_pulang && <span className="text-indigo-500 lowercase normal-case tracking-normal">ada foto ✅</span>}
+              {type === 'masuk' && data.foto_jam_absen && <span className="text-[#185B5A] lowercase normal-case tracking-normal">ada foto ✅</span>}
+              {type === 'pulang' && data.foto_jam_pulang && <span className="text-[#185B5A] lowercase normal-case tracking-normal">ada foto ✅</span>}
             </label>
-            <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-indigo-300 transition-all group">
+            <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-[#103552]/40 transition-all group">
               <input
                 type="file"
                 accept="image/*"
@@ -742,13 +742,13 @@ function EditAbsenModal({
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
               <div className="px-5 py-8 flex flex-col items-center justify-center gap-2 pointer-events-none">
-                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-indigo-500 group-hover:scale-110 transition-all">
+                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-[#185B5A] group-hover:scale-110 transition-all">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <p className="text-xs font-bold text-slate-500 text-center">
-                  {file ? <span className="text-indigo-600">{file.name}</span> : 'Pilih Foto Baru'}
+                  {file ? <span className="text-[#103552]">{file.name}</span> : 'Pilih Foto Baru'}
                 </p>
               </div>
             </div>
@@ -758,7 +758,7 @@ function EditAbsenModal({
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-black tracking-widest uppercase transition-all shadow-lg shadow-indigo-500/30 active:scale-95 disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-[#103552] hover:bg-[#103552] text-white rounded-2xl text-sm font-black tracking-widest uppercase transition-all shadow-lg shadow-[#103552]/20/30 active:scale-95 disabled:opacity-50"
             >
               {loading ? (
                 <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>

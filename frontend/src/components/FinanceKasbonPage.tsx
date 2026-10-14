@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import {
@@ -23,7 +23,7 @@ const statusCls: Record<string, string> = {
 
 const inputCls = [
     'w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold',
-    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400',
+    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]/60',
     'transition-all duration-200 shadow-sm'
 ].join(' ');
 
@@ -292,14 +292,14 @@ export function FinanceKasbonPage() {
     );
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] pb-20">
+        <div className="min-h-screen bg-[#F0F0F0] pb-20">
             {deleteTarget && <DeleteModal name={deleteTarget.user?.name} onConfirm={confirmDelete} onCancel={() => setDeleteTarget(null)} />}
 
             {view === 'form' ? renderForm() : (
                 <div className="p-4 lg:p-10 max-w-[1700px] mx-auto space-y-8">
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-5">
-                            <div className="w-14 h-14 rounded-[1.5rem] bg-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-200">
+                            <div className="w-14 h-14 rounded-[1.5rem] bg-[#103552] flex items-center justify-center shadow-xl shadow-[#96D1C6]/50">
                                 <Banknote className="w-7 h-7 text-white" />
                             </div>
                             <div>
@@ -311,7 +311,7 @@ export function FinanceKasbonPage() {
                             <div className="relative group">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                                 <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari nama pegawai..."
-                                    className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none" />
+                                    className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none" />
                             </div>
                             <div className="flex items-center gap-2">
                                 <button
@@ -320,7 +320,7 @@ export function FinanceKasbonPage() {
                                 >
                                     <Download className="w-5 h-5" /> Export
                                 </button>
-                                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none">
+                                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none">
                                     <option value="">Semua Status</option>
                                     <option value="PENDING">PENDING</option>
                                     <option value="ACC">ACC</option>
@@ -348,7 +348,7 @@ export function FinanceKasbonPage() {
                                     {loading && data.length === 0 ? (
                                         <tr>
                                             <td colSpan={7} className="py-24 text-center">
-                                                <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto" />
+                                                <div className="w-12 h-12 border-4 border-[#96D1C6]/30 border-t-[#103552] rounded-full animate-spin mx-auto" />
                                             </td>
                                         </tr>
                                     ) : data.length === 0 ? (
@@ -367,7 +367,7 @@ export function FinanceKasbonPage() {
                                                 <td className="py-6 px-8 text-xs font-bold text-slate-300">{idx + 1}.</td>
                                                 <td className="py-6 px-8">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white font-black text-xs shadow-lg shadow-indigo-100">
+                                                        <div className="w-10 h-10 rounded-xl bg-[#103552] flex items-center justify-center text-white font-black text-xs shadow-lg shadow-[#96D1C6]/30">
                                                             {row.user?.name?.charAt(0)}
                                                         </div>
                                                         <span className="text-sm font-black text-slate-800">{row.user?.name || '—'}</span>
@@ -376,7 +376,7 @@ export function FinanceKasbonPage() {
                                                 <td className="py-6 px-8 text-xs font-bold text-slate-500">
                                                     {row.tanggal ? new Date(row.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '—'}
                                                 </td>
-                                                <td className="py-6 px-8 font-black text-indigo-600 text-sm">{fmt(row.nominal)}</td>
+                                                <td className="py-6 px-8 font-black text-[#103552] text-sm">{fmt(row.nominal)}</td>
                                                 <td className="py-6 px-8">
                                                     <p className="text-xs font-bold text-slate-400 max-w-[300px] truncate">{row.keperluan || '—'}</p>
                                                 </td>

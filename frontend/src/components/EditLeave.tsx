@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Save, X, Calendar, User, FileText, ImageIcon, Loader2 } from 'lucide-react';
 import { cn, formatPhotoUrl } from '../lib/utils';
@@ -179,7 +179,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={onBack}
-                        className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white text-slate-500 hover:text-indigo-600 shadow-sm border border-slate-200 transition-all hover:border-indigo-200 active:scale-95"
+                        className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white text-slate-500 hover:text-[#103552] shadow-sm border border-slate-200 transition-all hover:border-[#96D1C6]/50 active:scale-95"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>
@@ -199,7 +199,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                         <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <select
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all appearance-none cursor-pointer"
                                 value={formData.user_id}
                                 onChange={e => setFormData({ ...formData, user_id: e.target.value })}
                             >
@@ -216,7 +216,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                         <div className="relative">
                             <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <select
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all appearance-none cursor-pointer"
                                 value={formData.nama_cuti}
                                 onChange={e => setFormData({ ...formData, nama_cuti: e.target.value })}
                             >
@@ -242,7 +242,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <input
                                 type="date"
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                                 value={formData.tanggal_mulai}
                                 onChange={e => setFormData({ ...formData, tanggal_mulai: e.target.value })}
                             />
@@ -255,7 +255,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <input
                                 type="date"
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                                 value={formData.tanggal_akhir}
                                 onChange={e => setFormData({ ...formData, tanggal_akhir: e.target.value })}
                             />
@@ -266,13 +266,13 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                 {/* File Upload */}
                 <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-wider text-slate-500 ml-1">Unggah Foto</label>
-                    <div className="flex items-center gap-6 p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-indigo-300 transition-all">
+                    <div className="flex items-center gap-6 p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-slate-100 hover:border-[#103552]/40 transition-all">
                         <div className="relative group shrink-0">
                             <div className="w-24 h-24 rounded-2xl border-2 border-slate-200 bg-white flex items-center justify-center overflow-hidden shadow-sm">
                                 {photoPreview ? (
                                     <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
                                 ) : (
-                                    <ImageIcon className="w-8 h-8 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                    <ImageIcon className="w-8 h-8 text-slate-300 group-hover:text-[#96D1C6] transition-colors" />
                                 )}
                             </div>
                             <input type="file" accept="image/*" onChange={handlePhotoChange} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
@@ -298,7 +298,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                     <label className="text-xs font-black uppercase tracking-wider text-slate-500 ml-1">Alasan Cuti</label>
                     <textarea
                         rows={4}
-                        className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none"
+                        className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all resize-none"
                         placeholder="Tulis alasan pengajuan cuti disini..."
                         value={formData.alasan_cuti}
                         onChange={e => setFormData({ ...formData, alasan_cuti: e.target.value })}
@@ -317,7 +317,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                     </button>
                     <button
                         type="submit"
-                        className="px-8 py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all flex items-center gap-2 active:scale-95 shadow-xl shadow-indigo-600/30"
+                        className="px-8 py-3.5 rounded-xl bg-[#103552] text-white text-sm font-bold hover:bg-[#103552] transition-all flex items-center gap-2 active:scale-95 shadow-xl shadow-[#103552]/30"
                         disabled={loading}
                     >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}

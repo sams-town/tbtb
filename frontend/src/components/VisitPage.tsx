@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import { 
   Activity, 
@@ -43,7 +43,7 @@ export function VisitPage() {
           <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">Visit & Kinerja</h1>
           <p className="text-slate-500 font-medium">Track external visits, field work, and employee performance logs.</p>
         </div>
-        <button className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95">
+        <button className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95">
           <Plus className="w-5 h-5" />
           Tambah Kunjungan
         </button>
@@ -53,7 +53,7 @@ export function VisitPage() {
         <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative w-full md:w-96">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder="Search employee or location..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+            <input type="text" placeholder="Search employee or location..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
           </div>
           <div className="flex items-center gap-3">
             <button className="p-3 bg-slate-50 text-slate-500 rounded-2xl hover:bg-slate-100 transition-all">
@@ -84,7 +84,7 @@ export function VisitPage() {
                   </td>
                   <td className="py-6 px-8">
                     <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
-                      <MapPin className="w-4 h-4 text-indigo-500" />
+                      <MapPin className="w-4 h-4 text-[#185B5A]" />
                       {item.location}
                     </div>
                   </td>
@@ -103,7 +103,7 @@ export function VisitPage() {
                   </td>
                   <td className="py-6 px-8">
                     <div className="flex items-center justify-end gap-2  transition-opacity">
-                      <button className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90"><ExternalLink className="w-4 h-4" /></button>
+                      <button className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90"><ExternalLink className="w-4 h-4" /></button>
                       <button className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>

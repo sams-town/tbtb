@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import { Search, Plus, Package, Edit2, Trash2, Tag, MapPin, Briefcase, Info, X, Loader2, AlertTriangle, Download, Barcode as BarcodeIcon, Printer, Camera } from 'lucide-react';
@@ -224,7 +224,7 @@ export function InventoryPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-indigo-500/5 overflow-hidden">
+      <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-[#103552]/20/5 overflow-hidden">
         <div className="p-10 border-b border-slate-50 flex flex-wrap items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
@@ -233,7 +233,7 @@ export function InventoryPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari kode atau nama barang..."
-              className="w-full pl-14 pr-8 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+              className="w-full pl-14 pr-8 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
             />
           </div>
           <div className="flex gap-3">
@@ -263,20 +263,20 @@ export function InventoryPage() {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                <tr><td colSpan={9} className="py-20 text-center text-slate-400 font-bold"><Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-indigo-500" /> Sedang menarik data...</td></tr>
+                <tr><td colSpan={9} className="py-20 text-center text-slate-400 font-bold"><Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-[#185B5A]" /> Sedang menarik data...</td></tr>
               ) : data.length === 0 ? (
                 <tr><td colSpan={9} className="py-20 text-center text-slate-400 font-bold">Tidak ada data inventory.</td></tr>
               ) : data.map((item, idx) => (
                 <tr key={item.id} className="group hover:bg-slate-50/30 transition-all">
                   <td className="py-6 px-8 text-xs font-black text-slate-300 italic">{idx + 1}.</td>
                   <td className="py-6 px-8">
-                    <span className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-wider border border-indigo-100">
+                    <span className="px-3 py-1.5 bg-[#96D1C6]/20 text-[#103552] rounded-lg text-[10px] font-black uppercase tracking-wider border border-[#96D1C6]/30">
                       {item.kode_barang}
                     </span>
                   </td>
                   <td className="py-6 px-8">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-slate-100 rounded-[14px] flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 overflow-hidden border border-slate-200">
+                      <div className="w-12 h-12 bg-slate-100 rounded-[14px] flex items-center justify-center text-slate-400 group-hover:bg-[#103552] group-hover:text-white transition-all duration-300 overflow-hidden border border-slate-200">
                         {item.foto ? (
                           <img src={item.foto.startsWith('http') ? item.foto : `${import.meta.env.VITE_API_MEANDPAY}/storage/${item.foto}`} alt={item.nama_barang} className="w-full h-full object-cover" />
                         ) : (
@@ -330,7 +330,7 @@ export function InventoryPage() {
                       </button>
                       <button
                         onClick={() => setEditData(item)}
-                        className="p-2.5 bg-white text-slate-400 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-slate-100 hover:border-indigo-600"
+                        className="p-2.5 bg-white text-slate-400 rounded-xl hover:bg-[#103552] hover:text-white transition-all shadow-sm border border-slate-100 hover:border-[#103552]"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -425,7 +425,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
 
         <div className="p-10 grid grid-cols-2 gap-6 max-h-[70vh] overflow-y-auto scrollbar-hide font-jakarta">
           <div className="col-span-2 flex flex-col items-center mb-4">
-            <div className="w-32 h-32 rounded-[32px] bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden relative group cursor-pointer hover:border-indigo-300 transition-all">
+            <div className="w-32 h-32 rounded-[32px] bg-slate-50 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden relative group cursor-pointer hover:border-[#103552]/40 transition-all">
               {preview ? (
                 <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
@@ -454,7 +454,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
               value={formData.kode_barang}
               onChange={(e) => setFormData({ ...formData, kode_barang: e.target.value })}
               placeholder="Contoh: KB-001"
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
             />
           </div>
           <div className="col-span-1">
@@ -464,7 +464,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
               value={formData.stok}
               onChange={(e) => setFormData({ ...formData, stok: e.target.value })}
               placeholder="Jumlah item"
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
             />
           </div>
           <div className="col-span-2">
@@ -474,7 +474,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
               value={formData.nama_barang}
               onChange={(e) => setFormData({ ...formData, nama_barang: e.target.value })}
               placeholder="Masukkan nama barang lengkap"
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
             />
           </div>
           <div className="col-span-1">
@@ -484,7 +484,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
               value={formData.uom}
               onChange={(e) => setFormData({ ...formData, uom: e.target.value })}
               placeholder="Contoh: Unit, Box, Pcs"
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
             />
           </div>
           <div className="col-span-1">
@@ -492,7 +492,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
             <select
               value={formData.lokasi_id}
               onChange={(e) => setFormData({ ...formData, lokasi_id: e.target.value })}
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all appearance-none cursor-pointer"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all appearance-none cursor-pointer"
             >
               <option value="">-- Pilih Lokasi --</option>
               {lokasis.map(l => <option key={l.id} value={l.id}>{l.nama_lokasi}</option>)}
@@ -503,7 +503,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
             <select
               value={formData.jabatan_id}
               onChange={(e) => setFormData({ ...formData, jabatan_id: e.target.value })}
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all appearance-none cursor-pointer"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all appearance-none cursor-pointer"
             >
               <option value="">-- Pilih Divisi --</option>
               {jabatans.map(j => <option key={j.id} value={j.id}>{j.nama_jabatan}</option>)}
@@ -515,7 +515,7 @@ function InventoryModal({ data, lokasis, jabatans, onConfirm, onCancel }: { data
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Tambahkan catatan atau deskripsi barang..."
-              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all min-h-[100px] resize-none"
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all min-h-[100px] resize-none"
             />
           </div>
         </div>

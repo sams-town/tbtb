@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -62,7 +62,7 @@ export function MobileLocationsPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-32">
       {/* Header */}
-      <div className="bg-indigo-700 pt-12 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-indigo-500/20 overflow-hidden">
+      <div className="bg-[#103552] pt-12 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-[#103552]/20/20 overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
         <div className="flex items-center justify-between relative z-10 text-white mb-8">
           <div className="flex items-center gap-4">
@@ -93,7 +93,7 @@ export function MobileLocationsPage() {
       <div className="px-6 -mt-10 relative z-20 space-y-4">
         {loading ? (
           <div className="flex flex-col items-center py-20 gap-3">
-            <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Memetakan lokasi...</p>
           </div>
         ) : filtered.length === 0 ? (
@@ -111,7 +111,7 @@ export function MobileLocationsPage() {
               className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/20 border border-slate-100 relative group"
             >
               <div className="flex items-center gap-4 mb-4">
-                 <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center shadow-inner shrink-0 group-hover:bg-indigo-600 transition-colors duration-500 group-hover:text-white">
+                 <div className="w-14 h-14 rounded-2xl bg-[#96D1C6]/20 flex items-center justify-center shadow-inner shrink-0 group-hover:bg-[#103552] transition-colors duration-500 group-hover:text-white">
                     <MapPin className="w-8 h-8" />
                  </div>
                  <div className="flex-1 min-w-0">
@@ -131,10 +131,10 @@ export function MobileLocationsPage() {
                    onClick={() => window.open(`http://maps.google.com/maps?q=${item.lat},${item.long}`, '_blank')}
                    className="flex-1 py-3 bg-slate-50 rounded-2xl flex items-center justify-center gap-2 border border-slate-100 active:scale-95 transition-all"
                  >
-                    <MapIcon className="w-4 h-4 text-indigo-500" />
+                    <MapIcon className="w-4 h-4 text-[#185B5A]" />
                     <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Buka Map</span>
                  </button>
-                 <button className="flex-1 py-3 bg-indigo-600 rounded-2xl flex items-center justify-center gap-2 text-white active:scale-95 transition-all shadow-lg shadow-indigo-600/20">
+                 <button className="flex-1 py-3 bg-[#103552] rounded-2xl flex items-center justify-center gap-2 text-white active:scale-95 transition-all shadow-lg shadow-[#103552]/20">
                     <Clock className="w-4 h-4" />
                     <span className="text-[10px] font-black uppercase tracking-widest">Gunakan</span>
                  </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     Search, Plus, Trash2, ArrowLeft, Clock, Calendar,
@@ -417,13 +417,13 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Shift</label>
                                 <div className="relative group">
-                                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors">
+                                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-[#185B5A] transition-colors">
                                         <Clock className="w-4 h-4" />
                                     </div>
                                     <select
                                         value={selectedShiftId}
                                         onChange={(e) => setSelectedShiftId(e.target.value)}
-                                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none"
+                                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer appearance-none"
                                         required
                                     >
                                         <option value="">Pilih Shift</option>
@@ -448,7 +448,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                         type="date"
                                         value={startDate}
                                         onChange={(e) => setStartDate(e.target.value)}
-                                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-mono"
+                                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all font-mono"
                                         required
                                     />
                                 </div>
@@ -465,7 +465,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                         type="date"
                                         value={endDate}
                                         onChange={(e) => setEndDate(e.target.value)}
-                                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-mono"
+                                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all font-mono"
                                         required
                                     />
                                 </div>
@@ -475,7 +475,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                 <button
                                     type="submit"
                                     disabled={submitLoading || deleteLoading}
-                                    className="w-full py-4 bg-[#1E3A5F] hover:bg-[#152a45] text-white rounded-2xl text-[10px] font-black tracking-widest uppercase transition-all shadow-lg shadow-indigo-500/10 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50"
+                                    className="w-full py-4 bg-[#1E3A5F] hover:bg-[#152a45] text-white rounded-2xl text-[10px] font-black tracking-widest uppercase transition-all shadow-lg shadow-[#103552]/20/10 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50"
                                 >
                                     {submitLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
                                 </button>
@@ -526,7 +526,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                         <tr>
                                             <td colSpan={6} className="py-20">
                                                 <div className="flex flex-col items-center justify-center gap-4">
-                                                    <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                                                    <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
                                                     <p className="text-sm font-bold text-slate-400 tracking-widest uppercase">Memuat data...</p>
                                                 </div>
                                             </td>
@@ -547,7 +547,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                                     key={row.id}
                                                     className={cn(
                                                         "group transition-colors border-l border-r border-slate-100",
-                                                        isEditing ? "bg-indigo-50/60" : "hover:bg-slate-50/50"
+                                                        isEditing ? "bg-[#96D1C6]/20/60" : "hover:bg-slate-50/50"
                                                     )}
                                                 >
                                                     <td className="py-4 text-xs font-bold text-slate-900 border-r border-slate-100">{idx + 1}.</td>
@@ -559,7 +559,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                                             <select
                                                                 value={editShiftId}
                                                                 onChange={e => setEditShiftId(e.target.value)}
-                                                                className="w-full px-3 py-1.5 bg-white border border-indigo-300 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer"
+                                                                className="w-full px-3 py-1.5 bg-white border border-[#103552]/40 rounded-xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#103552]/20 focus:border-[#103552] transition-all cursor-pointer"
                                                             >
                                                                 <option value="">Pilih Shift</option>
                                                                 {shifts.map(s => (
@@ -575,7 +575,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                                     <td className="py-4 px-6 text-xs font-bold border-r border-slate-100">
                                                         <span className={cn(
                                                             "underline",
-                                                            isEditing ? "text-indigo-400" : "text-emerald-500"
+                                                            isEditing ? "text-[#96D1C6]" : "text-emerald-500"
                                                         )}>
                                                             {isEditing ? (editedShift?.jam_masuk ?? row.shifts?.jam_masuk ?? '-') : (row.shifts?.jam_masuk || '-')}
                                                         </span>
@@ -585,7 +585,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                                     <td className="py-4 px-6 text-xs font-bold border-r border-slate-100">
                                                         <span className={cn(
                                                             "underline",
-                                                            isEditing ? "text-indigo-400" : "text-rose-500"
+                                                            isEditing ? "text-[#96D1C6]" : "text-rose-500"
                                                         )}>
                                                             {isEditing ? (editedShift?.jam_keluar ?? row.shifts?.jam_keluar ?? '-') : (row.shifts?.jam_keluar || '-')}
                                                         </span>
@@ -621,7 +621,7 @@ export function MappingDinasLuar({ employee, onBack }: MappingDinasLuarProps) {
                                                                 {/* Edit */}
                                                                 <button
                                                                     onClick={() => startEdit(row)}
-                                                                    className="p-1.5 hover:bg-indigo-50 rounded-lg text-indigo-500 transition-all"
+                                                                    className="p-1.5 hover:bg-[#96D1C6]/20 rounded-lg text-[#185B5A] transition-all"
                                                                     title="Edit"
                                                                 >
                                                                     <Pencil className="w-4 h-4" />

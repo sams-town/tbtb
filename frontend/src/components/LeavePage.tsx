@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   Calendar,
@@ -286,7 +286,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
         </div>
         <button
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95"
+          className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95"
         >
           <Plus className="w-5 h-5" />
           Tambah
@@ -301,7 +301,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
               <select
                 value={filterEmployeeId}
                 onChange={(e) => setFilterEmployeeId(e.target.value)}
-                className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none">
+                className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer appearance-none">
                 <option value="">Semua Pegawai</option>
                 {employees.map((emp) => (
                   <option key={emp.id} value={emp.id}>{emp.name}</option>
@@ -314,7 +314,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
                 type="date"
                 value={filterStartDate}
                 onChange={(e) => setFilterStartDate(e.target.value)}
-                className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
             <div className="md:col-span-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Tanggal Akhir</label>
@@ -322,7 +322,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
                 type="date"
                 value={filterEndDate}
                 onChange={(e) => setFilterEndDate(e.target.value)}
-                className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
             <div className="flex items-end">
               <button
@@ -338,7 +338,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
         <div className="overflow-x-auto scrollbar-hide">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+              <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
               <p className="text-sm font-bold text-slate-400">Memuat data cuti...</p>
             </div>
           ) : error ? (
@@ -349,7 +349,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
               <p className="text-sm font-bold text-slate-600">{error}</p>
               <button
                 onClick={fetchData}
-                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95"
+                className="px-6 py-2.5 bg-[#103552] text-white rounded-xl text-sm font-bold hover:bg-[#103552] transition-all active:scale-95"
               >
                 Coba Lagi
               </button>
@@ -426,7 +426,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
                             )}
                             <button
                               onClick={() => setIsEditing(item)}
-                              className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all border border-slate-200">
+                              className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#103552] hover:text-white transition-all border border-slate-200">
                               Edit
                             </button>
                             <button

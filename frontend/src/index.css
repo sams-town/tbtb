@@ -4,11 +4,17 @@
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  
-  --color-brand-primary: #4F46E5; /* Indigo 600 */
-  --color-brand-secondary: #10B981; /* Emerald 500 */
-  --color-brand-bg: #F8FAFC;
-  
+
+  /* ── Brand palette ── */
+  --color-brand-primary:    #103552; /* Sidebar / Header */
+  --color-brand-primary-h:  #0D4156; /* Primary hover */
+  --color-brand-accent:     #E09132; /* CTA / Accent */
+  --color-brand-accent-h:   #C97E28; /* Accent hover (slightly darker) */
+  --color-brand-soft:       #96D1C6; /* Badge / soft background */
+  --color-brand-bg:         #F0F0F0; /* Page background */
+  --color-brand-text:       #1C1C1C; /* Main text */
+  --color-brand-secondary:  #185B5A; /* Secondary elements */
+
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-3xl: 2rem;
@@ -16,7 +22,9 @@
 
 @layer base {
   body {
-    @apply font-sans bg-[#F8FAFC] text-slate-900 antialiased;
+    @apply font-sans antialiased;
+    background-color: #F0F0F0;
+    color: #1C1C1C;
   }
 }
 
@@ -24,8 +32,9 @@
   @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
 }
 
+/* Sidebar uses brand-primary */
 .sidebar-gradient {
-  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+  background: linear-gradient(180deg, #103552 0%, #0a2438 100%);
 }
 
 .calendar-grid {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
+﻿import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, AlertCircle, Loader2, X, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -97,11 +97,11 @@ function ToastItem({ toast, onClose }: { key?: string | number, toast: Toast, on
         loading: {
             icon: Loader2,
             bg: 'bg-white',
-            border: 'border-indigo-200',
-            iconColor: 'text-indigo-500',
-            iconBg: 'bg-indigo-50',
-            shadow: 'shadow-indigo-500/10',
-            progressColor: 'bg-indigo-500',
+            border: 'border-[#96D1C6]/50',
+            iconColor: 'text-[#185B5A]',
+            iconBg: 'bg-[#96D1C6]/20',
+            shadow: 'shadow-[#103552]/20/10',
+            progressColor: 'bg-[#103552]',
         },
         info: {
             icon: Info,
@@ -181,11 +181,11 @@ function ToastItem({ toast, onClose }: { key?: string | number, toast: Toast, on
 
             {/* Pulse animation for loading */}
             {toast.type === 'loading' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-100 overflow-hidden">
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#96D1C6]/30 overflow-hidden">
                     <motion.div
                         animate={{ x: ['-100%', '100%'] }}
                         transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-                        className="w-1/3 h-full bg-indigo-500 rounded-full"
+                        className="w-1/3 h-full bg-[#103552] rounded-full"
                     />
                 </div>
             )}

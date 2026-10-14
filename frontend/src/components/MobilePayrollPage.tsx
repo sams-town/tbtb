@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ChevronLeft,
@@ -81,9 +81,9 @@ export function MobilePayrollPage() {
     <div className="min-h-screen bg-[#F0F4FF] pb-28 font-sans">
 
       {/* ─── HERO HEADER ─── */}
-      <div className="relative bg-gradient-to-br from-indigo-700 via-indigo-600 to-violet-600 pt-14 pb-28 px-6 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[#103552] via-[#103552] to-[#185B5A] pt-14 pb-28 px-6 overflow-hidden">
         <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-violet-400/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#96D1C6]/20 rounded-full blur-3xl" />
 
         {/* Top Bar */}
         <div className="relative z-10 flex items-center justify-between mb-6">
@@ -128,7 +128,7 @@ export function MobilePayrollPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-[2rem] shadow-2xl shadow-indigo-500/10 p-4 border border-white"
+          className="bg-white rounded-[2rem] shadow-2xl shadow-[#103552]/20/10 p-4 border border-white"
         >
           <div className="flex gap-3">
             {/* Tahun */}
@@ -162,7 +162,7 @@ export function MobilePayrollPage() {
         <div className="space-y-3 mt-2">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-[#96D1C6]/30 border-t-[#103552] rounded-full animate-spin" />
               <p className="text-sm font-bold text-slate-400">Memuat data payroll...</p>
             </div>
           ) : data.length === 0 ? (
@@ -174,10 +174,10 @@ export function MobilePayrollPage() {
             >
               {/* Icon */}
               <div className="relative">
-                <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center shadow-inner">
-                  <Inbox className="w-12 h-12 text-indigo-300" />
+                <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#96D1C6]/30 to-[#96D1C6]/200 flex items-center justify-center shadow-inner">
+                  <Inbox className="w-12 h-12 text-[#96D1C6]" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-full flex items-center justify-center shadow-md">
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-[#185B5A] to-[#185B5A] rounded-full flex items-center justify-center shadow-md">
                   <span className="text-white text-[10px] font-black">!</span>
                 </div>
               </div>
@@ -186,7 +186,7 @@ export function MobilePayrollPage() {
               <div className="text-center">
                 <p className="text-base font-black text-slate-700">Data Tidak Tersedia</p>
                 <p className="text-[12px] font-semibold text-slate-400 mt-1">Tidak ada data payroll untuk</p>
-                <p className="text-[12px] font-black text-indigo-400 mt-0.5">{bulan} {tahun}</p>
+                <p className="text-[12px] font-black text-[#96D1C6] mt-0.5">{bulan} {tahun}</p>
               </div>
             </motion.div>
           ) : (
@@ -203,7 +203,7 @@ export function MobilePayrollPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     {/* Avatar/Index */}
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20">
+                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#185B5A] to-[#185B5A] flex items-center justify-center shrink-0 shadow-md shadow-[#103552]/20/20">
                       <span className="text-white text-sm font-black">{idx + 1}</span>
                     </div>
                     <div>
@@ -216,8 +216,8 @@ export function MobilePayrollPage() {
                     </div>
                   </div>
                   {/* Grand Total Badge */}
-                  <div className="bg-indigo-50 px-3 py-1.5 rounded-xl">
-                    <p className="text-[11px] font-black text-indigo-600">
+                  <div className="bg-[#96D1C6]/20 px-3 py-1.5 rounded-xl">
+                    <p className="text-[11px] font-black text-[#103552]">
                       {fmt(row.grand_total)}
                     </p>
                   </div>
@@ -239,7 +239,7 @@ export function MobilePayrollPage() {
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-50">
                   <button
                     onClick={e => { e.stopPropagation(); handlePrint(row.id.toString()); }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-2xl transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#103552] hover:bg-[#103552] active:scale-95 rounded-2xl transition-all"
                   >
                     <Printer className="w-4 h-4 text-white" />
                     <span className="text-[11px] font-black text-white">Download Slip</span>
@@ -274,7 +274,7 @@ export function MobilePayrollPage() {
 
               {/* Header */}
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#185B5A] to-[#185B5A] flex items-center justify-center shadow-md shadow-[#103552]/20/20">
                   <DollarSign className="w-7 h-7 text-white" />
                 </div>
                 <div>
@@ -289,20 +289,20 @@ export function MobilePayrollPage() {
                   { label: 'Nomor Gaji', value: selectedItem.no_gaji, icon: Hash, color: 'text-slate-600' },
                   { label: 'Periode', value: `${selectedItem.bulan} ${selectedItem.tahun}`, icon: Calendar, color: 'text-emerald-600' },
                   { label: 'Jabatan', value: selectedItem.user?.jabatan?.nama_jabatan || '—', icon: Briefcase, color: 'text-sky-600' },
-                  { label: 'Grand Total', value: fmt(selectedItem.grand_total), icon: TrendingUp, color: 'text-indigo-600', highlight: true },
+                  { label: 'Grand Total', value: fmt(selectedItem.grand_total), icon: TrendingUp, color: 'text-[#103552]', highlight: true },
                 ].map((item, i) => (
                   <div
                     key={i}
                     className={cn(
                       'flex items-center justify-between px-4 py-3.5 rounded-2xl',
-                      item.highlight ? 'bg-indigo-50 border border-indigo-100' : 'bg-slate-50'
+                      item.highlight ? 'bg-[#96D1C6]/20 border border-[#96D1C6]/30' : 'bg-slate-50'
                     )}
                   >
                     <div className="flex items-center gap-3">
                       <item.icon className={cn('w-4 h-4', item.color)} />
                       <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider">{item.label}</p>
                     </div>
-                    <p className={cn('text-sm font-black', item.highlight ? 'text-indigo-700' : 'text-slate-700')}>{item.value}</p>
+                    <p className={cn('text-sm font-black', item.highlight ? 'text-[#103552]' : 'text-slate-700')}>{item.value}</p>
                   </div>
                 ))}
               </div>
@@ -310,7 +310,7 @@ export function MobilePayrollPage() {
               {/* CTA */}
               <button
                 onClick={() => handlePrint(selectedItem.id.toString())}
-                className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-[1.5rem] flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/25 active:scale-95 transition-all mt-2"
+                className="w-full py-4 bg-gradient-to-r from-[#103552] to-[#185B5A] rounded-[1.5rem] flex items-center justify-center gap-3 shadow-xl shadow-[#103552]/20/25 active:scale-95 transition-all mt-2"
               >
                 <Printer className="w-5 h-5 text-white" />
                 <span className="text-sm font-black text-white">Download Slip Gaji</span>

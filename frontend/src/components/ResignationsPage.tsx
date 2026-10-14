@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   UserMinus,
@@ -75,8 +75,8 @@ const JENIS_OPTIONS = [
 function EmployeeAvatar({ name, foto, className }: { name: string; foto: string | null; className?: string }) {
   const initials = name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
   const colorPalette = [
-    'bg-indigo-100 text-indigo-600',
-    'bg-violet-100 text-violet-600',
+    'bg-[#96D1C6]/30 text-[#103552]',
+    'bg-[#96D1C6]/30 text-[#185B5A]',
     'bg-sky-100 text-sky-600',
     'bg-emerald-100 text-emerald-600',
     'bg-amber-100 text-amber-600',
@@ -130,7 +130,7 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
     <div ref={ref} className="relative w-full">
       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Pegawai *</label>
       <button type="button" onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all text-left"
       >
         {loadingUsers ? (
           <><Loader2 className="w-4 h-4 animate-spin text-slate-400" /><span className="text-slate-400">Memuat pegawai...</span></>
@@ -162,7 +162,7 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                 <input autoFocus type="text" placeholder="Cari nama pegawai..."
                   value={query} onChange={e => setQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#103552]/20" />
               </div>
             </div>
             <div className="max-h-60 overflow-y-auto divide-y divide-slate-50">
@@ -171,15 +171,15 @@ function UserSelect({ value, onChange, users, loadingUsers }: {
                 : filtered.map(u => (
                   <button key={u.id} type="button"
                     onClick={() => { onChange(u.id); setOpen(false); setQuery(''); }}
-                    className={cn("w-full flex items-center gap-3 px-4 py-3 hover:bg-indigo-50/60 transition-colors text-left",
-                      value === u.id && "bg-indigo-50")}
+                    className={cn("w-full flex items-center gap-3 px-4 py-3 hover:bg-[#96D1C6]/20/60 transition-colors text-left",
+                      value === u.id && "bg-[#96D1C6]/20")}
                   >
                     <EmployeeAvatar name={u.name} foto={u.foto_karyawan} className="w-8 h-8 rounded-xl object-cover shrink-0 text-[10px]" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-slate-900 truncate">{u.name}</p>
                       {u.jabatan && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">{u.jabatan}</p>}
                     </div>
-                    {value === u.id && <CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />}
+                    {value === u.id && <CheckCircle2 className="w-4 h-4 text-[#185B5A] shrink-0" />}
                   </button>
                 ))
               }
@@ -426,7 +426,7 @@ export function ResignationsPage() {
       title: 'Pulangkan ke Pegawai Aktif?',
       message: 'Apakah Anda yakin ingin memulangkan pegawai ini kembali ke status pegawai aktif?',
       confirmText: 'Ya, Pulangkan',
-      confirmColor: 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20 text-white'
+      confirmColor: 'bg-[#103552] hover:bg-[#103552] shadow-[#103552]/20/20 text-white'
     });
   };
 
@@ -608,7 +608,7 @@ export function ResignationsPage() {
         </div>
         <button
           onClick={openModal}
-          className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95"
+          className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95"
         >
           <Plus className="w-5 h-5" />
           Tambah
@@ -617,11 +617,11 @@ export function ResignationsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <ResignationStat label="Total Resignations" value={resignationsData.length.toString()} icon={UserMinus} color="text-indigo-600" bg="bg-indigo-50" />
+        <ResignationStat label="Total Resignations" value={resignationsData.length.toString()} icon={UserMinus} color="text-[#103552]" bg="bg-[#96D1C6]/20" />
         <ResignationStat label="Pending Approval" value={resignationsData.filter(r => r.status === 'PENDING').length.toString()} icon={Clock} color="text-amber-600" bg="bg-amber-50" />
         <ResignationStat label="Approved" value={resignationsData.filter(r => r.status === 'APPROVED').length.toString()} icon={CheckCircle2} color="text-emerald-600" bg="bg-emerald-50" />
-        <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 p-8 flex items-center gap-6 group hover:border-violet-300 transition-all">
-          <div className="w-16 h-16 rounded-[2rem] bg-violet-50 text-violet-600 flex items-center justify-center shrink-0 border border-violet-100 group-hover:bg-violet-600 group-hover:text-white transition-all">
+        <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/30 p-8 flex items-center gap-6 group hover:border-[#96D1C6] transition-all">
+          <div className="w-16 h-16 rounded-[2rem] bg-[#96D1C6]/20 text-[#185B5A] flex items-center justify-center shrink-0 border border-[#96D1C6]/30 group-hover:bg-[#185B5A] group-hover:text-white transition-all">
             <TrendingUp className="w-8 h-8" />
           </div>
           <div>
@@ -640,21 +640,21 @@ export function ResignationsPage() {
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Nama Pegawai</label>
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search employee..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search employee..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
               </div>
             </div>
             <div>
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Tanggal Mulai</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="date" value={dateStart} onChange={e => setDateStart(e.target.value)} className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                <input type="date" value={dateStart} onChange={e => setDateStart(e.target.value)} className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
               </div>
             </div>
             <div>
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Tanggal Akhir</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input type="date" value={dateEnd} onChange={e => setDateEnd(e.target.value)} className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+                <input type="date" value={dateEnd} onChange={e => setDateEnd(e.target.value)} className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
               </div>
             </div>
           </div>
@@ -717,7 +717,7 @@ export function ResignationsPage() {
                       <div className="flex items-center justify-end gap-2  transition-opacity">
                         {item.status === 'PENDING' && (
                           <>
-                            <button onClick={() => openEditModal(item)} className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90" title="Edit Data"><Edit2 className="w-4 h-4" /></button>
+                            <button onClick={() => openEditModal(item)} className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90" title="Edit Data"><Edit2 className="w-4 h-4" /></button>
                             <button onClick={() => openDeleteConfirm(item.id)} className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90" title="Hapus Data"><Trash2 className="w-4 h-4" /></button>
                             <button onClick={() => openApproveConfirm(item.id)} className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all active:scale-90" title="Setujui (Approve)"><Check className="w-4 h-4" /></button>
                           </>
@@ -725,7 +725,7 @@ export function ResignationsPage() {
                         {item.status === 'APPROVED' && (
                           <>
                             <button onClick={() => openDetailModal(item.id)} className="p-2.5 bg-sky-50 text-sky-600 rounded-xl hover:bg-sky-600 hover:text-white transition-all active:scale-90" title="Lihat Detail"><Eye className="w-4 h-4" /></button>
-                            <button onClick={() => openRestoreConfirm(item.id)} className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90" title="Pulangkan Pegawai"><UserCheck className="w-4 h-4" /></button>
+                            <button onClick={() => openRestoreConfirm(item.id)} className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90" title="Pulangkan Pegawai"><UserCheck className="w-4 h-4" /></button>
                             <button onClick={() => openDeleteConfirm(item.id)} className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90" title="Hapus Data"><Trash2 className="w-4 h-4" /></button>
                           </>
                         )}
@@ -748,7 +748,7 @@ export function ResignationsPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={meta.page === 1}
-                className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 hover:border-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90"
+                className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] hover:border-[#103552] disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -764,8 +764,8 @@ export function ResignationsPage() {
                       className={cn(
                         "w-10 h-10 rounded-xl text-xs font-black transition-all active:scale-90",
                         meta.page === pNum 
-                          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20" 
-                          : "bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-600"
+                          ? "bg-[#103552] text-white shadow-lg shadow-[#103552]/20" 
+                          : "bg-white border border-slate-200 text-slate-400 hover:text-[#103552] hover:border-[#103552]"
                       )}
                     >
                       {pNum}
@@ -777,7 +777,7 @@ export function ResignationsPage() {
               <button
                 onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
                 disabled={meta.page === meta.totalPages}
-                className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-indigo-600 hover:border-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90"
+                className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-[#103552] hover:border-[#103552] disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -847,7 +847,7 @@ export function ResignationsPage() {
                       <select
                         value={form.jenis}
                         onChange={e => setForm(f => ({ ...f, jenis: e.target.value }))}
-                        className="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none"
+                        className="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all appearance-none"
                       >
                         <option value="">-- Pilih Jenis Keberhentian --</option>
                         {JENIS_OPTIONS.map(j => (
@@ -868,7 +868,7 @@ export function ResignationsPage() {
                       onChange={e => setForm(f => ({ ...f, alasan: e.target.value }))}
                       rows={3}
                       placeholder="Masukkan alasan..."
-                      className="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none"
+                      className="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all resize-none"
                     />
                   </div>
 
@@ -883,7 +883,7 @@ export function ResignationsPage() {
                         type="date"
                         value={form.tanggal}
                         onChange={e => setForm(f => ({ ...f, tanggal: e.target.value }))}
-                        className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                        className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                       />
                     </div>
                   </div>
@@ -893,7 +893,7 @@ export function ResignationsPage() {
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">
                       File
                     </label>
-                    <label className="flex items-center gap-3 w-full px-5 py-3 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-sm font-medium text-slate-500 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all">
+                    <label className="flex items-center gap-3 w-full px-5 py-3 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-sm font-medium text-slate-500 cursor-pointer hover:border-[#103552]/60 hover:bg-[#96D1C6]/20/30 transition-all">
                       <Upload className="w-4 h-4 shrink-0" />
                       <span className="truncate">
                         {form.file ? form.file.name : 'Pilih file (Opsional) atau drop'}
@@ -919,7 +919,7 @@ export function ResignationsPage() {
                   <button
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black shadow-xl shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
                     {submitting ? 'Menyimpan...' : 'Simpan'}
@@ -1011,7 +1011,7 @@ export function ResignationsPage() {
                       <a
                         href={detailData.pegawai_keluar_file_path?.startsWith('http') ? detailData.pegawai_keluar_file_path : `${import.meta.env.VITE_API_MEANDPAY.replace('/api', '')}${detailData.pegawai_keluar_file_path}`}
                         target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-bold hover:bg-indigo-100 transition-all"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#96D1C6]/20 text-[#103552] rounded-xl text-sm font-bold hover:bg-[#96D1C6]/30 transition-all"
                       >
                         <FileText className="w-4 h-4" />
                         Lihat Dokumen

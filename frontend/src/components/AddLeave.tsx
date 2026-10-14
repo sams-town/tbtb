@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Save, X, Calendar, User, FileText, ImageIcon, Loader2, Download } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -73,21 +73,21 @@ export function AddLeave({ onBack }: AddLeaveProps) {
 
             <Card className="space-y-6">
                 {templateUrl && (
-                    <div className="flex items-center justify-between p-4 bg-indigo-50 border border-indigo-100 rounded-2xl mb-2">
+                    <div className="flex items-center justify-between p-4 bg-[#96D1C6]/20 border border-[#96D1C6]/30 rounded-2xl mb-2">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#103552] shadow-sm">
                                 <FileText className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-xs font-black text-indigo-900 uppercase tracking-tight">Template Formulir Cuti</p>
-                                <p className="text-[10px] font-bold text-indigo-400">Unduh & lengkapi sebelum mengunggah</p>
+                                <p className="text-xs font-black text-[#103552] uppercase tracking-tight">Template Formulir Cuti</p>
+                                <p className="text-[10px] font-bold text-[#96D1C6]">Unduh & lengkapi sebelum mengunggah</p>
                             </div>
                         </div>
                         <a
                             href={templateUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-200 active:scale-95 transition-all"
+                            className="flex items-center gap-2 px-4 py-2 bg-[#103552] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#96D1C6]/50 active:scale-95 transition-all"
                         >
                             <Download className="w-3.5 h-3.5" />
                             Unduh File
@@ -112,11 +112,11 @@ export function AddLeave({ onBack }: AddLeaveProps) {
                         </div>
                     </Field>
 
-                    <Field label="Alasan"><textarea rows={3} value={form.alasan_cuti} onChange={e => setForm({ ...form, alasan_cuti: e.target.value })} className="w-full p-4 bg-slate-50 border rounded-xl outline-none focus:border-indigo-400 transition-all" placeholder="Tulis alasan..." /></Field>
+                    <Field label="Alasan"><textarea rows={3} value={form.alasan_cuti} onChange={e => setForm({ ...form, alasan_cuti: e.target.value })} className="w-full p-4 bg-slate-50 border rounded-xl outline-none focus:border-[#103552]/60 transition-all" placeholder="Tulis alasan..." /></Field>
 
                     <div className="flex justify-end gap-3 pt-6 border-t font-bold">
                         <button type="button" onClick={onBack} className="px-6 py-3 text-slate-500">Batal</button>
-                        <button type="submit" disabled={loading} className="px-8 py-3 bg-indigo-600 text-white rounded-xl shadow-lg flex items-center gap-2">
+                        <button type="submit" disabled={loading} className="px-8 py-3 bg-[#103552] text-white rounded-xl shadow-lg flex items-center gap-2">
                             {loading ? <Loader2 className="animate-spin" /> : <Save />} Simpan
                         </button>
                     </div>

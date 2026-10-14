@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Lock, User, Eye, EyeOff, Loader2, KeyRound } from 'lucide-react';
 import { useToast } from './Toast';
@@ -63,11 +63,11 @@ export function ChangePasswordPage({ user, onBack }: { user: any, onBack: () => 
                 <p className="text-slate-500 font-medium italic mt-1">Perbarui password akun Anda</p>
             </div>
 
-            <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-indigo-500/5 overflow-hidden">
+            <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-[#103552]/20/5 overflow-hidden">
                 {/* Header info */}
                 <div className="p-10 border-b border-slate-50 flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center">
-                        <KeyRound className="w-8 h-8 text-indigo-500" />
+                    <div className="w-16 h-16 rounded-2xl bg-[#96D1C6]/20 flex items-center justify-center">
+                        <KeyRound className="w-8 h-8 text-[#185B5A]" />
                     </div>
                     <div>
                         <div className="flex items-center gap-3 mb-1">
@@ -89,7 +89,7 @@ export function ChangePasswordPage({ user, onBack }: { user: any, onBack: () => 
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     placeholder="Masukkan password baru"
-                                    className="w-full pl-14 pr-14 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+                                    className="w-full pl-14 pr-14 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
                                 />
                                 <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                                 <button
@@ -111,7 +111,7 @@ export function ChangePasswordPage({ user, onBack }: { user: any, onBack: () => 
                                     value={formData.password_confirmation}
                                     onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
                                     placeholder="Ulangi password baru"
-                                    className="w-full pl-14 pr-14 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+                                    className="w-full pl-14 pr-14 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
                                 />
                                 <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                                 <button
@@ -139,7 +139,7 @@ export function ChangePasswordPage({ user, onBack }: { user: any, onBack: () => 
                         <button
                             type="submit"
                             disabled={loading || !formData.password || !formData.password_confirmation}
-                            className="flex-[2] py-4.5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-[2] py-4.5 bg-[#103552] text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-[#103552]/20/20 hover:bg-[#103552] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                             Simpan Password

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Save, ShieldCheck, CheckSquare, Square } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -92,7 +92,7 @@ export function AddRole({ onBack }: { onBack: () => void }) {
                     <button onClick={onBack} className="p-3 bg-white border rounded-2xl shadow-sm"><ArrowLeft/></button>
                     <div><h1 className="text-xl font-bold">Tambah Role</h1><p className="text-sm text-slate-400">Atur hak akses jabatan baru</p></div>
                 </div>
-                <button onClick={handleSubmit} disabled={loading} className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold flex items-center gap-2 shadow-lg">{loading ? '...' : <Save />} Simpan</button>
+                <button onClick={handleSubmit} disabled={loading} className="px-8 py-3 bg-[#103552] text-white rounded-xl font-bold flex items-center gap-2 shadow-lg">{loading ? '...' : <Save />} Simpan</button>
             </div>
 
             <div className="grid grid-cols-4 gap-8">
@@ -108,12 +108,12 @@ export function AddRole({ onBack }: { onBack: () => void }) {
                         {Object.entries(permissionGroups).map(([group, ps]) => (
                             <div key={group} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
                                 <button onClick={() => toggleG(ps)} className="flex items-center gap-2 mb-3 pb-2 border-b font-bold text-xs uppercase tracking-wider text-slate-600 w-full text-left">
-                                    {ps.every(p => perms.has(p)) ? <CheckSquare className="size-4 text-indigo-600" /> : <Square className="size-4 text-slate-300" />} {group}
+                                    {ps.every(p => perms.has(p)) ? <CheckSquare className="size-4 text-[#103552]" /> : <Square className="size-4 text-slate-300" />} {group}
                                 </button>
                                 <div className="space-y-2">
                                     {ps.map(p => (
                                         <button key={p} onClick={() => toggleP(p)} className="flex items-center gap-2 text-[11px] text-slate-500 hover:text-slate-900 w-full text-left">
-                                            {perms.has(p) ? <CheckSquare className="size-3.5 text-indigo-500" /> : <Square className="size-3.5 text-slate-200" />} {p.split('.')[1]}
+                                            {perms.has(p) ? <CheckSquare className="size-3.5 text-[#185B5A]" /> : <Square className="size-3.5 text-slate-200" />} {p.split('.')[1]}
                                         </button>
                                     ))}
                                 </div>

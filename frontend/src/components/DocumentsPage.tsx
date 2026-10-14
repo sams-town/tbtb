@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Plus, FileText, Download, Trash2, Clock, X, Loader2, FileUp, Calendar, User, Info, Pencil, AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -229,7 +229,7 @@ export function DocumentsPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-indigo-500/5 overflow-hidden">
+      <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-[#103552]/20/5 overflow-hidden">
         <div className="p-10 border-b border-slate-50 flex flex-wrap items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
@@ -238,7 +238,7 @@ export function DocumentsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari nama dokumen atau pemilik..."
-              className="w-full pl-14 pr-8 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
+              className="w-full pl-14 pr-8 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/5 focus:border-[#96D1C6]/50 transition-all"
             />
           </div>
           <div className="flex gap-2">
@@ -263,7 +263,7 @@ export function DocumentsPage() {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                <tr><td colSpan={6} className="py-20 text-center"><Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-indigo-500" /></td></tr>
+                <tr><td colSpan={6} className="py-20 text-center"><Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-[#185B5A]" /></td></tr>
               ) : data.length === 0 ? (
                 <tr><td colSpan={6} className="py-20 text-center text-slate-400 font-bold">Tidak ada dokumen ditemukan.</td></tr>
               ) : (
@@ -278,8 +278,8 @@ export function DocumentsPage() {
                   const typedDocs = docs as Document[];
                   return (
                     <React.Fragment key={employeeName}>
-                      <tr className="bg-indigo-50/20">
-                        <td colSpan={6} className="py-4 px-8 font-black text-xs text-indigo-600 uppercase tracking-widest border-y border-indigo-50/40">
+                      <tr className="bg-[#96D1C6]/20/20">
+                        <td colSpan={6} className="py-4 px-8 font-black text-xs text-[#103552] uppercase tracking-widest border-y border-[#96D1C6]/20/40">
                           <div className="flex items-center gap-2">
                             <User className="w-4 h-4" />
                             <span>{employeeName} ({typedDocs.length} Dokumen)</span>
@@ -294,11 +294,11 @@ export function DocumentsPage() {
                                 "w-10 h-10 rounded-[14px] flex items-center justify-center text-white font-black text-[10px] shadow-sm shrink-0",
                                 item.type === 'PDF' ? "bg-[#EF4444]" :
                                   item.type === 'DOCX' || item.type === 'DOC' ? "bg-[#3B82F6]" :
-                                    item.type === 'XLS' || item.type === 'XLSX' ? "bg-[#10B981]" : "bg-indigo-500"
+                                    item.type === 'XLS' || item.type === 'XLSX' ? "bg-[#10B981]" : "bg-[#103552]"
                               )}>
                                 {item.type}
                               </div>
-                              <div className="font-bold text-slate-700 text-sm group-hover:text-indigo-600 transition-colors">{item.name}</div>
+                              <div className="font-bold text-slate-700 text-sm group-hover:text-[#103552] transition-colors">{item.name}</div>
                             </div>
                           </td>
                           <td className="py-6 px-8">

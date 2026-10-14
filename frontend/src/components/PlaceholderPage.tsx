@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -11,7 +11,7 @@ interface PlaceholderPageProps {
   color?: string;
 }
 
-export function PlaceholderPage({ title, subtitle, icon: Icon, color = "text-indigo-600" }: PlaceholderPageProps) {
+export function PlaceholderPage({ title, subtitle, icon: Icon, color = "text-[#103552]" }: PlaceholderPageProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}

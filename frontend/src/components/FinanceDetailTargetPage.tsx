@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     Search, Plus, Edit, Trash2, ArrowLeft, Target,
@@ -13,7 +13,7 @@ const fmt = (val: any) =>
 
 const inputCls = [
     'w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 font-bold',
-    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400',
+    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]/60',
     'transition-all duration-200'
 ].join(' ');
 
@@ -206,7 +206,7 @@ export function FinanceDetailTargetPage() {
     const renderForm = () => (
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4 lg:p-8 max-w-[1700px] mx-auto">
             <div className="flex items-center gap-6 mb-10">
-                <button onClick={() => { setView('list'); setEditingId(null); }} className="w-12 h-12 flex items-center justify-center bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition-all active:scale-95 shadow-sm">
+                <button onClick={() => { setView('list'); setEditingId(null); }} className="w-12 h-12 flex items-center justify-center bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-[#103552] hover:border-[#96D1C6]/50 transition-all active:scale-95 shadow-sm">
                     <ArrowLeft className="w-5 h-5" />
                 </button>
                 <div>
@@ -219,8 +219,8 @@ export function FinanceDetailTargetPage() {
                 <div className="xl:col-span-2 space-y-8">
                     <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm space-y-6">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center">
-                                <Activity className="w-4 h-4 text-indigo-500" />
+                            <div className="w-8 h-8 rounded-xl bg-[#96D1C6]/20 flex items-center justify-center">
+                                <Activity className="w-4 h-4 text-[#185B5A]" />
                             </div>
                             <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Informasi Utama</h3>
                         </div>
@@ -271,22 +271,22 @@ export function FinanceDetailTargetPage() {
                     <div className="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl shadow-slate-200">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-indigo-400" />
+                                <Sparkles className="w-4 h-4 text-[#96D1C6]" />
                             </div>
                             <h3 className="text-sm font-black text-white/50 uppercase tracking-widest text-[10px]">Rewards & Penilaian</h3>
                         </div>
                         <div className="space-y-6">
                             <Field label="Bonus Pribadi (P)">
                                 <input type="number" value={form.bonus_p} onChange={e => setForm({ ...form, bonus_p: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm font-bold text-white focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all" />
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm font-bold text-white focus:ring-4 focus:ring-[#103552]/20 outline-none transition-all" />
                             </Field>
                             <Field label="Bonus Team (T)">
                                 <input type="number" value={form.bonus_t} onChange={e => setForm({ ...form, bonus_t: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm font-bold text-white focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all" />
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm font-bold text-white focus:ring-4 focus:ring-[#103552]/20 outline-none transition-all" />
                             </Field>
                             <Field label="Bonus Jackpot (J)">
                                 <input type="number" value={form.bonus_j} onChange={e => setForm({ ...form, bonus_j: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm font-bold text-white focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all" />
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-sm font-bold text-white focus:ring-4 focus:ring-[#103552]/20 outline-none transition-all" />
                             </Field>
                         </div>
                     </div>
@@ -303,7 +303,7 @@ export function FinanceDetailTargetPage() {
                     </div>
 
                     <button disabled={isSubmitting} type="submit"
-                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-base shadow-2xl shadow-indigo-100 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3">
+                        className="w-full py-4 bg-[#103552] hover:bg-[#103552] text-white rounded-2xl font-black text-base shadow-2xl shadow-[#96D1C6]/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3">
                         {isSubmitting ? (
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : <Target className="w-5 h-5" />}
@@ -315,7 +315,7 @@ export function FinanceDetailTargetPage() {
     );
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] pb-20">
+        <div className="min-h-screen bg-[#F0F0F0] pb-20">
             {deleteTarget && <DeleteModal name={deleteTarget.users?.name || 'Item'} onConfirm={confirmDelete} onCancel={() => setDeleteTarget(null)} />}
 
             {view === 'form' ? renderForm() : (
@@ -323,7 +323,7 @@ export function FinanceDetailTargetPage() {
                     {/* Header */}
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-5 mb-2">
-                            <div className="w-14 h-14 rounded-[1.5rem] bg-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-200 rotate-3 transition-transform hover:rotate-0">
+                            <div className="w-14 h-14 rounded-[1.5rem] bg-[#103552] flex items-center justify-center shadow-xl shadow-[#96D1C6]/50 rotate-3 transition-transform hover:rotate-0">
                                 <Target className="w-7 h-7 text-white" />
                             </div>
                             <div>
@@ -335,7 +335,7 @@ export function FinanceDetailTargetPage() {
                             <div className="relative group">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                                 <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari pegawai..."
-                                    className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none" />
+                                    className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none" />
                             </div>
                             <button onClick={() => { setForm(blankForm()); setEditingId(null); setView('form'); }}
                                 className="px-8 py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-black text-sm flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-slate-200">
@@ -363,7 +363,7 @@ export function FinanceDetailTargetPage() {
                                     {loading && data.length === 0 ? (
                                         <tr>
                                             <td colSpan={16} className="py-24 text-center text-slate-900">
-                                                <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto text-slate-900" />
+                                                <div className="w-12 h-12 border-4 border-[#96D1C6]/30 border-t-[#103552] rounded-full animate-spin mx-auto text-slate-900" />
                                                 <p className="text-xs font-black text-slate-400 mt-6 uppercase tracking-[0.3em] animate-pulse">Menghubungkan Server...</p>
                                             </td>
                                         </tr>
@@ -383,14 +383,14 @@ export function FinanceDetailTargetPage() {
                                                 <td className="py-6 px-8 text-xs font-bold text-slate-300">{idx + 1}.</td>
                                                 <td className="py-6 px-8">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 font-black text-xs">
+                                                        <div className="w-10 h-10 rounded-xl bg-[#96D1C6]/20 flex items-center justify-center text-[#185B5A] font-black text-xs">
                                                             {row.users?.name?.charAt(0)}
                                                         </div>
                                                         <span className="text-sm font-black text-slate-800">{row.users?.name || '—'}</span>
                                                     </div>
                                                 </td>
                                                 <td className="py-6 px-8">
-                                                    <span className="text-[10px] font-black text-indigo-500 px-3 py-1.5 bg-indigo-50 rounded-lg">
+                                                    <span className="text-[10px] font-black text-[#185B5A] px-3 py-1.5 bg-[#96D1C6]/20 rounded-lg">
                                                         {row.target_kinerjas?.nomor || '—'}
                                                     </span>
                                                 </td>
@@ -412,10 +412,10 @@ export function FinanceDetailTargetPage() {
                                                 <td className="py-6 px-8">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                            <div className="h-full bg-indigo-500 rounded-full"
+                                                            <div className="h-full bg-[#103552] rounded-full"
                                                                 style={{ width: `${Math.min(100, parseFloat(row.capai_persen) || 0)}%` }} />
                                                         </div>
-                                                        <span className="text-[10px] font-black text-indigo-600">{row.capai_persen}%</span>
+                                                        <span className="text-[10px] font-black text-[#103552]">{row.capai_persen}%</span>
                                                     </div>
                                                 </td>
                                                 <td className="py-6 px-8">

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import {
   Database,
@@ -350,7 +350,7 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
                 onClick={() => setViewMode('table')}
                 className={cn(
                   "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all gap-2 flex items-center",
-                  viewMode === 'table' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-900"
+                  viewMode === 'table' ? "bg-white text-[#103552] shadow-sm" : "text-slate-500 hover:text-slate-900"
                 )}
               >
                 <TableIcon className="w-4 h-4" /> Pivot Table
@@ -359,7 +359,7 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
                 onClick={() => setViewMode('chart')}
                 className={cn(
                   "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all gap-2 flex items-center",
-                  viewMode === 'chart' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-900"
+                  viewMode === 'chart' ? "bg-white text-[#103552] shadow-sm" : "text-slate-500 hover:text-slate-900"
                 )}
               >
                 <BarChart3 className="w-4 h-4" /> Grafik & Bar
@@ -375,7 +375,7 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
             </button>
             <button
               onClick={() => setExportModal({ show: true, type: 'rekap' })}
-              className="flex items-center gap-3 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs transition-all active:scale-95 shadow-lg shadow-indigo-200"
+              className="flex items-center gap-3 px-6 py-3.5 bg-[#103552] hover:bg-[#103552] text-white rounded-xl font-black text-xs transition-all active:scale-95 shadow-lg shadow-[#96D1C6]/50"
             >
               <FileText className="w-5 h-5" />
               <span>Export Rekap</span>
@@ -461,7 +461,7 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
                     type="date"
                     value={startDate}
                     onChange={e => setStartDate(e.target.value)}
-                    className="px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                    className="px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 transition-all"
                   />
                 </div>
                 <div className="relative">
@@ -469,13 +469,13 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
                     type="date"
                     value={endDate}
                     onChange={e => setEndDate(e.target.value)}
-                    className="px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                    className="px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 transition-all"
                   />
                 </div>
                 <button
                   onClick={handleFetchRecap}
                   disabled={loading}
-                  className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl text-sm font-bold shadow-lg hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-3 bg-[#103552] text-white rounded-2xl text-sm font-bold shadow-lg hover:bg-[#103552] transition-all active:scale-95 disabled:opacity-50"
                 >
                   {loading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div> : <Search className="w-4 h-4" />}
                   <span>Filter</span>
@@ -488,7 +488,7 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
                   placeholder="Cari nama pegawai..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                  className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                 />
               </div>
             </div>
@@ -617,24 +617,24 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
             <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Tanggal Mulai</label>
               <div className="relative group">
-                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#103552] transition-colors" />
                 <input
                   type="date"
                   value={startDate}
                   onChange={e => setStartDate(e.target.value)}
-                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                 />
               </div>
             </div>
             <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Tanggal Akhir</label>
               <div className="relative group">
-                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#103552] transition-colors" />
                 <input
                   type="date"
                   value={endDate}
                   onChange={e => setEndDate(e.target.value)}
-                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border border-slate-200 rounded-3xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                 />
               </div>
             </div>
@@ -644,7 +644,7 @@ export function DataRecapPage({ onNavigate }: DataRecapPageProps) {
             <button
               onClick={handleFetchRecap}
               disabled={loading}
-              className="w-full sm:w-auto flex items-center justify-center gap-3 px-12 py-5 bg-indigo-600 text-white rounded-[1.5rem] text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-3 px-12 py-5 bg-[#103552] text-white rounded-[1.5rem] text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95 disabled:opacity-50"
             >
               {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white animate-spin rounded-full"></div> : <Send className="w-5 h-5" />}
               Submit

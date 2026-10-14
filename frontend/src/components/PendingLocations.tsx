@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { AnimatePresence } from 'motion/react';
 import {
@@ -147,7 +147,7 @@ export function PendingLocations({ onBack }: { onBack: () => void }) {
                     <div className="flex items-center gap-6">
                         <button
                             onClick={onBack}
-                            className="p-4 bg-white text-slate-500 rounded-2xl hover:bg-slate-50 hover:text-indigo-600 transition-all shadow-xl shadow-slate-200/20 active:scale-95 border border-slate-100"
+                            className="p-4 bg-white text-slate-500 rounded-2xl hover:bg-slate-50 hover:text-[#103552] transition-all shadow-xl shadow-slate-200/20 active:scale-95 border border-slate-100"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
@@ -168,7 +168,7 @@ export function PendingLocations({ onBack }: { onBack: () => void }) {
                     <div className="overflow-x-auto scrollbar-hide">
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-20 gap-4">
-                                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                                <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
                                 <p className="text-sm font-bold text-slate-400">Memuat data lokasi pending...</p>
                             </div>
                         ) : error ? (
@@ -179,7 +179,7 @@ export function PendingLocations({ onBack }: { onBack: () => void }) {
                                 <p className="text-sm font-bold text-slate-600">{error}</p>
                                 <button
                                     onClick={fetchPendingLocations}
-                                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95"
+                                    className="px-6 py-2.5 bg-[#103552] text-white rounded-xl text-sm font-bold hover:bg-[#103552] transition-all active:scale-95"
                                 >
                                     Coba Lagi
                                 </button>
@@ -236,7 +236,7 @@ export function PendingLocations({ onBack }: { onBack: () => void }) {
                                                     <button onClick={() => setApprovingId(item.id)} className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all active:scale-90" title="Approve">
                                                         <Check className="w-4 h-4" />
                                                     </button>
-                                                    <button onClick={() => setEditingId(item.id)} className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90" title="Edit">
+                                                    <button onClick={() => setEditingId(item.id)} className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90" title="Edit">
                                                         <Edit2 className="w-4 h-4" />
                                                     </button>
                                                     <button onClick={() => setDeletingId(item.id)} className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90" title="Delete">

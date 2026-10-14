@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import {
   Bell,
@@ -244,7 +244,7 @@ export function NotificationsPage({ onNavigate, onRefreshCount }: NotificationsP
             onClick={handleMarkAllAsRead}
             className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
           >
-            <CheckCheck className="w-4 h-4 text-indigo-600" />
+            <CheckCheck className="w-4 h-4 text-[#103552]" />
             Mark all as read
           </button>
           <button 
@@ -279,14 +279,14 @@ export function NotificationsPage({ onNavigate, onRefreshCount }: NotificationsP
           <input
             type="text"
             placeholder="Search notifications..."
-            className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+            className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
           />
         </div>
       </div>
 
       {loading ? (
         <div className="flex justify-center items-center py-20">
-          <div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin"></div>
+          <div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin"></div>
         </div>
       ) : (
         <div className="space-y-4">
@@ -300,12 +300,12 @@ export function NotificationsPage({ onNavigate, onRefreshCount }: NotificationsP
                 transition={{ delay: index * 0.05 }}
                 className={cn(
                   "group relative bg-white p-6 rounded-[2rem] border transition-all hover:shadow-2xl hover:shadow-slate-200/50 flex items-start gap-6",
-                  notification.unread ? "border-indigo-100 bg-indigo-50/10" : "border-slate-100"
+                  notification.unread ? "border-[#96D1C6]/30 bg-[#96D1C6]/20/10" : "border-slate-100"
                 )}
               >
                 {/* Unread Indicator */}
                 {notification.unread && (
-                  <div className="absolute top-8 left-3 w-2 h-2 bg-indigo-600 rounded-full shadow-[0_0_10px_rgba(79,70,229,0.5)]"></div>
+                  <div className="absolute top-8 left-3 w-2 h-2 bg-[#103552] rounded-full shadow-[0_0_10px_rgba(79,70,229,0.5)]"></div>
                 )}
 
                 {/* Icon/Avatar */}
@@ -359,7 +359,7 @@ export function NotificationsPage({ onNavigate, onRefreshCount }: NotificationsP
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleViewDetail(notification)}
-                        className="px-6 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-indigo-100 transition-all active:scale-95"
+                        className="px-6 py-2 bg-[#96D1C6]/20 text-[#103552] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#96D1C6]/30 transition-all active:scale-95"
                       >
                         Lihat Detail
                       </button>
@@ -385,7 +385,7 @@ export function NotificationsPage({ onNavigate, onRefreshCount }: NotificationsP
 
       {/* Load More */}
       <div className="flex justify-center pt-4">
-        <button className="px-8 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-black text-slate-500 hover:text-indigo-600 hover:border-indigo-100 transition-all active:scale-95 shadow-lg shadow-slate-200/20">
+        <button className="px-8 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-black text-slate-500 hover:text-[#103552] hover:border-[#96D1C6]/30 transition-all active:scale-95 shadow-lg shadow-slate-200/20">
           Load Older Notifications
         </button>
       </div>
@@ -400,7 +400,7 @@ function TabButton({ label, active, onClick, count }: { label: string, active: b
       className={cn(
         "px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-all rounded-xl flex items-center gap-2",
         active
-          ? "bg-white text-indigo-600 shadow-sm"
+          ? "bg-white text-[#103552] shadow-sm"
           : "text-slate-500 hover:text-slate-900"
       )}
     >
@@ -408,7 +408,7 @@ function TabButton({ label, active, onClick, count }: { label: string, active: b
       {count !== undefined && (
         <span className={cn(
           "px-1.5 py-0.5 rounded-md text-[10px]",
-          active ? "bg-indigo-50 text-indigo-600" : "bg-slate-200 text-slate-500"
+          active ? "bg-[#96D1C6]/20 text-[#103552]" : "bg-slate-200 text-slate-500"
         )}>
           {count}
         </span>
@@ -430,7 +430,7 @@ function getIcon(type: Notification['type'], className = 'w-3 h-3') {
 function getIconBg(type: Notification['type']) {
   switch (type) {
     case 'request': return 'bg-emerald-500';
-    case 'mention': return 'bg-indigo-500';
+    case 'mention': return 'bg-[#103552]';
     case 'system': return 'bg-amber-500';
     case 'alert': return 'bg-rose-500';
     default: return 'bg-slate-500';

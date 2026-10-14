@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Clock, Search, Plus, Edit2, Trash2,
@@ -130,7 +130,7 @@ function ShiftModal({
           onChange={e => set(field, e.target.value)}
           className={cn(
             'w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-4 transition-all',
-            errors[field] ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-50' : 'border-slate-200 focus:border-indigo-400 focus:ring-indigo-50'
+            errors[field] ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-50' : 'border-slate-200 focus:border-[#103552]/60 focus:ring-[#96D1C6]/20'
           )}
         />
       </div>
@@ -156,8 +156,8 @@ function ShiftModal({
         {/* Header */}
         <div className="px-6 pt-6 pb-5 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
-              <Clock className="w-4 h-4 text-indigo-600" />
+            <div className="w-9 h-9 rounded-xl bg-[#96D1C6]/20 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-[#103552]" />
             </div>
             <div>
               <p className="text-sm font-bold text-slate-900">{isEdit ? 'Edit Shift' : 'Tambah Shift'}</p>
@@ -181,7 +181,7 @@ function ShiftModal({
               placeholder="contoh: Pagi, Siang, Malam..."
               className={cn(
                 'w-full px-4 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 transition-all',
-                errors.nama_shift ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-50' : 'border-slate-200 focus:border-indigo-400 focus:ring-indigo-50'
+                errors.nama_shift ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-50' : 'border-slate-200 focus:border-[#103552]/60 focus:ring-[#96D1C6]/20'
               )}
             />
             {errors.nama_shift && <p className="text-[11px] text-rose-500 font-medium">{errors.nama_shift}</p>}
@@ -213,7 +213,7 @@ function ShiftModal({
             Batal
           </button>
           <button onClick={handleSubmit} disabled={loading}
-            className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-indigo-200">
+            className="flex-1 py-2.5 bg-[#103552] hover:bg-[#103552] text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-2 shadow-md shadow-[#96D1C6]/50">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {loading ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Tambah Shift'}
           </button>
@@ -338,7 +338,7 @@ export function ShiftPage() {
           </div>
           <button
             onClick={() => setAddOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#103552] hover:bg-[#103552] text-white text-sm font-semibold rounded-xl shadow-lg shadow-[#96D1C6]/50 transition-all active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" /> Tambah Shift
           </button>
@@ -353,7 +353,7 @@ export function ShiftPage() {
               <input
                 type="text" value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Cari nama shift..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#103552]/60 focus:ring-4 focus:ring-[#96D1C6]/20 transition-all"
               />
               {search && (
                 <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -362,7 +362,7 @@ export function ShiftPage() {
               )}
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={fetchShifts} className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all">
+              <button onClick={fetchShifts} className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-[#103552] hover:border-[#96D1C6]/50 transition-all">
                 <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
               </button>
               <span className="text-xs text-slate-400 font-medium">
@@ -377,7 +377,7 @@ export function ShiftPage() {
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
                 <AlertCircle className="w-8 h-8 text-rose-400" />
                 <p className="text-sm font-semibold text-slate-600">{error}</p>
-                <button onClick={fetchShifts} className="text-indigo-600 text-sm font-semibold hover:underline">Coba lagi</button>
+                <button onClick={fetchShifts} className="text-[#103552] text-sm font-semibold hover:underline">Coba lagi</button>
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center py-20 gap-3 text-slate-400">
@@ -416,8 +416,8 @@ export function ShiftPage() {
 
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                            <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                          <div className="w-8 h-8 rounded-xl bg-[#96D1C6]/20 flex items-center justify-center shrink-0">
+                            <Clock className="w-3.5 h-3.5 text-[#185B5A]" />
                           </div>
                           <span className="text-sm font-semibold text-slate-800 capitalize">{shift.nama_shift}</span>
                         </div>
@@ -451,7 +451,7 @@ export function ShiftPage() {
                         <div className="flex items-center justify-end gap-1  transition-opacity">
                           <button
                             onClick={() => setEditShift(shift)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/20 transition-all"
                             title="Edit"
                           >
                             <Edit2 className="w-4 h-4" />

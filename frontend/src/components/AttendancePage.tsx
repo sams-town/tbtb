@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import * as XLSX from 'xlsx';
 import { Clock, Search, Download, MapPin, User, Calendar, ArrowUpRight, ArrowDownLeft, ExternalLink, Loader2, X } from 'lucide-react';
@@ -178,7 +178,7 @@ export function AttendancePage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                            {loading ? <tr><td colSpan={7} className="py-20 text-center"><Loader2 className="animate-spin inline text-indigo-600" /></td></tr> : (
+                            {loading ? <tr><td colSpan={7} className="py-20 text-center"><Loader2 className="animate-spin inline text-[#103552]" /></td></tr> : (
                                 logs.length === 0 ? <tr><td colSpan={7} className="py-20 text-center text-slate-400 font-medium">Tidak ada data absensi ditemukan</td></tr> : logs.map((l: any, i) => (
                                     <tr key={l.id} className="group hover:bg-slate-50/60 transition-colors">
                                         <td className="py-4 px-6 text-xs font-semibold text-slate-300 group-hover:text-slate-500 transition-colors">
@@ -186,7 +186,7 @@ export function AttendancePage() {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="size-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center overflow-hidden shadow-sm">
+                                                <div className="size-8 rounded-full bg-[#96D1C6]/20 border border-[#96D1C6]/30 flex items-center justify-center overflow-hidden shadow-sm">
                                                     {l.photoUser ? <img src={fmtPhoto(l.photoUser)} className="size-full object-cover" /> : <User size={14} className="text-slate-400"/>}
                                                 </div>
                                                 <div>
@@ -223,7 +223,7 @@ export function AttendancePage() {
                                             </span>
                                         </td>
                                         <td className="py-4 px-6 text-right">
-                                            <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                                            <button className="p-2 text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/20 rounded-lg transition-all">
                                                 <ExternalLink size={14}/>
                                             </button>
                                         </td>

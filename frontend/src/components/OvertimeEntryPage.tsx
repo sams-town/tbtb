@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MapPin, Camera, Clock, X, Loader2, ScanFace, CheckCircle2 } from 'lucide-react';
 import { useToast } from './Toast';
@@ -164,7 +164,7 @@ export function OvertimeEntryPage() {
         {/* Time Display */}
         <div className="flex gap-2">
           {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).split(':').map((unit, i) => (
-            <div key={i} className="w-12 h-10 bg-indigo-500 text-white rounded-lg flex items-center justify-center font-black text-lg shadow-lg shadow-indigo-500/20">
+            <div key={i} className="w-12 h-10 bg-[#103552] text-white rounded-lg flex items-center justify-center font-black text-lg shadow-lg shadow-[#103552]/20/20">
               {unit}
             </div>
           ))}
@@ -178,15 +178,15 @@ export function OvertimeEntryPage() {
           {lat ? 'Lokasi Tersimpan' : 'Lihat Lokasi Saya'}
         </button>
 
-        <div className="w-full max-w-md bg-white p-10 rounded-[40px] border border-slate-100 shadow-xl shadow-indigo-500/5 flex flex-col items-center space-y-6">
+        <div className="w-full max-w-md bg-white p-10 rounded-[40px] border border-slate-100 shadow-xl shadow-[#103552]/20/5 flex flex-col items-center space-y-6">
           <div
             onClick={() => setIsWebcamOpen(true)}
-            className="w-full aspect-video bg-slate-50 rounded-3xl flex items-center justify-center border-2 border-dashed border-slate-200 group cursor-pointer hover:border-indigo-300 transition-colors overflow-hidden"
+            className="w-full aspect-video bg-slate-50 rounded-3xl flex items-center justify-center border-2 border-dashed border-slate-200 group cursor-pointer hover:border-[#103552]/40 transition-colors overflow-hidden"
           >
             {foto ? (
               <img src={foto} className="w-full h-full object-cover" alt="Bukti" />
             ) : (
-              <div className="flex flex-col items-center gap-2 text-slate-400 group-hover:text-indigo-500 transition-colors">
+              <div className="flex flex-col items-center gap-2 text-slate-400 group-hover:text-[#185B5A] transition-colors">
                 <Camera className="w-10 h-10" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Ambil Foto Bukti</span>
               </div>
@@ -196,7 +196,7 @@ export function OvertimeEntryPage() {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-4 bg-[#103552] text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Masuk'}
           </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Clock, Users, Trash2, Search, Loader2, X,
@@ -66,8 +66,8 @@ function initials(name: string) {
 }
 
 const avatarGradients = [
-  'from-violet-500 to-purple-600',
-  'from-blue-500 to-indigo-600',
+  'from-[#185B5A] to-purple-600',
+  'from-blue-500 to-[#103552]',
   'from-sky-500 to-cyan-600',
   'from-emerald-500 to-teal-600',
   'from-amber-500 to-orange-600',
@@ -128,10 +128,10 @@ function getShiftTheme(jamMasuk: string): ShiftTheme {
       icon: Moon,
       label: 'Malam',
       accent: '#6366f1',
-      gradient: 'from-indigo-500 to-violet-600',
-      lightBg: 'bg-indigo-50',
-      lightText: 'text-indigo-700',
-      lightRing: 'ring-indigo-200/60',
+      gradient: 'from-[#185B5A] to-[#185B5A]',
+      lightBg: 'bg-[#96D1C6]/20',
+      lightText: 'text-[#103552]',
+      lightRing: 'ring-[#96D1C6]/50/60',
     };
   }
 }
@@ -384,8 +384,8 @@ export function ShiftEmployeesPage({ onBack }: ShiftEmployeesPageProps) {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 blur-lg opacity-30" />
-              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#185B5A] to-[#185B5A] blur-lg opacity-30" />
+              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-[#185B5A] to-[#185B5A] flex items-center justify-center shadow-lg">
                 <Clock className="w-6 h-6 text-white" />
               </div>
             </div>
@@ -397,7 +397,7 @@ export function ShiftEmployeesPage({ onBack }: ShiftEmployeesPageProps) {
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => generateMappingTemplate(shifts, allEmployees)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-xl text-[13px] font-semibold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm active:scale-[0.97]"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200/80 rounded-xl text-[13px] font-semibold text-slate-500 hover:text-[#103552] hover:border-[#96D1C6]/50 transition-all shadow-sm active:scale-[0.97]"
             >
               <Download className="w-3.5 h-3.5" /> Template
             </button>
@@ -425,9 +425,9 @@ export function ShiftEmployeesPage({ onBack }: ShiftEmployeesPageProps) {
         {/* ── Stats Row ── */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: 'Total Shift', value: shifts.length, icon: Clock, color: 'from-indigo-500 to-violet-600', lightBg: 'bg-indigo-50', lightIcon: 'text-indigo-500' },
+            { label: 'Total Shift', value: shifts.length, icon: Clock, color: 'from-[#185B5A] to-[#185B5A]', lightBg: 'bg-[#96D1C6]/20', lightIcon: 'text-[#185B5A]' },
             { label: 'Karyawan Aktif', value: totalEmployeesInShifts, icon: Users, color: 'from-emerald-500 to-teal-600', lightBg: 'bg-emerald-50', lightIcon: 'text-emerald-500' },
-            { label: 'Jadwal Terjadwal', value: mappings.length, icon: Calendar, color: 'from-violet-500 to-purple-600', lightBg: 'bg-violet-50', lightIcon: 'text-violet-500' },
+            { label: 'Jadwal Terjadwal', value: mappings.length, icon: Calendar, color: 'from-[#185B5A] to-purple-600', lightBg: 'bg-[#96D1C6]/20', lightIcon: 'text-[#185B5A]' },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -457,7 +457,7 @@ export function ShiftEmployeesPage({ onBack }: ShiftEmployeesPageProps) {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Cari shift berdasarkan nama..."
-            className="w-full pl-11 pr-10 py-3 bg-white border border-slate-200/80 rounded-2xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all shadow-sm"
+            className="w-full pl-11 pr-10 py-3 bg-white border border-slate-200/80 rounded-2xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#103552]/60 focus:ring-4 focus:ring-[#96D1C6]/20 transition-all shadow-sm"
           />
           {search && (
             <button onClick={() => setSearch('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
@@ -528,7 +528,7 @@ export function ShiftEmployeesPage({ onBack }: ShiftEmployeesPageProps) {
                       </div>
                       <button
                         onClick={() => { setSelectedShift(shift); setShowAddModal(true); }}
-                        className="p-2 rounded-xl bg-white text-slate-400 hover:text-indigo-600 ring-1 ring-slate-200 hover:ring-indigo-300 hover:bg-indigo-50 transition-all active:scale-90 shrink-0 shadow-sm"
+                        className="p-2 rounded-xl bg-white text-slate-400 hover:text-[#103552] ring-1 ring-slate-200 hover:ring-[#103552]/40 hover:bg-[#96D1C6]/20 transition-all active:scale-90 shrink-0 shadow-sm"
                         title="Tambah Karyawan"
                       >
                         <UserPlus className="w-4 h-4" />
@@ -555,7 +555,7 @@ export function ShiftEmployeesPage({ onBack }: ShiftEmployeesPageProps) {
                         <p className="text-[11px] text-slate-400 font-semibold">Belum ada karyawan terdaftar</p>
                         <button
                           onClick={() => { setSelectedShift(shift); setShowAddModal(true); }}
-                          className="mt-2 text-[11px] font-bold text-indigo-500 hover:text-indigo-700 transition-colors"
+                          className="mt-2 text-[11px] font-bold text-[#185B5A] hover:text-[#103552] transition-colors"
                         >
                           + Tambah sekarang
                         </button>
@@ -593,7 +593,7 @@ export function ShiftEmployeesPage({ onBack }: ShiftEmployeesPageProps) {
                                       <div className={cn(
                                         "flex items-center gap-0.5 px-1 py-[1px] rounded-[4px] text-[8px] font-black uppercase tracking-tighter",
                                         emp.assignment.lockLocation 
-                                          ? "bg-indigo-50 text-indigo-500 ring-1 ring-indigo-100" 
+                                          ? "bg-[#96D1C6]/20 text-[#185B5A] ring-1 ring-[#96D1C6]/30" 
                                           : "bg-slate-50 text-slate-400 ring-1 ring-slate-100"
                                       )}>
                                         {emp.assignment.lockLocation ? <Check className="w-2 h-2" /> : <X className="w-2 h-2" />}
@@ -801,7 +801,7 @@ function AddEmployeeToShiftModal({
                   type="date"
                   value={startDate}
                   onChange={e => setStartDate(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-400 transition-all font-mono shadow-sm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-[#96D1C6]/20 focus:border-[#103552]/60 transition-all font-mono shadow-sm"
                   required
                 />
               </div>
@@ -814,7 +814,7 @@ function AddEmployeeToShiftModal({
                   type="date"
                   value={endDate}
                   onChange={e => setEndDate(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-400 transition-all font-mono shadow-sm"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-[#96D1C6]/20 focus:border-[#103552]/60 transition-all font-mono shadow-sm"
                   required
                 />
               </div>
@@ -826,7 +826,7 @@ function AddEmployeeToShiftModal({
               id="lockLocationAdd"
               checked={lockLocation}
               onChange={e => setLockLocation(e.target.checked)}
-              className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              className="w-4 h-4 rounded border-slate-300 text-[#103552] focus:ring-[#103552]"
             />
             <label htmlFor="lockLocationAdd" className="text-xs font-bold text-slate-500 tracking-tight cursor-pointer">
               Lock Location
@@ -843,7 +843,7 @@ function AddEmployeeToShiftModal({
               value={employeeSearch}
               onChange={e => setEmployeeSearch(e.target.value)}
               placeholder="Cari karyawan..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#103552]/60 focus:ring-4 focus:ring-[#96D1C6]/20 transition-all"
             />
           </div>
           {selectedEmployees.length > 0 && (
@@ -869,7 +869,7 @@ function AddEmployeeToShiftModal({
                     ? "bg-slate-50 opacity-40 cursor-not-allowed"
                     : isSelected
                     ? "bg-emerald-50 border border-emerald-200 ring-2 ring-emerald-500/20"
-                    : "bg-white border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/30"
+                    : "bg-white border border-slate-100 hover:border-[#96D1C6]/50 hover:bg-[#96D1C6]/20/30"
                 )}
               >
                 <div className={cn("w-8 h-8 rounded-[10px] flex items-center justify-center text-white text-[10px] font-bold shrink-0 bg-gradient-to-br shadow-sm", avatarGradient(emp.id))}>
@@ -1119,7 +1119,7 @@ function ImportMappingModal({
                         <td className="px-4 py-4 font-mono text-xs text-slate-600">{r.tanggal_mulai}</td>
                         <td className="px-4 py-4 font-mono text-xs text-slate-600">{r.tanggal_akhir}</td>
                         <td className="px-4 py-4">
-                          <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-black", r.lock_location ? "bg-indigo-50 text-indigo-600" : "bg-slate-100 text-slate-400")}>
+                          <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-black", r.lock_location ? "bg-[#96D1C6]/20 text-[#103552]" : "bg-slate-100 text-slate-400")}>
                             {r.lock_location ? 'YES' : 'NO'}
                           </span>
                         </td>

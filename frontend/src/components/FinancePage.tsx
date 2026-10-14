@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import { DollarSign, TrendingUp, TrendingDown, Target, PieChart, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
@@ -24,12 +24,12 @@ export function FinancePage() {
         <h1 className="text-3xl font-black text-slate-800 tracking-tight">Keuangan & Target</h1>
         <div className="flex gap-4">
           <button className="px-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">Download Report</button>
-          <button className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95">Set New Target</button>
+          <button className="px-6 py-3 bg-[#103552] text-white rounded-2xl font-bold shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95">Set New Target</button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <FinanceStatCard label="Monthly Revenue" value="Rp 124.5M" trend="+12.5%" isUp icon={DollarSign} color="text-indigo-600" bg="bg-indigo-50" />
+        <FinanceStatCard label="Monthly Revenue" value="Rp 124.5M" trend="+12.5%" isUp icon={DollarSign} color="text-[#103552]" bg="bg-[#96D1C6]/20" />
         <FinanceStatCard label="Expenses" value="Rp 42.8M" trend="-2.4%" isUp={false} icon={TrendingDown} color="text-rose-600" bg="bg-rose-50" />
         <FinanceStatCard label="Net Profit" value="Rp 81.7M" trend="+18.2%" isUp icon={TrendingUp} color="text-emerald-600" bg="bg-emerald-50" />
         <FinanceStatCard label="Target Progress" value="84%" trend="On Track" isUp icon={Target} color="text-amber-600" bg="bg-amber-50" />
@@ -72,12 +72,12 @@ export function FinancePage() {
         <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-black text-slate-800 tracking-tight">Department Budget</h3>
-            <button className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+            <button className="p-2 bg-slate-50 text-slate-400 rounded-xl hover:bg-[#96D1C6]/20 hover:text-[#103552] transition-all">
               <PieChart className="w-5 h-5" />
             </button>
           </div>
           <div className="space-y-6">
-            <BudgetProgress label="IT & Engineering" current={45000000} total={60000000} color="bg-indigo-500" />
+            <BudgetProgress label="IT & Engineering" current={45000000} total={60000000} color="bg-[#103552]" />
             <BudgetProgress label="Marketing" current={28000000} total={35000000} color="bg-emerald-500" />
             <BudgetProgress label="Human Resources" current={12000000} total={15000000} color="bg-amber-500" />
             <BudgetProgress label="Operations" current={35000000} total={40000000} color="bg-rose-500" />

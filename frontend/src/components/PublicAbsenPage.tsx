@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -267,11 +267,11 @@ export function PublicAbsenPage({ mode, settings }: PublicAbsenPageProps) {
               </div>
 
               {/* Camera viewfinder */}
-              <div className="relative bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-indigo-500/10 border-4 border-white" style={{ aspectRatio: '3/4' }}>
+              <div className="relative bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#103552]/20/10 border-4 border-white" style={{ aspectRatio: '3/4' }}>
                 {/* Loading */}
                 {!camReady && !camError && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                    <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-[#96D1C6] animate-spin" />
                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Akses Kamera...</p>
                   </div>
                 )}
@@ -337,11 +337,11 @@ export function PublicAbsenPage({ mode, settings }: PublicAbsenPageProps) {
                   {submitting && (
                     <motion.div
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="absolute inset-0 bg-indigo-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 text-white"
+                      className="absolute inset-0 bg-[#0a2438]/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 text-white"
                     >
-                      <ShieldCheck className="w-10 h-10 text-indigo-300 animate-pulse mb-4" />
-                      <div className="w-10 h-10 border-4 border-indigo-200 border-t-white rounded-full animate-spin shadow-lg" />
-                      <p className="mt-4 text-xs font-black uppercase tracking-widest text-indigo-100 drop-shadow">Menganalisis Wajah...</p>
+                      <ShieldCheck className="w-10 h-10 text-[#96D1C6] animate-pulse mb-4" />
+                      <div className="w-10 h-10 border-4 border-[#96D1C6]/50 border-t-white rounded-full animate-spin shadow-lg" />
+                      <p className="mt-4 text-xs font-black uppercase tracking-widest text-[#96D1C6]/30 drop-shadow">Menganalisis Wajah...</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -452,11 +452,11 @@ export function PublicAbsenPage({ mode, settings }: PublicAbsenPageProps) {
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                   className="w-full max-w-sm bg-white p-5 rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/50 flex items-center gap-4 mt-2"
                 >
-                  <div className="w-14 h-14 bg-indigo-50 border border-indigo-100 rounded-2xl overflow-hidden shrink-0">
+                  <div className="w-14 h-14 bg-[#96D1C6]/20 border border-[#96D1C6]/30 rounded-2xl overflow-hidden shrink-0">
                     {resultData?.foto_karyawan ? (
                       <img src={resultData.foto_karyawan.startsWith('http') ? resultData.foto_karyawan : `${API.replace('/api', '')}/uploads/${resultData.foto_karyawan}`} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <User className="w-6 h-6 m-auto mt-4 text-indigo-300" />
+                      <User className="w-6 h-6 m-auto mt-4 text-[#96D1C6]" />
                     )}
                   </div>
                   <div className="text-left flex-1 min-w-0">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Save, Calendar, User, Clock, FileText, Loader2, Download } from 'lucide-react';
 import { useToast } from './Toast';
@@ -136,7 +136,7 @@ export function AddOvertime({ onBack }: AddOvertimeProps) {
                         <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                             <select 
-                                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
+                                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all appearance-none cursor-pointer"
                                 value={formData.user_id}
                                 onChange={e => setFormData({...formData, user_id: e.target.value})}
                                 required
@@ -154,7 +154,7 @@ export function AddOvertime({ onBack }: AddOvertimeProps) {
                                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                 <input 
                                     type="date" 
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-[#103552]/10 transition-all"
                                     value={formData.tanggal}
                                     onChange={e => setFormData({...formData, tanggal: e.target.value})}
                                 />
@@ -166,7 +166,7 @@ export function AddOvertime({ onBack }: AddOvertimeProps) {
                                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                 <input 
                                     type="time" 
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-[#103552]/10 transition-all"
                                     value={formData.jam_mulai}
                                     onChange={e => setFormData({...formData, jam_mulai: e.target.value})}
                                 />
@@ -178,7 +178,7 @@ export function AddOvertime({ onBack }: AddOvertimeProps) {
                                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                                 <input 
                                     type="time" 
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-[#103552]/10 transition-all"
                                     value={formData.jam_selesai}
                                     onChange={e => setFormData({...formData, jam_selesai: e.target.value})}
                                 />
@@ -192,7 +192,7 @@ export function AddOvertime({ onBack }: AddOvertimeProps) {
                             <FileText className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
                             <textarea 
                                 rows={3}
-                                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none"
+                                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-[#103552]/10 transition-all resize-none"
                                 placeholder="Tulis alasan disini..."
                                 value={formData.alasan}
                                 onChange={e => setFormData({...formData, alasan: e.target.value})}
@@ -202,7 +202,7 @@ export function AddOvertime({ onBack }: AddOvertimeProps) {
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
                         <button type="button" onClick={onBack} className="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all">Batal</button>
-                        <button type="submit" disabled={loading} className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all flex items-center gap-2">
+                        <button type="submit" disabled={loading} className="px-10 py-4 bg-[#103552] text-white rounded-2xl font-black shadow-xl shadow-[#103552]/20 hover:bg-[#103552] transition-all flex items-center gap-2">
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                             Simpan Pengajuan
                         </button>

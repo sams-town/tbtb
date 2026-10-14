@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Plus, Edit, Trash2, ChevronDown, Save, X, Activity } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -174,7 +174,7 @@ export function PenugasanKerjaPage() {
         <h1 className="text-2xl font-black text-slate-800 tracking-tight">Penugasan Kerja</h1>
         <button
           onClick={() => setIsAdding(true)}
-          className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2 text-sm"
+          className="px-6 py-2.5 bg-[#103552] text-white rounded-xl font-bold shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 flex items-center gap-2 text-sm"
         >
           <Plus className="w-4 h-4" />
           Tambah Penugasan
@@ -190,14 +190,14 @@ export function PenugasanKerjaPage() {
               placeholder="Tanggal Mulai"
               onFocus={(e) => e.target.type = 'date'}
               onBlur={(e) => e.target.type = 'text'}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all w-64"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all w-64"
             />
             <input
               type="text"
               placeholder="Tanggal Akhir"
               onFocus={(e) => e.target.type = 'date'}
               onBlur={(e) => e.target.type = 'text'}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all w-64"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all w-64"
             />
           </div>
 
@@ -223,7 +223,7 @@ export function PenugasanKerjaPage() {
                 <tr>
                   <td colSpan={9} className="py-20 text-center">
                     <div className="flex justify-center items-center">
-                      <div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin"></div>
+                      <div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin"></div>
                     </div>
                   </td>
                 </tr>
@@ -236,7 +236,7 @@ export function PenugasanKerjaPage() {
               ) : data.map((row, idx) => (
                 <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="py-4 px-8 text-xs font-bold text-slate-600">{idx + 1}</td>
-                  <td className="py-4 px-8 text-xs font-black text-indigo-600">{row.nomor_penugasan || '-'}</td>
+                  <td className="py-4 px-8 text-xs font-black text-[#103552]">{row.nomor_penugasan || '-'}</td>
                   <td className="py-4 px-8 text-xs font-bold text-slate-600">{row.tanggal ? new Date(row.tanggal).toLocaleDateString('id-ID') : '-'}</td>
                   <td className="py-4 px-8 text-xs font-bold text-slate-900">{row.users?.name || 'Unknown'}</td>
                   <td className="py-4 px-8 text-xs font-bold text-slate-700">{row.judul}</td>
@@ -244,7 +244,7 @@ export function PenugasanKerjaPage() {
                   <td className="py-4 px-8">
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden w-24">
-                        <div className={cn("h-full transition-all duration-500", parseInt(row.progress) === 100 ? 'bg-emerald-500' : 'bg-indigo-500')} style={{ width: `${row.progress || 0}%` }}></div>
+                        <div className={cn("h-full transition-all duration-500", parseInt(row.progress) === 100 ? 'bg-emerald-500' : 'bg-[#103552]')} style={{ width: `${row.progress || 0}%` }}></div>
                       </div>
                       <span className="text-[10px] font-black text-slate-600">{row.progress || '0'}%</span>
                     </div>
@@ -252,7 +252,7 @@ export function PenugasanKerjaPage() {
                   <td className="py-4 px-8">
                     <span className={cn(
                       "px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest whitespace-nowrap",
-                      row.status === 'Completed' || parseInt(row.progress) === 100 ? "bg-emerald-50 text-emerald-600" : "bg-indigo-50 text-indigo-600"
+                      row.status === 'Completed' || parseInt(row.progress) === 100 ? "bg-emerald-50 text-emerald-600" : "bg-[#96D1C6]/20 text-[#103552]"
                     )}>
                       {parseInt(row.progress) === 100 ? 'Completed' : (row.status || 'In Progress')}
                     </span>
@@ -277,7 +277,7 @@ export function PenugasanKerjaPage() {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="w-full max-w-2xl bg-white rounded-[24px] shadow-2xl overflow-hidden my-auto">
               <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-[#96D1C6]/30 text-[#103552] flex items-center justify-center">
                     <Activity className="w-5 h-5" />
                   </div>
                   <h3 className="text-xl font-black text-slate-800 tracking-tight">Tambah Penugasan Baru</h3>
@@ -289,7 +289,7 @@ export function PenugasanKerjaPage() {
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Karyawan</label>
                     <div className="relative">
-                      <select name="user_id" value={formData.user_id} onChange={handleInputChange} required className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer">
+                      <select name="user_id" value={formData.user_id} onChange={handleInputChange} required className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer">
                         <option value="" disabled>-- Pilih Karyawan --</option>
                         {employees.map(emp => (
                           <option key={emp.id} value={emp.id}>{emp.name}</option>
@@ -300,24 +300,24 @@ export function PenugasanKerjaPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Nomor Penugasan</label>
-                    <input type="text" name="nomor_penugasan" value={formData.nomor_penugasan} onChange={handleInputChange} placeholder="Contoh: PK-2026-003" className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" />
+                    <input type="text" name="nomor_penugasan" value={formData.nomor_penugasan} onChange={handleInputChange} placeholder="Contoh: PK-2026-003" className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tanggal</label>
-                    <input type="date" name="tanggal" value={formData.tanggal} onChange={handleInputChange} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700" />
+                    <input type="date" name="tanggal" value={formData.tanggal} onChange={handleInputChange} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] text-slate-700" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Judul Tugas</label>
-                    <input type="text" name="judul" value={formData.judul} onChange={handleInputChange} required className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" />
+                    <input type="text" name="judul" value={formData.judul} onChange={handleInputChange} required className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" />
                   </div>
                   <div className="col-span-2 space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Rincian / Deskripsi</label>
-                    <textarea name="rincian" value={formData.rincian} onChange={handleInputChange} required rows={4} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 resize-none" />
+                    <textarea name="rincian" value={formData.rincian} onChange={handleInputChange} required rows={4} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] resize-none" />
                   </div>
                 </div>
                 <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
                   <button type="button" onClick={() => setIsAdding(false)} className="px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm">Batal</button>
-                  <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm disabled:opacity-70 flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+                  <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-[#103552] text-white font-bold rounded-xl hover:bg-[#103552] transition-all text-sm disabled:opacity-70 flex items-center gap-2 shadow-lg shadow-[#103552]/20">
                     <Save className="w-4 h-4" />
                     {isSubmitting ? 'Menyimpan...' : 'Simpan Data'}
                   </button>
@@ -342,7 +342,7 @@ export function PenugasanKerjaPage() {
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Karyawan</label>
                     <div className="relative">
-                      <select name="user_id" value={editData.user_id || ''} onChange={handleEditChange} required className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer">
+                      <select name="user_id" value={editData.user_id || ''} onChange={handleEditChange} required className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer">
                         <option value="" disabled>-- Pilih Karyawan --</option>
                         {employees.map(emp => (
                           <option key={emp.id} value={emp.id}>{emp.name}</option>
@@ -353,19 +353,19 @@ export function PenugasanKerjaPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Nomor Penugasan</label>
-                    <input type="text" name="nomor_penugasan" value={editData.nomor_penugasan || ''} onChange={handleEditChange} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" />
+                    <input type="text" name="nomor_penugasan" value={editData.nomor_penugasan || ''} onChange={handleEditChange} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Progress (%)</label>
                     <div className="relative">
-                      <input type="number" min="0" max="100" name="progress" value={editData.progress || '0'} onChange={handleEditChange} className="w-full border border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm font-black text-indigo-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" />
+                      <input type="number" min="0" max="100" name="progress" value={editData.progress || '0'} onChange={handleEditChange} className="w-full border border-slate-200 rounded-xl px-4 py-3 pr-10 text-sm font-black text-[#103552] outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Status Tugas</label>
                     <div className="relative">
-                      <select name="status" value={editData.status || 'In Progress'} onChange={handleEditChange} className="w-full appearance-none border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer">
+                      <select name="status" value={editData.status || 'In Progress'} onChange={handleEditChange} className="w-full appearance-none border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer">
                         <option value="In Progress">In Progress</option>
                         <option value="Completed">Completed</option>
                         <option value="Pending">Pending</option>
@@ -376,11 +376,11 @@ export function PenugasanKerjaPage() {
                   </div>
                   <div className="col-span-2 space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Judul Tugas</label>
-                    <input type="text" name="judul" value={editData.judul || ''} onChange={handleEditChange} required className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500" />
+                    <input type="text" name="judul" value={editData.judul || ''} onChange={handleEditChange} required className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]" />
                   </div>
                   <div className="col-span-2 space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Rincian / Deskripsi</label>
-                    <textarea name="rincian" value={editData.rincian || ''} onChange={handleEditChange} required rows={3} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 resize-none" />
+                    <textarea name="rincian" value={editData.rincian || ''} onChange={handleEditChange} required rows={3} className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] resize-none" />
                   </div>
                 </div>
                 <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     ArrowLeft, Save, X, Camera, User, Mail, Phone, MapPin,
@@ -364,12 +364,12 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto pb-20 space-y-6">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3"><button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-xl border bg-white shadow-sm"><ArrowLeft size={16}/></button><div><h1 className="text-xl font-bold">Edit Pegawai</h1><p className="text-sm text-slate-400">{form.name}</p></div></div>
-                    <div className="flex gap-2"><button onClick={onBack} className="px-4 py-2 bg-white border rounded-xl font-semibold"><X size={16}/></button><button onClick={handleSubmit} disabled={loading} className="px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold flex items-center gap-2">{loading ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>} Simpan</button></div>
+                    <div className="flex gap-2"><button onClick={onBack} className="px-4 py-2 bg-white border rounded-xl font-semibold"><X size={16}/></button><button onClick={handleSubmit} disabled={loading} className="px-5 py-2 bg-[#103552] text-white rounded-xl font-bold flex items-center gap-2">{loading ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>} Simpan</button></div>
                 </div>
 
                 <div className="bg-white rounded-2xl border p-1.5 flex flex-wrap gap-1">
                     {sections.map(({ label, icon: Icon }, i) => (
-                        <button key={i} onClick={() => setActiveSection(i)} className={cn("flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all", activeSection === i ? "bg-indigo-600 text-white" : "text-slate-500 hover:bg-slate-50")}>
+                        <button key={i} onClick={() => setActiveSection(i)} className={cn("flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all", activeSection === i ? "bg-[#103552] text-white" : "text-slate-500 hover:bg-slate-50")}>
                             <Icon size={14}/> {label}
                         </button>
                     ))}
@@ -379,7 +379,7 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
                     <motion.div key={activeSection} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
                         {activeSection === 0 && <>
                             <Card>
-                                <SectionTitle icon={Camera} title="Foto" color="text-violet-600" bg="bg-violet-50" />
+                                <SectionTitle icon={Camera} title="Foto" color="text-[#185B5A]" bg="bg-[#96D1C6]/20" />
                                 <div className="flex gap-6 items-center">
                                     <div className="relative size-24 border-2 border-dashed rounded-2xl flex items-center justify-center overflow-hidden">
                                         {currentP ? <img src={currentP} className="size-full object-cover" /> : <ImageIcon className="text-slate-200" />}
@@ -491,7 +491,7 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
                                             rows={3} 
                                             value={form.alamat || ''} 
                                             onChange={e => setForm(p=>({...p, alamat: e.target.value}))} 
-                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-indigo-400 text-sm font-bold text-slate-700" 
+                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-[#103552]/60 text-sm font-bold text-slate-700" 
                                             placeholder="Alamat akan terisi otomatis..."
                                         />
                                     </div>
@@ -582,7 +582,7 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
                                             rows={3} 
                                             value={form.alamat_domisili || ''} 
                                             onChange={e => setForm(p=>({...p, alamat_domisili: e.target.value}))} 
-                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-indigo-400 text-sm font-bold text-slate-700" 
+                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-[#103552]/60 text-sm font-bold text-slate-700" 
                                             placeholder="Alamat akan terisi otomatis..."
                                         />
                                     </div>
@@ -614,7 +614,7 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
                                             <div className="flex justify-between items-center">
                                                 <span className="text-sm font-semibold text-slate-700">{docName}</span>
                                                 <div className="flex gap-2">
-                                                    {docFile && <a href={fileUrl} target="_blank" className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100"><ExternalLink size={16}/></a>}
+                                                    {docFile && <a href={fileUrl} target="_blank" className="p-2 bg-[#96D1C6]/20 text-[#103552] rounded-lg hover:bg-[#96D1C6]/30"><ExternalLink size={16}/></a>}
                                                     <button onClick={async () => { if (confirm('Hapus?')) { await fetch(`${BASE_URL}/documents/${d.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setExistingDocs(existingDocs.filter(x => x.id !== d.id)); } }} className="p-2 bg-rose-50 text-rose-500 rounded-lg hover:bg-rose-100"><Trash2 size={16}/></button>
                                                 </div>
                                             </div>
@@ -622,7 +622,7 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
                                         </div>
                                     );
                                 })}
-                                <button onClick={() => setDocs([...docs, { id: Math.random().toString(), nama_dokumen: '', file: null }])} className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-bold w-max hover:bg-indigo-100 transition-colors">+ Tambah Baru</button>
+                                <button onClick={() => setDocs([...docs, { id: Math.random().toString(), nama_dokumen: '', file: null }])} className="px-4 py-2 bg-[#96D1C6]/20 text-[#103552] rounded-xl text-xs font-bold w-max hover:bg-[#96D1C6]/30 transition-colors">+ Tambah Baru</button>
                                 {docs.map(doc => {
                                     const isImage = doc.file?.type.startsWith('image/');
                                     const previewUrl = doc.file && isImage ? URL.createObjectURL(doc.file) : null;
@@ -631,7 +631,7 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
                                             <div className="flex gap-4 items-start">
                                                 <div className="flex-1 space-y-3">
                                                     <FormInput value={doc.nama_dokumen} onChange={(_:any,v:string)=>setDocs(docs.map(x=>x.id===doc.id?{...x,nama_dokumen:v}:x))} placeholder="Nama File (KTP, SIM, dll)" />
-                                                    <input type="file" onChange={e=>setDocs(docs.map(x=>x.id===doc.id?{...x,file:e.target.files?.[0]||null}:x))} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 cursor-pointer" />
+                                                    <input type="file" onChange={e=>setDocs(docs.map(x=>x.id===doc.id?{...x,file:e.target.files?.[0]||null}:x))} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#96D1C6]/20 file:text-[#103552] cursor-pointer" />
                                                 </div>
                                                 <button onClick={()=>setDocs(docs.filter(x=>x.id!==doc.id))} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 size={20}/></button>
                                             </div>
@@ -690,7 +690,7 @@ export function EditEmployeeForm({ employeeId, onBack, onSuccess }: EditEmployee
 
                 <div className="flex justify-between p-4 bg-white border rounded-2xl shadow-sm">
                     <button onClick={() => setActiveSection(Math.max(0, activeSection - 1))} className="p-2 border rounded-xl"><ChevronLeft/></button>
-                    <div className="flex gap-1.5 items-center">{sections.map((_, i) => <div key={i} className={cn("h-1.5 rounded-full transition-all", activeSection === i ? "w-6 bg-indigo-600" : "w-1.5 bg-slate-200")} />)}</div>
+                    <div className="flex gap-1.5 items-center">{sections.map((_, i) => <div key={i} className={cn("h-1.5 rounded-full transition-all", activeSection === i ? "w-6 bg-[#103552]" : "w-1.5 bg-slate-200")} />)}</div>
                     <button onClick={() => setActiveSection(Math.min(sections.length - 1, activeSection + 1))} className="p-2 border rounded-xl"><ChevronRight/></button>
                 </div>
             </motion.div>

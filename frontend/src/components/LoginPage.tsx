@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -85,7 +85,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
   ];
 
   return (
-    <div className="min-h-screen w-full flex bg-[#F8FAFC] relative overflow-hidden">
+    <div className="min-h-screen w-full flex bg-[#F0F0F0] relative overflow-hidden">
 
       {/* ─── Background blobs removed ─── */}
 
@@ -111,12 +111,12 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
               {settings?.logo ? (
                  <img src={getFileUrl(settings.logo)} alt="Logo" className="w-9 h-9 sm:w-10 sm:h-10 object-contain" />
               ) : (
-                <Briefcase className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-600" />
+                <Briefcase className="w-6 h-6 sm:w-7 sm:h-7 text-[#103552]" />
               )}
             </div>
             <div>
               <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 block leading-none">{settings?.name || 'MeAndPay'}</span>
-              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-500">{settings?.name ? 'HRIS Platform' : 'HRIS Platform'}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-[#E09132]">{settings?.name ? 'HRIS Platform' : 'HRIS Platform'}</span>
             </div>
           </div>
 
@@ -152,7 +152,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
             <div className="space-y-2">
               <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Username</label>
               <div className="relative group">
-                <User className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors pointer-events-none" />
+                <User className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-focus-within:text-[#103552] transition-colors pointer-events-none" />
                 <input
                   type="text"
                   required
@@ -160,7 +160,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Masukkan username"
-                  className="w-full pl-11 sm:pl-14 pr-5 py-4 sm:py-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-slate-900 font-semibold text-sm sm:text-base placeholder:text-slate-300"
+                  className="w-full pl-11 sm:pl-14 pr-5 py-4 sm:py-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all text-slate-900 font-semibold text-sm sm:text-base placeholder:text-slate-300"
                 />
               </div>
             </div>
@@ -169,7 +169,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
             <div className="space-y-2">
               <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Password</label>
               <div className="relative group">
-                <Lock className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors pointer-events-none" />
+                <Lock className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-focus-within:text-[#103552] transition-colors pointer-events-none" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
@@ -177,7 +177,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 sm:pl-14 pr-12 sm:pr-14 py-4 sm:py-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-slate-900 font-semibold text-sm sm:text-base placeholder:text-slate-300"
+                  className="w-full pl-11 sm:pl-14 pr-12 sm:pr-14 py-4 sm:py-5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all text-slate-900 font-semibold text-sm sm:text-base placeholder:text-slate-300"
                 />
                 <button
                   type="button"
@@ -194,7 +194,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
               type="submit"
               disabled={isLoading}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 sm:py-5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all disabled:opacity-60 group shadow-xl shadow-slate-900/10 mt-2"
+              className="w-full py-4 sm:py-5 bg-[#103552] hover:bg-[#0D4156] text-white rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all disabled:opacity-60 group shadow-xl shadow-[#103552]/20 mt-2"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -214,7 +214,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
                 <div className="w-full border-t border-slate-100" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-[#F8FAFC] px-4 text-[11px] font-black uppercase tracking-widest text-slate-300">
+                <span className="bg-[#F0F0F0] px-4 text-[11px] font-black uppercase tracking-widest text-slate-300">
                   Akses Langsung
                 </span>
               </div>
@@ -266,13 +266,13 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="hidden lg:flex flex-1 bg-slate-900 flex-col justify-center p-16 relative overflow-hidden"
+          className="hidden lg:flex flex-1 bg-[#103552] flex-col justify-center p-16 relative overflow-hidden"
         >
           {/* Abstract shapes */}
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute -top-20 -right-20 w-80 h-80 border-[40px] border-white/5 rounded-full" />
-            <div className="absolute bottom-1/4 -left-20 w-64 h-64 border-[20px] border-indigo-500/5 rounded-full" />
-            <div className="absolute bottom-0 right-0 w-full h-1/2 bg-gradient-to-t from-indigo-950/20 to-transparent" />
+            <div className="absolute bottom-1/4 -left-20 w-64 h-64 border-[20px] border-[#103552]/5 rounded-full" />
+            <div className="absolute bottom-0 right-0 w-full h-1/2 bg-gradient-to-t from-[#103552]/20 to-transparent" />
           </div>
 
           <div className="relative z-10">
@@ -281,17 +281,17 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35, duration: 0.5 }}
             >
-              <div className="inline-flex items-center gap-2 bg-slate-500/10 border border-slate-400/20 rounded-full px-4 py-1.5 mb-8">
-                <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">All-in-one HRIS</span>
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-8">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#96D1C6] animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#96D1C6]">All-in-one HRIS</span>
               </div>
 
               <h2 className="text-4xl xl:text-5xl font-black mb-6 leading-[1.1] tracking-tight text-white">
                 Kelola SDM <br />
-                <span className="text-slate-400">lebih efisien</span> <br />
+                <span className="text-[#96D1C6]">lebih efisien</span> <br />
                 dengan teknologi modern.
               </h2>
-              <p className="text-slate-400 text-base mb-12 max-w-sm font-medium leading-relaxed">
+              <p className="text-white/60 text-base mb-12 max-w-sm font-medium leading-relaxed">
                 Platform HRIS lengkap untuk absensi, payroll, manajemen cuti, dan laporan karyawan dalam satu tempat.
               </p>
             </motion.div>
@@ -304,14 +304,14 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + i * 0.1, duration: 0.4 }}
-                  className="flex items-center gap-4 p-4 bg-white/5 border border-white/8 rounded-2xl hover:bg-white/8 transition-all"
+                  className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all"
                 >
-                  <div className="w-10 h-10 bg-slate-500/20 rounded-xl flex items-center justify-center shrink-0">
-                    <Icon className="w-5 h-5 text-slate-400" />
+                  <div className="w-10 h-10 bg-[#E09132]/20 rounded-xl flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-[#E09132]" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-white">{label}</p>
-                    <p className="text-xs text-slate-500 font-medium">{desc}</p>
+                    <p className="text-xs text-white/50 font-medium">{desc}</p>
                   </div>
                 </motion.div>
               ))}

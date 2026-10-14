@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -334,7 +334,7 @@ export function MobileOvertimePage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24">
       {/* Header */}
-      <div className="bg-indigo-700 pt-12 pb-20 px-6 rounded-b-[3rem] relative shadow-xl shadow-indigo-500/20">
+      <div className="bg-[#103552] pt-12 pb-20 px-6 rounded-b-[3rem] relative shadow-xl shadow-[#103552]/20/20">
         <div className="flex items-center gap-4 relative z-10 text-white">
           <button onClick={() => navigate('/beranda')} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
             <ChevronLeft className="w-6 h-6" />
@@ -362,7 +362,7 @@ export function MobileOvertimePage() {
               onClick={() => handleTabChange('my')}
               className={cn(
                 "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                activeSubTab === 'my' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500"
+                activeSubTab === 'my' ? "bg-white text-[#103552] shadow-sm" : "text-slate-500"
               )}
             >
               Pengajuan Saya
@@ -371,7 +371,7 @@ export function MobileOvertimePage() {
               onClick={() => handleTabChange('approval')}
               className={cn(
                 "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                activeSubTab === 'approval' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500"
+                activeSubTab === 'approval' ? "bg-white text-[#103552] shadow-sm" : "text-slate-500"
               )}
             >
               Persetujuan Lembur
@@ -380,8 +380,8 @@ export function MobileOvertimePage() {
         )}
 
         {activeSubTab === 'approval' && location.state?.userId && (
-          <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-3xl flex items-center justify-between">
-            <span className="text-[10px] font-bold text-indigo-900 leading-tight">
+          <div className="bg-[#96D1C6]/20 border border-[#96D1C6]/30 p-4 rounded-3xl flex items-center justify-between">
+            <span className="text-[10px] font-bold text-[#103552] leading-tight">
               Menampilkan pengajuan untuk karyawan tertentu
             </span>
             <button
@@ -389,7 +389,7 @@ export function MobileOvertimePage() {
                 navigate('/overtime-data', { replace: true, state: {} });
                 handleTabChange('approval');
               }}
-              className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline"
+              className="text-[10px] font-black text-[#103552] uppercase tracking-widest hover:underline"
             >
               Tampilkan Semua
             </button>
@@ -401,7 +401,7 @@ export function MobileOvertimePage() {
       <div className="mt-8 px-6 space-y-4">
         {loading ? (
           <div className="flex flex-col items-center py-20 gap-3">
-            <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Memproses riwayat...</p>
           </div>
         ) : data.length === 0 ? (
@@ -429,7 +429,7 @@ export function MobileOvertimePage() {
                     </div>
                     <div>
                       {activeSubTab === 'approval' && (
-                        <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-0.5 leading-none">
+                        <p className="text-[9px] font-black text-[#103552] uppercase tracking-widest mb-0.5 leading-none">
                           {item.karyawan?.name || 'Karyawan'}
                         </p>
                       )}
@@ -476,9 +476,9 @@ export function MobileOvertimePage() {
                   </button>
                 )}
 
-                <div className="flex items-center justify-between gap-3 bg-indigo-50/50 p-3 rounded-xl mb-4">
+                <div className="flex items-center justify-between gap-3 bg-[#96D1C6]/20/50 p-3 rounded-xl mb-4">
                    <div className="flex items-start gap-2 min-w-0">
-                      <FileText className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                      <FileText className="w-4 h-4 text-[#96D1C6] shrink-0 mt-0.5" />
                       <p className="text-[10px] font-bold text-slate-600 leading-relaxed italic truncate">
                           {item.notes || 'Belum ada catatan...'}
                       </p>
@@ -488,7 +488,7 @@ export function MobileOvertimePage() {
                         href={item.file_lembur} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 bg-white border border-indigo-100 rounded-lg text-[9px] font-black text-indigo-600 uppercase tracking-widest shrink-0"
+                        className="px-3 py-1.5 bg-white border border-[#96D1C6]/30 rounded-lg text-[9px] font-black text-[#103552] uppercase tracking-widest shrink-0"
                       >
                         Berkas
                       </a>
@@ -541,7 +541,7 @@ export function MobileOvertimePage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Masukkan catatan persetujuan..."
-                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-[1.5rem] text-xs font-semibold focus:outline-none focus:border-indigo-400 focus:bg-white transition-all h-24 resize-none"
+                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-[1.5rem] text-xs font-semibold focus:outline-none focus:border-[#103552]/60 focus:bg-white transition-all h-24 resize-none"
                   />
                   <MessageSquare className="absolute right-4 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
@@ -592,7 +592,7 @@ export function MobileOvertimePage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Masukkan alasan penolakan..."
-                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-[1.5rem] text-xs font-semibold focus:outline-none focus:border-indigo-400 focus:bg-white transition-all h-24 resize-none"
+                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-[1.5rem] text-xs font-semibold focus:outline-none focus:border-[#103552]/60 focus:bg-white transition-all h-24 resize-none"
                   />
                   <MessageSquare className="absolute right-4 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>

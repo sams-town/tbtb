@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import { 
   TrendingUp, 
@@ -54,7 +54,7 @@ export function OvertimePage() {
         </div>
         <button 
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95"
+          className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95"
         >
           <Plus className="w-5 h-5" />
           Tambah Lembur
@@ -62,7 +62,7 @@ export function OvertimePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Total Overtime Hours" value="45h" icon={Clock} color="text-indigo-600" bg="bg-indigo-50" />
+        <StatCard title="Total Overtime Hours" value="45h" icon={Clock} color="text-[#103552]" bg="bg-[#96D1C6]/20" />
         <StatCard title="Pending Approval" value="12" icon={TrendingUp} color="text-amber-600" bg="bg-amber-50" />
         <StatCard title="Approved This Month" value="28" icon={CheckCircle2} color="text-emerald-600" bg="bg-emerald-50" />
       </div>
@@ -71,7 +71,7 @@ export function OvertimePage() {
         <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="relative w-full md:w-96">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder="Search employee..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+            <input type="text" placeholder="Search employee..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
           </div>
           <div className="flex items-center gap-3">
             <button className="p-3 bg-slate-50 text-slate-500 rounded-2xl hover:bg-slate-100 transition-all">
@@ -103,7 +103,7 @@ export function OvertimePage() {
                   </td>
                   <td className="py-6 px-8 text-sm font-bold text-slate-600">{item.date}</td>
                   <td className="py-6 px-8 text-sm font-bold text-slate-600">{item.startTime} - {item.endTime}</td>
-                  <td className="py-6 px-8 text-sm font-black text-indigo-600">{item.duration}</td>
+                  <td className="py-6 px-8 text-sm font-black text-[#103552]">{item.duration}</td>
                   <td className="py-6 px-8 text-sm font-bold text-slate-600 max-w-[200px] truncate">{item.reason}</td>
                   <td className="py-6 px-8">
                     <span className={cn(
@@ -116,7 +116,7 @@ export function OvertimePage() {
                   </td>
                   <td className="py-6 px-8">
                     <div className="flex items-center justify-end gap-2  transition-opacity">
-                      <button className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90"><Edit2 className="w-4 h-4" /></button>
+                      <button className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90"><Edit2 className="w-4 h-4" /></button>
                       <button className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>

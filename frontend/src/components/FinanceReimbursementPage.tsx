@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import {
@@ -21,7 +21,7 @@ const statusCfg: Record<string, { dot: string; pill: string }> = {
 
 const inputCls = [
     'w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-xl text-gray-800',
-    'placeholder:text-gray-400 focus:outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-50',
+    'placeholder:text-gray-400 focus:outline-none focus:border-[#96D1C6] focus:ring-4 focus:ring-[#96D1C6]/20',
     'transition-all duration-200'
 ].join(' ');
 
@@ -33,8 +33,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Card({ title, children, accent = 'violet' }: { title: string; children: React.ReactNode; accent?: string }) {
     const bar: Record<string, string> = {
-        violet: 'bg-violet-500', emerald: 'bg-emerald-500',
-        indigo: 'bg-indigo-500', sky: 'bg-sky-500',
+        violet: 'bg-[#185B5A]', emerald: 'bg-emerald-500',
+        indigo: 'bg-[#103552]', sky: 'bg-sky-500',
     };
     return (
         <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
@@ -305,7 +305,7 @@ export function FinanceReimbursementPage() {
                         </span>
                     </div>
                     <button type="submit" form="reimb-form" disabled={isSubmitting}
-                        className="flex items-center gap-2 px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold transition-colors disabled:opacity-50 shadow-sm shadow-violet-200">
+                        className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#185B5A] hover:bg-[#0D4156] text-white text-sm font-semibold transition-colors disabled:opacity-50 shadow-sm shadow-[#185B5A]/20">
                         {isSubmitting && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
                         {isSubmitting ? 'Menyimpan...' : 'Simpan'}
                     </button>
@@ -409,7 +409,7 @@ export function FinanceReimbursementPage() {
                                     </div>
                                     <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                                         <span className="text-sm font-bold text-gray-700">Sisa</span>
-                                        <span className="text-xl font-black text-violet-600">{fmt(sisa)}</span>
+                                        <span className="text-xl font-black text-[#185B5A]">{fmt(sisa)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -419,10 +419,10 @@ export function FinanceReimbursementPage() {
                             <label className="block cursor-pointer">
                                 <div className={cn(
                                     'flex flex-col items-center justify-center gap-3 py-8 rounded-xl border-2 border-dashed transition-all',
-                                    selectedFile ? 'border-violet-300 bg-violet-50' : 'border-gray-200 hover:border-violet-300 hover:bg-violet-50/40'
+                                    selectedFile ? 'border-[#96D1C6] bg-[#96D1C6]/20' : 'border-gray-200 hover:border-[#96D1C6] hover:bg-[#96D1C6]/20/40'
                                 )}>
-                                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', selectedFile ? 'bg-violet-100' : 'bg-gray-100')}>
-                                        <Upload className={cn('w-5 h-5', selectedFile ? 'text-violet-600' : 'text-gray-400')} />
+                                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', selectedFile ? 'bg-[#96D1C6]/30' : 'bg-gray-100')}>
+                                        <Upload className={cn('w-5 h-5', selectedFile ? 'text-[#185B5A]' : 'text-gray-400')} />
                                     </div>
                                     <div className="text-center">
                                         <p className="text-xs font-semibold text-gray-700">
@@ -465,7 +465,7 @@ export function FinanceReimbursementPage() {
                     className="flex items-center justify-between bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
                     <div>
                         <div className="flex items-center gap-4 mb-1">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-500 flex items-center justify-center shadow-xl shadow-indigo-200">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#103552] to-[#185B5A] flex items-center justify-center shadow-xl shadow-[#96D1C6]/50">
                                 <Receipt className="w-6 h-6 text-white" />
                             </div>
                             <div>
@@ -494,7 +494,7 @@ export function FinanceReimbursementPage() {
                     {[
                         {
                             icon: DollarSign, label: 'TOTAL REIMBURSEMENT', value: fmt(totalReimb),
-                            iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600',
+                            iconBg: 'bg-[#96D1C6]/20', iconColor: 'text-[#103552]',
                         },
                         {
                             icon: TrendingUp, label: 'TOTAL SISA', value: fmt(totalSisa),
@@ -522,10 +522,10 @@ export function FinanceReimbursementPage() {
                 {/* Search */}
                 <div className="flex flex-col lg:flex-row items-center gap-6">
                     <div className="relative flex-1 group w-full">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#185B5A] transition-colors" />
                         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                             placeholder="Cari nama pegawai, event pengajuan..."
-                            className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white border border-slate-200 text-sm font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all shadow-sm" />
+                            className="w-full pl-14 pr-6 py-4 rounded-2xl bg-white border border-slate-200 text-sm font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]/60 transition-all shadow-sm" />
                     </div>
                 </div>
 
@@ -557,7 +557,7 @@ export function FinanceReimbursementPage() {
                                             <td className="px-4 py-3.5 whitespace-nowrap font-semibold text-gray-900">{row.users?.name || '—'}</td>
                                             <td className="px-4 py-3.5 text-gray-500 max-w-[150px] truncate text-xs">{row.event || '—'}</td>
                                             <td className="px-4 py-3.5 whitespace-nowrap">
-                                                <span className="px-2.5 py-0.5 text-[10px] font-bold text-indigo-600 bg-indigo-50 rounded-lg ring-1 ring-indigo-100">
+                                                <span className="px-2.5 py-0.5 text-[10px] font-bold text-[#103552] bg-[#96D1C6]/20 rounded-lg ring-1 ring-[#96D1C6]/30">
                                                     {row.kategoris?.name || '—'}
                                                 </span>
                                             </td>
@@ -575,7 +575,7 @@ export function FinanceReimbursementPage() {
                                                     {row.reimbursements_items?.length || 0}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3.5 whitespace-nowrap font-bold text-violet-600 text-xs">{fmt(row.sisa)}</td>
+                                            <td className="px-4 py-3.5 whitespace-nowrap font-bold text-[#185B5A] text-xs">{fmt(row.sisa)}</td>
                                             <td className="px-4 py-3.5">
                                                 {row.file_path
                                                     ? <a href={row.file_path} target="_blank" rel="noreferrer"
@@ -587,7 +587,7 @@ export function FinanceReimbursementPage() {
                                             <td className="px-4 py-3.5">
                                                 <div className="flex items-center gap-1  transition-opacity">
                                                     <button onClick={() => handleEdit(row)}
-                                                        className="p-1.5 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-all">
+                                                        className="p-1.5 rounded-lg text-gray-400 hover:text-[#185B5A] hover:bg-[#96D1C6]/20 transition-all">
                                                         <Edit className="w-3.5 h-3.5" />
                                                     </button>
                                                     <button

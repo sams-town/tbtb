@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
     Search, FileText, Download, ArrowLeft, Loader2, Calendar, FileSpreadsheet
@@ -143,7 +143,7 @@ export function ContractsEmployeeDetail({ employee, onBack }: ContractsEmployeeD
                                     <tr>
                                         <td colSpan={7} className="py-32">
                                             <div className="flex flex-col items-center justify-center gap-4">
-                                                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                                                <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
                                                 <p className="text-sm font-bold text-slate-400 tracking-widest uppercase">Memuat data...</p>
                                             </div>
                                         </td>
@@ -169,7 +169,7 @@ export function ContractsEmployeeDetail({ employee, onBack }: ContractsEmployeeD
                                                         href={getFileUrl(row.kontrak_file_path)!}
                                                         target="_blank"
                                                         rel="noreferrer"
-                                                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-95"
+                                                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#96D1C6]/20 text-[#103552] rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#103552] hover:text-white transition-all shadow-sm active:scale-95"
                                                     >
                                                         <FileText className="w-3.5 h-3.5" />
                                                         Buka File

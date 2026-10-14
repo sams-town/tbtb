@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import {
@@ -337,7 +337,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
             <select
               value={filterEmployeeId}
               onChange={(e) => setFilterEmployeeId(e.target.value)}
-              className="w-full pl-6 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none"
+              className="w-full pl-6 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer appearance-none"
             >
               <option value="">Semua Pegawai</option>
               {employees.map(emp => (
@@ -348,14 +348,14 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
           </div>
           <div className="flex items-center gap-4">
             <div className="w-48">
-              <input type="date" value={filterStartDate} onChange={(e) => setFilterStartDate(e.target.value)} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+              <input type="date" value={filterStartDate} onChange={(e) => setFilterStartDate(e.target.value)} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
             <span className="text-slate-300 font-black">/</span>
             <div className="w-48">
-              <input type="date" value={filterEndDate} onChange={(e) => setFilterEndDate(e.target.value)} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+              <input type="date" value={filterEndDate} onChange={(e) => setFilterEndDate(e.target.value)} className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
           </div>
-          <button onClick={fetchData} className="p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition-all active:scale-95 border border-indigo-100">
+          <button onClick={fetchData} className="p-3.5 bg-[#96D1C6]/20 text-[#103552] rounded-2xl hover:bg-[#96D1C6]/30 transition-all active:scale-95 border border-[#96D1C6]/30">
             <Search className="w-5 h-5" />
           </button>
         </div>
@@ -378,7 +378,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                <tr><td colSpan={11} className="py-32 text-center"><Loader2 className="w-10 h-10 text-indigo-500 animate-spin mx-auto" /></td></tr>
+                <tr><td colSpan={11} className="py-32 text-center"><Loader2 className="w-10 h-10 text-[#185B5A] animate-spin mx-auto" /></td></tr>
               ) : currentData.length === 0 ? (
                 <tr><td colSpan={11} className="py-32 text-center text-slate-400 font-bold">Tidak ada data lembur ditemukan.</td></tr>
               ) : currentData.map((item, idx) => (
@@ -389,7 +389,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                       {item.karyawan?.foto_karyawan ? (
                         <img src={formatPhotoUrl(item.karyawan.foto_karyawan)} className="w-9 h-9 rounded-full object-cover border border-slate-200" alt="" />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-black">
+                        <div className="w-9 h-9 rounded-full bg-[#96D1C6]/20 border border-[#96D1C6]/30 flex items-center justify-center text-[#103552] text-xs font-black">
                           {getInitials(item.karyawan?.name || '??')}
                         </div>
                       )}
@@ -409,7 +409,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => item.lat_masuk && item.long_masuk && setMapParams({ isOpen: true, lat: item.lat_masuk, lng: item.long_masuk, title: `Lembur Masuk - ${item.karyawan?.name}` })}
-                          className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors flex items-center gap-1"
+                          className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-[#103552] transition-colors flex items-center gap-1"
                         >
                           <MapPin className="w-2.5 h-2.5" /> Maps
                         </button>
@@ -417,7 +417,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                         {item.foto_jam_masuk && (
                           <button
                             onClick={() => setPhotoModal({ isOpen: true, url: formatPhotoUrl(item.foto_jam_masuk), title: `Foto Masuk - ${item.karyawan?.name}` })}
-                            className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors"
+                            className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-[#103552] transition-colors"
                           >
                             Foto
                           </button>
@@ -434,7 +434,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => item.lat_keluar && item.long_keluar && setMapParams({ isOpen: true, lat: item.lat_keluar, lng: item.long_keluar, title: `Lembur Keluar - ${item.karyawan?.name}` })}
-                          className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors flex items-center gap-1"
+                          className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-[#103552] transition-colors flex items-center gap-1"
                         >
                           <MapPin className="w-2.5 h-2.5" /> Maps
                         </button>
@@ -442,7 +442,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                         {item.foto_jam_keluar && (
                           <button
                             onClick={() => setPhotoModal({ isOpen: true, url: formatPhotoUrl(item.foto_jam_keluar), title: `Foto Keluar - ${item.karyawan?.name}` })}
-                            className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors"
+                            className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-[#103552] transition-colors"
                           >
                             Foto
                           </button>
@@ -451,7 +451,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                     </div>
                   </td>
                   <td className="py-5 px-6">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#96D1C6]/20 text-[#103552] rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#96D1C6]/30">
                       {formatDuration(item.total_lembur)}
                     </span>
                   </td>
@@ -463,7 +463,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                           href={formatPhotoUrl(item.file_lembur)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] font-black text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-wider"
+                          className="inline-flex items-center gap-1 text-[10px] font-black text-[#103552] hover:text-[#103552] transition-colors uppercase tracking-wider"
                         >
                           <FileText className="w-3 h-3" /> Berkas
                         </a>
@@ -509,12 +509,12 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
         {totalPages > 1 && (
           <div className="px-8 py-5 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
             <p className="text-xs font-bold text-slate-400">
-              Menampilkan <span className="text-indigo-600">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> - <span className="text-indigo-600">{Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)}</span> dari <span className="text-indigo-600">{filteredData.length}</span> pengajuan
+              Menampilkan <span className="text-[#103552]">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> - <span className="text-[#103552]">{Math.min(currentPage * ITEMS_PER_PAGE, filteredData.length)}</span> dari <span className="text-[#103552]">{filteredData.length}</span> pengajuan
             </p>
             <div className="flex items-center gap-1.5">
               <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"><ChevronLeft className="w-4 h-4" /></button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(pg => (
-                <button key={pg} onClick={() => setCurrentPage(pg)} className={cn("w-9 h-9 rounded-xl text-xs font-black transition-all", currentPage === pg ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-500 hover:bg-slate-100 border border-transparent hover:border-slate-200")}>{pg}</button>
+                <button key={pg} onClick={() => setCurrentPage(pg)} className={cn("w-9 h-9 rounded-xl text-xs font-black transition-all", currentPage === pg ? "bg-[#103552] text-white shadow-lg shadow-[#96D1C6]/50" : "text-slate-500 hover:bg-slate-100 border border-transparent hover:border-slate-200")}>{pg}</button>
               ))}
               <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"><ChevronRight className="w-4 h-4" /></button>
             </div>
@@ -664,7 +664,7 @@ function ApprovalModal({ data, onConfirm, onCancel }: { data: OvertimeData, onCo
                     href={formatPhotoUrl(data.file_lembur)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-black text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-wider"
+                    className="inline-flex items-center gap-1 text-xs font-black text-[#103552] hover:text-[#103552] transition-colors uppercase tracking-wider"
                   >
                     <FileText className="w-3.5 h-3.5" /> Lihat
                   </a>
@@ -752,7 +752,7 @@ function EditOvertimeModal({ data, onConfirm, onCancel }: { data: OvertimeData, 
 
         <div className="flex gap-3">
           <button onClick={onCancel} className="flex-1 py-4 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all active:scale-95">Batal</button>
-          <button onClick={() => onConfirm(formData)} className="flex-[2] py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-indigo-200 transition-all active:scale-95">Simpan Perubahan</button>
+          <button onClick={() => onConfirm(formData)} className="flex-[2] py-4 bg-[#103552] hover:bg-[#103552] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-[#96D1C6]/50 transition-all active:scale-95">Simpan Perubahan</button>
         </div>
       </motion.div>
     </div>

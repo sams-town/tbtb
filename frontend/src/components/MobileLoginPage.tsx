@@ -84,10 +84,10 @@ export function MobileLoginPage({ onLogin, settings }: MobileLoginPageProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans overflow-hidden">
       {/* Visual Header */}
-      <div className="h-[40vh] bg-indigo-700 relative overflow-hidden flex items-center justify-center p-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-900/40" />
+      <div className="h-[40vh] bg-[#103552] relative overflow-hidden flex items-center justify-center p-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a2438]/40" />
         <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-400/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#96D1C6]/20 rounded-full blur-3xl" />
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -103,7 +103,7 @@ export function MobileLoginPage({ onLogin, settings }: MobileLoginPageProps) {
           </div>
           <div>
              <h1 className="text-4xl font-black text-white tracking-tighter">{settings?.name || 'Portal Absensi'}</h1>
-             <p className="text-white/60 font-black uppercase tracking-[0.3em] text-[10px] mt-2">Mobile Integrated System</p>
+             <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.3em] mt-2">Mobile Integrated System</span>
           </div>
         </motion.div>
       </div>
@@ -142,7 +142,7 @@ export function MobileLoginPage({ onLogin, settings }: MobileLoginPageProps) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="ID Pegawai"
-                  className="w-full pl-18 pr-6 py-5 bg-slate-50 border border-transparent rounded-[1.5rem] outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-500 transition-all text-slate-900 font-bold text-sm"
+                  className="w-full pl-18 pr-6 py-5 bg-slate-50 border border-transparent rounded-[1.5rem] outline-none focus:ring-4 focus:ring-[#103552]/10 focus:bg-white focus:border-[#103552] transition-all text-slate-900 font-bold text-sm"
                 />
               </div>
             </div>
@@ -159,7 +159,7 @@ export function MobileLoginPage({ onLogin, settings }: MobileLoginPageProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-18 pr-14 py-5 bg-slate-50 border border-transparent rounded-[1.5rem] outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-500 transition-all text-slate-900 font-bold text-sm"
+                  className="w-full pl-18 pr-14 py-5 bg-slate-50 border border-transparent rounded-[1.5rem] outline-none focus:ring-4 focus:ring-[#103552]/10 focus:bg-white focus:border-[#103552] transition-all text-slate-900 font-bold text-sm"
                 />
                 <button
                   type="button"
@@ -174,7 +174,7 @@ export function MobileLoginPage({ onLogin, settings }: MobileLoginPageProps) {
 
           <button
             disabled={isLoading}
-            className="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-2xl shadow-slate-900/20 flex items-center justify-center gap-3 active:scale-95 transition-all text-sm"
+            className="w-full py-6 bg-[#E09132] hover:bg-[#C97E28] text-white rounded-[2rem] font-black uppercase tracking-widest shadow-2xl shadow-[#E09132]/25 flex items-center justify-center gap-3 active:scale-95 transition-all text-sm"
           >
             {isLoading ? (
               <Loader2 className="w-6 h-6 animate-spin" />

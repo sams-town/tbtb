@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   MapPin,
@@ -321,7 +321,7 @@ export function MobileAbsenPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-700 via-indigo-600 to-violet-600">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#103552] via-[#103552] to-[#185B5A]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center border border-white/30">
             <Fingerprint className="w-8 h-8 text-white animate-pulse" />
@@ -335,7 +335,7 @@ export function MobileAbsenPage() {
   return (
     <div className="min-h-screen font-sans bg-[#F0F4FF] pb-28">
       {/* ─── HERO HEADER ─── */}
-      <div className="relative bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 pt-16 pb-36 px-6 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[#103552] via-[#185B5A] to-fuchsia-600 pt-16 pb-36 px-6 overflow-hidden">
         {/* Animated background elements */}
         <motion.div 
           animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
@@ -375,13 +375,13 @@ export function MobileAbsenPage() {
                 <UserIcon className="text-white w-8 h-8" />
               )}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-400 border-2 border-indigo-600 rounded-full shadow-lg" />
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-400 border-2 border-[#103552] rounded-full shadow-lg" />
           </div>
           <div>
             <p className="text-white/60 text-[11px] font-black uppercase tracking-[0.2em] mb-0.5">Pegawai Aktif</p>
             <h2 className="text-white text-xl font-black tracking-tight leading-none mb-1.5">{userData?.name || 'Pengguna'}</h2>
             <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/10">
-              <p className="text-indigo-100 text-[9px] font-black uppercase tracking-widest">{userData?.jabatan?.nama_jabatan || 'Staff'}</p>
+              <p className="text-[#96D1C6]/30 text-[9px] font-black uppercase tracking-widest">{userData?.jabatan?.nama_jabatan || 'Staff'}</p>
             </div>
           </div>
         </div>
@@ -407,12 +407,12 @@ export function MobileAbsenPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-[2.5rem] p-6 shadow-2xl shadow-indigo-500/10 border border-white"
+          className="bg-white rounded-[2.5rem] p-6 shadow-2xl shadow-[#103552]/20/10 border border-white"
         >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-indigo-500" />
+              <div className="w-9 h-9 bg-[#96D1C6]/20 rounded-xl flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-[#185B5A]" />
               </div>
               <div>
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Jadwal Hari Ini</p>
@@ -577,9 +577,9 @@ export function MobileAbsenPage() {
                 </p>
               </div>
               <div className="flex gap-3">
-                <div className="flex-1 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-center">
-                  <p className="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Clock In</p>
-                  <p className="text-lg font-black text-indigo-700 tabular-nums">{todayMapping.jam_absen}</p>
+                <div className="flex-1 p-4 bg-[#96D1C6]/20 rounded-2xl border border-[#96D1C6]/30 text-center">
+                  <p className="text-[8px] font-black text-[#96D1C6] uppercase tracking-widest">Clock In</p>
+                  <p className="text-lg font-black text-[#103552] tabular-nums">{todayMapping.jam_absen}</p>
                 </div>
                 <div className="flex-1 p-4 bg-rose-50 rounded-2xl border border-rose-100 text-center">
                   <p className="text-[8px] font-black text-rose-400 uppercase tracking-widest">Clock Out</p>
@@ -591,12 +591,12 @@ export function MobileAbsenPage() {
             <motion.div key="action" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
               {/* Status badge if checked in */}
               {isCheckedIn && (
-                <div className="bg-indigo-50 px-6 py-4 rounded-2xl border border-indigo-100 flex items-center justify-between">
+                <div className="bg-[#96D1C6]/20 px-6 py-4 rounded-2xl border border-[#96D1C6]/30 flex items-center justify-between">
                   <div>
-                    <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-0.5">Sudah Absen Masuk</p>
-                    <p className="text-xl font-black text-indigo-700 tabular-nums">{todayMapping.jam_absen}</p>
+                    <p className="text-[9px] font-black text-[#96D1C6] uppercase tracking-widest mb-0.5">Sudah Absen Masuk</p>
+                    <p className="text-xl font-black text-[#103552] tabular-nums">{todayMapping.jam_absen}</p>
                   </div>
-                  <CheckCircle2 className="w-8 h-8 text-indigo-300" />
+                  <CheckCircle2 className="w-8 h-8 text-[#96D1C6]" />
                 </div>
               )}
 
@@ -634,12 +634,12 @@ export function MobileAbsenPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="bg-indigo-50/50 px-5 py-4 rounded-2xl border border-indigo-100/50"
+                    className="bg-[#96D1C6]/20/50 px-5 py-4 rounded-2xl border border-[#96D1C6]/30/50"
                   >
-                    <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <p className="text-[9px] font-black text-[#96D1C6] uppercase tracking-widest mb-2 flex items-center gap-2">
                        <MapIcon className="w-3 h-3" /> Alamat Terdeteksi
                     </p>
-                    <p className="text-[11px] font-bold text-indigo-950 leading-relaxed italic">
+                    <p className="text-[11px] font-bold text-[#103552] leading-relaxed italic">
                       "{address}"
                     </p>
                   </motion.div>
@@ -680,7 +680,7 @@ export function MobileAbsenPage() {
                   value={keterangan}
                   onChange={(e) => setKeterangan(e.target.value)}
                   placeholder={isCheckedIn ? 'Tugas selesai, semua target terpenuhi.' : 'Mulai bekerja, kondisi sehat.'}
-                  className="w-full px-5 py-4 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all min-h-[90px] resize-none shadow-sm"
+                  className="w-full px-5 py-4 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all min-h-[90px] resize-none shadow-sm"
                 />
               </div>
 
@@ -782,14 +782,14 @@ export function MobileAbsenPage() {
             <div className="pb-16 px-6">
               <button
                 onClick={capturePhoto}
-                className="w-full h-20 bg-white text-indigo-700 rounded-full flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all"
+                className="w-full h-20 bg-white text-[#103552] rounded-full flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all"
               >
-                <div className="w-14 h-14 rounded-full border-4 border-indigo-200 flex items-center justify-center">
-                  <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full border-4 border-[#96D1C6]/50 flex items-center justify-center">
+                  <div className="w-10 h-10 bg-[#103552] rounded-full flex items-center justify-center">
                     <Camera className="w-5 h-5 text-white" />
                   </div>
                 </div>
-                <span className="font-black text-indigo-700 tracking-tight">Ambil Foto</span>
+                <span className="font-black text-[#103552] tracking-tight">Ambil Foto</span>
               </button>
               <p className="text-center text-white/30 text-[10px] font-bold uppercase tracking-widest mt-4">
                 Pastikan cahaya cukup & wajah terlihat jelas
@@ -875,7 +875,7 @@ function ActionButton({
       className={cn(
         'flex flex-col items-center justify-center py-7 rounded-[2rem] transition-all relative overflow-hidden active:scale-95 border-2',
         active
-          ? 'bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20'
+          ? 'bg-[#103552] border-[#103552] text-white shadow-xl shadow-[#103552]/20'
           : 'bg-white border-slate-100 text-slate-400 shadow-sm'
       )}
     >
@@ -889,7 +889,7 @@ function ActionButton({
       </div>
       <span className="font-black uppercase tracking-widest text-[10px]">{label}</span>
       {active && (
-        <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-indigo-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+        <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#103552] animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
       )}
     </button>
   );

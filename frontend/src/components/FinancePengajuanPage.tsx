@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     Search, Plus, Edit, Trash2, ArrowLeft, Send,
@@ -17,12 +17,12 @@ const statusCls: Record<string, string> = {
     'PENDING': 'bg-amber-50 text-amber-600 border-amber-100',
     'APPROVED': 'bg-emerald-50 text-emerald-600 border-emerald-100',
     'REJECTED': 'bg-rose-50 text-rose-600 border-rose-100',
-    'COMPLETED': 'bg-indigo-50 text-indigo-600 border-indigo-100'
+    'COMPLETED': 'bg-[#96D1C6]/20 text-[#103552] border-[#96D1C6]/30'
 };
 
 const inputCls = [
     'w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold',
-    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400',
+    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]/60',
     'transition-all duration-200'
 ].join(' ');
 
@@ -83,13 +83,13 @@ export function FinancePengajuanPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] pb-20">
+        <div className="min-h-screen bg-[#F0F0F0] pb-20">
             <div className="p-4 lg:p-10 max-w-[1700px] mx-auto space-y-8">
                 {/* Header Card */}
                 <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-8">
                     <div className="flex items-center gap-5">
                         <div className="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center shadow-xl shadow-slate-200">
-                            <DollarSign className="w-7 h-7 text-indigo-400" />
+                            <DollarSign className="w-7 h-7 text-[#96D1C6]" />
                         </div>
                         <div>
                             <h1 className="text-3xl font-black text-slate-900 tracking-tight">Pengajuan Keuangan</h1>
@@ -99,11 +99,11 @@ export function FinancePengajuanPage() {
 
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                         <div className="relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#185B5A] transition-colors" />
                             <input
                                 type="text" value={search} onChange={e => setSearch(e.target.value)}
                                 placeholder="Cari pengajuan..."
-                                className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
+                                className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none"
                             />
                         </div>
 
@@ -111,7 +111,7 @@ export function FinancePengajuanPage() {
                             <select
                                 value={statusFilter}
                                 onChange={e => setStatusFilter(e.target.value)}
-                                className="px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none pr-10 cursor-pointer"
+                                className="px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none appearance-none pr-10 cursor-pointer"
                                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1em' }}
                             >
                                 <option value="">Semua Status</option>
@@ -151,7 +151,7 @@ export function FinancePengajuanPage() {
                                 {loading ? (
                                     <tr>
                                         <td colSpan={12} className="py-32 text-center">
-                                            <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
+                                            <div className="w-12 h-12 border-4 border-[#96D1C6]/30 border-t-[#103552] rounded-full animate-spin mx-auto mb-4" />
                                             <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Sinkronisasi Data...</p>
                                         </td>
                                     </tr>
@@ -170,13 +170,13 @@ export function FinancePengajuanPage() {
                                         <tr key={row.id} className="hover:bg-slate-50/50 transition-colors group/row">
                                             <td className="py-6 px-8 text-xs font-bold text-slate-300">{idx + 1}.</td>
                                             <td className="py-6 px-8">
-                                                <span className="font-black text-indigo-600 text-[10px] px-3 py-1.5 bg-indigo-50 rounded-lg border border-indigo-100">
+                                                <span className="font-black text-[#103552] text-[10px] px-3 py-1.5 bg-[#96D1C6]/20 rounded-lg border border-[#96D1C6]/30">
                                                     {row.nomor || '—'}
                                                 </span>
                                             </td>
                                             <td className="py-6 px-8 font-black text-slate-800 text-sm">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white text-[10px] shadow-lg shadow-indigo-100">
+                                                    <div className="w-8 h-8 rounded-lg bg-[#103552] flex items-center justify-center text-white text-[10px] shadow-lg shadow-[#96D1C6]/30">
                                                         {row.requester?.name?.charAt(0)}
                                                     </div>
                                                     {row.requester?.name || '—'}
@@ -188,7 +188,7 @@ export function FinancePengajuanPage() {
                                             <td className="py-6 px-8">
                                                 <div className="flex -space-x-2">
                                                     {row.items?.slice(0, 3).map((item: any, i: number) => (
-                                                        <div key={i} className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center shadow-sm text-[9px] font-black text-slate-400 group-hover/row:border-indigo-200 transition-colors">
+                                                        <div key={i} className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center shadow-sm text-[9px] font-black text-slate-400 group-hover/row:border-[#96D1C6]/50 transition-colors">
                                                             {i + 1}
                                                         </div>
                                                     ))}
@@ -207,7 +207,7 @@ export function FinancePengajuanPage() {
                                             </td>
                                             <td className="py-6 px-8">
                                                 {row.pk_file_path ? (
-                                                    <button onClick={() => handleDownload(row.pk_file_path)} className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-indigo-500 hover:bg-slate-900 hover:text-white transition-all shadow-sm">
+                                                    <button onClick={() => handleDownload(row.pk_file_path)} className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-[#185B5A] hover:bg-slate-900 hover:text-white transition-all shadow-sm">
                                                         <FileText className="w-4 h-4" />
                                                     </button>
                                                 ) : (
@@ -222,7 +222,7 @@ export function FinancePengajuanPage() {
                                             </td>
                                             <td className="py-6 px-8 text-center">
                                                 {row.nota_file_path ? (
-                                                    <button onClick={() => handleDownload(row.nota_file_path)} className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 hover:bg-indigo-600 hover:text-white transition-all mx-auto">
+                                                    <button onClick={() => handleDownload(row.nota_file_path)} className="w-9 h-9 rounded-xl bg-[#96D1C6]/20 flex items-center justify-center text-[#185B5A] hover:bg-[#103552] hover:text-white transition-all mx-auto">
                                                         <Download className="w-4 h-4" />
                                                     </button>
                                                 ) : (

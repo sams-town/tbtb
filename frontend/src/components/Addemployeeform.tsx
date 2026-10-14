@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     ArrowLeft, Save, X, Camera, User, Mail, Phone, MapPin,
@@ -333,13 +333,13 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
         <>
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-7xl mx-auto pb-20 space-y-6">
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3"><button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-xl border bg-white shadow-sm hover:text-indigo-600"><ArrowLeft size={16}/></button><div><h1 className="text-xl font-bold">Tambah Pegawai</h1><p className="text-sm text-slate-400">Data lengkap pegawai baru</p></div></div>
-                    <div className="flex gap-2"><button onClick={onBack} className="px-4 py-2 bg-white border rounded-xl font-semibold"><X size={16}/></button><button onClick={handleSubmit} disabled={loading} className="px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold flex items-center gap-2">{loading ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>} Simpan</button></div>
+                    <div className="flex items-center gap-3"><button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-xl border bg-white shadow-sm hover:text-[#103552]"><ArrowLeft size={16}/></button><div><h1 className="text-xl font-bold">Tambah Pegawai</h1><p className="text-sm text-slate-400">Data lengkap pegawai baru</p></div></div>
+                    <div className="flex gap-2"><button onClick={onBack} className="px-4 py-2 bg-white border rounded-xl font-semibold"><X size={16}/></button><button onClick={handleSubmit} disabled={loading} className="px-5 py-2 bg-[#103552] text-white rounded-xl font-bold flex items-center gap-2">{loading ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>} Simpan</button></div>
                 </div>
 
                 <div className="bg-white rounded-2xl border p-1.5 flex flex-wrap gap-1">
                     {sections.map(({ label, icon: Icon }, i) => (
-                        <button key={i} onClick={() => setActiveSection(i)} className={cn("flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all", activeSection === i ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:bg-slate-50")}>
+                        <button key={i} onClick={() => setActiveSection(i)} className={cn("flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all", activeSection === i ? "bg-[#103552] text-white shadow-sm" : "text-slate-500 hover:bg-slate-50")}>
                             <Icon size={14}/> {label}
                         </button>
                     ))}
@@ -349,14 +349,14 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
                     <motion.div key={activeSection} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
                         {activeSection === 0 && <>
                             <Card>
-                                <SectionTitle icon={Camera} title="Foto" color="text-violet-600" bg="bg-violet-50" />
+                                <SectionTitle icon={Camera} title="Foto" color="text-[#185B5A]" bg="bg-[#96D1C6]/20" />
                                 <div className="flex items-center gap-6">
                                     <div className="relative group size-24 border-2 border-dashed rounded-2xl flex items-center justify-center overflow-hidden">
                                         {photo.preview ? <img src={photo.preview} className="size-full object-cover" /> : <ImageIcon className="text-slate-300" />}
                                         <input type="file" accept="image/*" onChange={handlePhoto} className="absolute inset-0 opacity-0 cursor-pointer" />
                                     </div>
                                     <div className="space-y-1">
-                                        <button onClick={startCamera} className="px-4 py-2 bg-violet-50 text-violet-600 rounded-xl text-xs font-bold flex items-center gap-2 border border-violet-100 hover:bg-violet-100 transition-colors">
+                                        <button onClick={startCamera} className="px-4 py-2 bg-[#96D1C6]/20 text-[#185B5A] rounded-xl text-xs font-bold flex items-center gap-2 border border-[#96D1C6]/30 hover:bg-[#96D1C6]/30 transition-colors">
                                             <Camera size={14}/> Ambil dari Kamera
                                         </button>
                                         <p className="text-xs text-slate-400">Atau klik kotak untuk pilih file (Max 2MB)</p>
@@ -466,7 +466,7 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
                                             rows={3} 
                                             value={form.alamat} 
                                             onChange={e => handleChange('alamat', e.target.value)} 
-                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-indigo-400 text-sm font-bold text-slate-700" 
+                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-[#103552]/60 text-sm font-bold text-slate-700" 
                                             placeholder="Alamat akan terisi otomatis..."
                                         />
                                     </div>
@@ -557,7 +557,7 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
                                             rows={3} 
                                             value={form.alamat_domisili} 
                                             onChange={e => handleChange('alamat_domisili', e.target.value)} 
-                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-indigo-400 text-sm font-bold text-slate-700" 
+                                            className="w-full p-4 border rounded-xl bg-slate-50 outline-none focus:border-[#103552]/60 text-sm font-bold text-slate-700" 
                                             placeholder="Alamat akan terisi otomatis..."
                                         />
                                     </div>
@@ -578,7 +578,7 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
                             <SectionTitle icon={FileText} title="Dokumen Identitas" color="text-amber-600" bg="bg-amber-50" />
                             <div className="grid grid-cols-2 gap-4">{['ktp', 'kartu_keluarga', 'bpjs_kesehatan', 'bpjs_ketenagakerjaan', 'npwp', 'sim'].map(k => <FormInput key={k} label={k.toUpperCase()} name={k} value={(form as any)[k]} onChange={handleChange} icon={CreditCard} required />)}</div>
                             <div className="border-t pt-6 mt-6 space-y-4">
-                                <button onClick={() => setDocs([...docs, { id: Math.random().toString(), nama_dokumen: '', file: null }])} className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-bold w-max hover:bg-indigo-100 transition-colors">+ Tambah Baru</button>
+                                <button onClick={() => setDocs([...docs, { id: Math.random().toString(), nama_dokumen: '', file: null }])} className="px-4 py-2 bg-[#96D1C6]/20 text-[#103552] rounded-xl text-xs font-bold w-max hover:bg-[#96D1C6]/30 transition-colors">+ Tambah Baru</button>
                                 {docs.map(doc => {
                                     const isImage = doc.file?.type.startsWith('image/');
                                     const previewUrl = doc.file && isImage ? URL.createObjectURL(doc.file) : null;
@@ -587,7 +587,7 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
                                             <div className="flex gap-4 items-start">
                                                 <div className="flex-1 space-y-3">
                                                     <FormInput value={doc.nama_dokumen} onChange={(_:any,v:string)=>setDocs(docs.map(x=>x.id===doc.id?{...x,nama_dokumen:v}:x))} placeholder="Nama File (KTP, SIM, dll)" />
-                                                    <input type="file" onChange={e=>setDocs(docs.map(x=>x.id===doc.id?{...x,file:e.target.files?.[0]||null}:x))} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 cursor-pointer" />
+                                                    <input type="file" onChange={e=>setDocs(docs.map(x=>x.id===doc.id?{...x,file:e.target.files?.[0]||null}:x))} className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#96D1C6]/20 file:text-[#103552] cursor-pointer" />
                                                 </div>
                                                 <button onClick={()=>setDocs(docs.filter(x=>x.id!==doc.id))} className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg"><Trash2 size={20}/></button>
                                             </div>
@@ -647,7 +647,7 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
 
                 <div className="flex justify-between p-4 bg-white border rounded-2xl shadow-sm">
                     <button onClick={() => setActiveSection(Math.max(0, activeSection - 1))} className="px-4 py-2 bg-slate-50 rounded-xl"><ChevronLeft/></button>
-                    <div className="flex gap-1.5 items-center">{sections.map((_, i) => <div key={i} className={cn("h-1.5 rounded-full", activeSection === i ? "w-6 bg-indigo-600" : "w-1.5 bg-slate-200")} />)}</div>
+                    <div className="flex gap-1.5 items-center">{sections.map((_, i) => <div key={i} className={cn("h-1.5 rounded-full", activeSection === i ? "w-6 bg-[#103552]" : "w-1.5 bg-slate-200")} />)}</div>
                     <button onClick={() => setActiveSection(Math.min(sections.length - 1, activeSection + 1))} className="px-4 py-2 bg-slate-50 rounded-xl"><ChevronRight/></button>
                 </div>
             </motion.div>
@@ -673,8 +673,8 @@ export function AddEmployeeForm({ onBack, onSuccess }: AddEmployeeFormProps) {
 
                             <div className="p-8 flex flex-col items-center gap-4 bg-slate-50">
                                 <button onClick={capturePhoto} className="group relative">
-                                    <div className="size-20 rounded-full border-4 border-indigo-600 flex items-center justify-center p-1 group-active:scale-95 transition-all">
-                                        <div className="size-full bg-indigo-600 rounded-full flex items-center justify-center text-white">
+                                    <div className="size-20 rounded-full border-4 border-[#103552] flex items-center justify-center p-1 group-active:scale-95 transition-all">
+                                        <div className="size-full bg-[#103552] rounded-full flex items-center justify-center text-white">
                                             <Camera size={32}/>
                                         </div>
                                     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   MapPin, 
@@ -211,10 +211,10 @@ export function AdminAbsenPage() {
   const isCheckedOut = !!todayMapping?.jam_pulang;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-sans flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a2438] via-[#103552] to-[#0a2438] font-sans flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background blobs */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#103552]/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#185B5A]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-0 right-0 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
@@ -253,7 +253,7 @@ export function AdminAbsenPage() {
                     key={unit + i}
                     initial={{ y: -5, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="w-16 h-16 bg-indigo-500/20 border border-indigo-400/30 rounded-2xl flex items-center justify-center"
+                    className="w-16 h-16 bg-[#103552]/20 border border-[#103552]/60/30 rounded-2xl flex items-center justify-center"
                   >
                     <span className="text-2xl font-black text-white tabular-nums">{unit}</span>
                   </motion.div>
@@ -267,7 +267,7 @@ export function AdminAbsenPage() {
           {/* Status Bar */}
           {loading ? (
             <div className="flex items-center justify-center py-4">
-              <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+              <Loader2 className="w-6 h-6 text-[#96D1C6] animate-spin" />
             </div>
           ) : isCheckedOut ? (
             <div className="bg-emerald-500/10 border border-emerald-400/20 rounded-2xl p-5 text-center space-y-2">
@@ -316,9 +316,9 @@ export function AdminAbsenPage() {
               </div>
 
               {isCheckedIn && (
-                <div className="flex items-center gap-2 bg-indigo-500/10 border border-indigo-400/20 rounded-xl px-4 py-3">
-                  <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
-                  <p className="text-indigo-300 text-[11px] font-black">Sudah absen masuk pukul <span className="text-white">{todayMapping?.jam_absen}</span></p>
+                <div className="flex items-center gap-2 bg-[#103552]/10 border border-[#103552]/60/20 rounded-xl px-4 py-3">
+                  <CheckCircle2 className="w-4 h-4 text-[#96D1C6] shrink-0" />
+                  <p className="text-[#96D1C6] text-[11px] font-black">Sudah absen masuk pukul <span className="text-white">{todayMapping?.jam_absen}</span></p>
                 </div>
               )}
 
@@ -375,7 +375,7 @@ export function AdminAbsenPage() {
                 value={keterangan}
                 onChange={e => setKeterangan(e.target.value)}
                 placeholder={`Keterangan ${activeTab === 'masuk' ? 'masuk kerja' : 'pulang kerja'}... (opsional)`}
-                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium text-white/70 placeholder:text-white/20 outline-none focus:border-indigo-400/50 focus:bg-white/10 transition-all resize-none h-20"
+                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-sm font-medium text-white/70 placeholder:text-white/20 outline-none focus:border-[#103552]/60/50 focus:bg-white/10 transition-all resize-none h-20"
               />
 
               {/* Submit Button */}
@@ -417,8 +417,8 @@ export function AdminAbsenPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-indigo-500/20 rounded-xl flex items-center justify-center">
-                    <Camera className="w-4 h-4 text-indigo-400" />
+                  <div className="w-8 h-8 bg-[#103552]/20 rounded-xl flex items-center justify-center">
+                    <Camera className="w-4 h-4 text-[#96D1C6]" />
                   </div>
                   <span className="text-white font-black tracking-tight">Ambil Selfie</span>
                 </div>
@@ -430,12 +430,12 @@ export function AdminAbsenPage() {
               <div className="relative aspect-square bg-black rounded-2xl overflow-hidden border border-white/10">
                 <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
                 <canvas ref={canvasRef} className="hidden" />
-                <div className="absolute inset-0 border-[3px] border-indigo-400/20 rounded-full m-8 pointer-events-none" />
+                <div className="absolute inset-0 border-[3px] border-[#103552]/60/20 rounded-full m-8 pointer-events-none" />
               </div>
 
               <button
                 onClick={capturePhoto}
-                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-indigo-500 transition-all active:scale-95"
+                className="w-full py-4 bg-[#103552] text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-[#103552] transition-all active:scale-95"
               >
                 <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
                   <div className="w-3 h-3 bg-white rounded-full" />

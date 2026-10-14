@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Settings, Shield, Bell, Globe, Database, Key, HelpCircle, Loader2 } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -159,7 +159,7 @@ export function SettingsPage() {
       className="max-w-[1600px] mx-auto space-y-8 pb-20"
     >
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+        <div className="w-12 h-12 bg-[#96D1C6]/20 rounded-2xl flex items-center justify-center text-[#103552]">
           <Settings className="w-6 h-6" />
         </div>
         <div>
@@ -182,7 +182,7 @@ export function SettingsPage() {
 
           {loading ? (
             <div className="flex justify-center items-center py-20">
-              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+              <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
             </div>
           ) : (
             <>
@@ -194,7 +194,7 @@ export function SettingsPage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="HRIS"
-                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -204,7 +204,7 @@ export function SettingsPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="samstown31@gmail.com"
-                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
               </div>
@@ -216,7 +216,7 @@ export function SettingsPage() {
                   value={formData.footer}
                   onChange={(e) => setFormData({ ...formData, footer: e.target.value })}
                   placeholder="© 2026 HRIS Platform"
-                  className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                  className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                 />
               </div>
 
@@ -226,7 +226,7 @@ export function SettingsPage() {
                   value={formData.alamat}
                   onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
                   placeholder="Bogor"
-                  className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all min-h-[100px]"
+                  className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all min-h-[100px]"
                 />
               </div>
 
@@ -238,7 +238,7 @@ export function SettingsPage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="628988531672"
-                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -248,7 +248,7 @@ export function SettingsPage() {
                     value={formData.whatsapp}
                     onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                     placeholder="628988531672"
-                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
               </div>
@@ -256,9 +256,9 @@ export function SettingsPage() {
               <div className="flex items-center justify-between pt-2">
                 <h3 className="text-lg font-black text-slate-800 tracking-tight">API Configuration</h3>
                 {formData.api_url && (
-                  <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-lg border border-indigo-100">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Konfigurasi Terisi</span>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-[#96D1C6]/20 rounded-lg border border-[#96D1C6]/30">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#103552]" />
+                    <span className="text-[10px] font-black text-[#103552] uppercase tracking-widest">Konfigurasi Terisi</span>
                   </div>
                 )}
               </div>
@@ -271,7 +271,7 @@ export function SettingsPage() {
                     value={formData.api_url}
                     onChange={(e) => setFormData({ ...formData, api_url: e.target.value })}
                     placeholder="https://api.example.com"
-                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
                 <div className="space-y-2">
@@ -281,7 +281,7 @@ export function SettingsPage() {
                     value={formData.api_whatsapp}
                     onChange={(e) => setFormData({ ...formData, api_whatsapp: e.target.value })}
                     placeholder="Api Key Whatsapp"
-                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
               </div>
@@ -318,7 +318,7 @@ export function SettingsPage() {
                       type="file"
                       accept="image/*"
                       onChange={handleLogoChange}
-                      className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+                      className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-[#96D1C6]/20 file:text-[#103552] hover:file:bg-[#96D1C6]/30"
                     />
                   </div>
                 </div>
@@ -375,7 +375,7 @@ export function SettingsPage() {
                             setFormCutiPreview(URL.createObjectURL(file));
                           }
                         }}
-                        className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+                        className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-[#96D1C6]/20 file:text-[#103552] hover:file:bg-[#96D1C6]/30"
                       />
                     </div>
                   </div>
@@ -421,7 +421,7 @@ export function SettingsPage() {
                             setFormLemburPreview(URL.createObjectURL(file));
                           }
                         }}
-                        className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+                        className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-[#96D1C6]/20 file:text-[#103552] hover:file:bg-[#96D1C6]/30"
                       />
                     </div>
                   </div>
@@ -467,7 +467,7 @@ export function SettingsPage() {
                             setSlipGajiPreview(URL.createObjectURL(file));
                           }
                         }}
-                        className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+                        className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-black file:bg-[#96D1C6]/20 file:text-[#103552] hover:file:bg-[#96D1C6]/30"
                       />
                     </div>
                   </div>
@@ -488,7 +488,7 @@ export function SettingsPage() {
           <button
             onClick={handleSubmit}
             disabled={loading || saving}
-            className="flex items-center gap-2 px-8 py-3 bg-indigo-600 text-white rounded-2xl text-sm font-black shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 px-8 py-3 bg-[#103552] text-white rounded-2xl text-sm font-black shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 disabled:opacity-50"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes

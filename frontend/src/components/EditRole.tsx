@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Save, ShieldCheck, CheckSquare, Square, Loader2 } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -160,7 +160,7 @@ export function EditRole({ roleId, onBack }: EditRoleProps) {
     if (fetchLoading) {
         return (
             <div className="max-w-7xl mx-auto py-20 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                <Loader2 className="w-8 h-8 text-[#103552] animate-spin" />
                 <p className="text-sm font-bold text-slate-400">Memuat data role...</p>
             </div>
         );
@@ -175,7 +175,7 @@ export function EditRole({ roleId, onBack }: EditRoleProps) {
         >
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all active:scale-90 shadow-sm">
+                    <button onClick={onBack} className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-[#103552] hover:border-[#96D1C6]/50 hover:bg-[#96D1C6]/20 transition-all active:scale-90 shadow-sm">
                         <ArrowLeft className="w-5 h-5" />
                     </button>
                     <div>
@@ -184,7 +184,7 @@ export function EditRole({ roleId, onBack }: EditRoleProps) {
                     </div>
                 </div>
 
-                <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
+                <button onClick={handleSubmit} disabled={loading} className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">
                     <Save className="w-5 h-5" />
                     {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
@@ -194,7 +194,7 @@ export function EditRole({ roleId, onBack }: EditRoleProps) {
                 <div className="lg:col-span-1 space-y-6">
                     <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/30">
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                            <div className="w-12 h-12 rounded-xl bg-[#96D1C6]/20 flex items-center justify-center text-[#103552]">
                                 <ShieldCheck className="w-6 h-6" />
                             </div>
                             <h2 className="text-lg font-black text-slate-900 tracking-tight">Info Role</h2>
@@ -203,11 +203,11 @@ export function EditRole({ roleId, onBack }: EditRoleProps) {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Nama Role</label>
-                                <input type="text" value={roleName} onChange={e => setRoleName(e.target.value)} placeholder="Mis. Admin" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                                <input type="text" value={roleName} onChange={e => setRoleName(e.target.value)} placeholder="Mis. Admin" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#103552]/20 focus:border-[#103552] transition-all" />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Guard</label>
-                                <input type="text" value={guardName} onChange={e => setGuardName(e.target.value)} placeholder="web" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                                <input type="text" value={guardName} onChange={e => setGuardName(e.target.value)} placeholder="web" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#103552]/20 focus:border-[#103552] transition-all" />
                             </div>
                         </div>
                     </div>
@@ -228,7 +228,7 @@ export function EditRole({ roleId, onBack }: EditRoleProps) {
                                 return (
                                     <div key={groupName} className="p-5 rounded-2xl bg-slate-50/50 border border-slate-100 hover:border-slate-200 transition-colors">
                                         <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200 cursor-pointer group" onClick={() => toggleGroup(groupName, perms)}>
-                                            <button className={cn("transition-colors", allSelected ? "text-indigo-600" : someSelected ? "text-indigo-400" : "text-slate-300 group-hover:text-slate-400")}>
+                                            <button className={cn("transition-colors", allSelected ? "text-[#103552]" : someSelected ? "text-[#96D1C6]" : "text-slate-300 group-hover:text-slate-400")}>
                                                 {allSelected ? <CheckSquare className="w-5 h-5" /> : someSelected ? <CheckSquare className="w-5 h-5 opacity-50" /> : <Square className="w-5 h-5" />}
                                             </button>
                                             <h3 className="font-bold text-slate-900 tracking-tight">{groupName}</h3>
@@ -238,7 +238,7 @@ export function EditRole({ roleId, onBack }: EditRoleProps) {
                                                 const isSelected = selectedPermissions.has(perm);
                                                 return (
                                                     <div key={perm} className="flex items-center gap-3 cursor-pointer group" onClick={() => togglePermission(perm)}>
-                                                        <button className={cn("transition-colors", isSelected ? "text-indigo-600" : "text-slate-300 group-hover:text-slate-400")}>
+                                                        <button className={cn("transition-colors", isSelected ? "text-[#103552]" : "text-slate-300 group-hover:text-slate-400")}>
                                                             {isSelected ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                                                         </button>
                                                         <span className={cn("text-sm font-medium transition-colors", isSelected ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700")}>{perm}</span>

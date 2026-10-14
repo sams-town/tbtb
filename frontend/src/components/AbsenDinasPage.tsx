@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   MapPin, 
@@ -141,7 +141,7 @@ export function AbsenDinasPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F0F0F0] flex flex-col font-sans">
       {/* Header Container */}
       <div className="bg-gradient-to-br from-amber-500 to-orange-600 px-6 pt-14 pb-20 rounded-b-[3rem] shadow-2xl relative overflow-hidden shrink-0">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />

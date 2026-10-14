@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Save, MapPin, Crosshair, Loader2, Navigation, Map, CheckCircle2, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -173,7 +173,7 @@ export function AddLocation({ onBack }: { onBack: () => void }) {
                     <button onClick={onBack} className="p-2.5 bg-white border rounded-xl shadow-sm"><ArrowLeft/></button>
                     <div><h1 className="text-xl font-bold">Tambah Lokasi Kantor</h1><p className="text-sm text-slate-400">Tentukan titik koordinat pada peta</p></div>
                 </div>
-                <button onClick={handleSubmit} disabled={saving} className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold flex items-center gap-2">
+                <button onClick={handleSubmit} disabled={saving} className="px-6 py-2.5 bg-[#103552] text-white rounded-xl font-bold flex items-center gap-2">
                     {saving ? <Loader2 className="animate-spin" /> : <Save />} Simpan
                 </button>
             </div>
@@ -181,7 +181,7 @@ export function AddLocation({ onBack }: { onBack: () => void }) {
             <div className="grid grid-cols-5 gap-6 h-[500px]">
                 <Card className="col-span-2 space-y-4 overflow-y-auto">
                     <div className="flex gap-1 p-1 bg-slate-100 rounded-xl mb-4">
-                        {['manual', 'otomatis'].map(m => <button key={m} onClick={() => setMode(m as any)} className={cn("flex-1 py-2 rounded-lg text-xs font-bold uppercase", mode === m ? "bg-white shadow-sm text-indigo-600" : "text-slate-400")}>{m}</button>)}
+                        {['manual', 'otomatis'].map(m => <button key={m} onClick={() => setMode(m as any)} className={cn("flex-1 py-2 rounded-lg text-xs font-bold uppercase", mode === m ? "bg-white shadow-sm text-[#103552]" : "text-slate-400")}>{m}</button>)}
                     </div>
                     <FormInput label="Nama Lokasi" value={form.nama_lokasi} onChange={(n:any,v:any)=>setForm({...form,nama_lokasi:v})} placeholder="Kantor Pusat" />
                     {mode === 'manual' ? (
@@ -190,7 +190,7 @@ export function AddLocation({ onBack }: { onBack: () => void }) {
                             <FormInput label="Long" value={form.long_kantor} onChange={(n:any,v:any)=>setForm({...form,long_kantor:v})} />
                         </div>
                     ) : (
-                        <button onClick={handleGps} className="w-full py-3 border-2 border-dashed rounded-xl text-xs font-bold text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                        <button onClick={handleGps} className="w-full py-3 border-2 border-dashed rounded-xl text-xs font-bold text-slate-400 hover:bg-[#96D1C6]/20 hover:text-[#103552] transition-all">
                             {gettingLocation ? 'Mencari...' : 'Ambil dari GPS'}
                         </button>
                     )}

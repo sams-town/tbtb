@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   User,
@@ -221,7 +221,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto flex flex-col items-center justify-center py-40 gap-4"
       >
-        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
         <p className="text-sm font-bold text-slate-400">Memuat data profil...</p>
       </motion.div>
     );
@@ -240,7 +240,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
         <p className="text-sm font-bold text-slate-600">{error}</p>
         <button
           onClick={fetchProfile}
-          className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95"
+          className="px-6 py-2.5 bg-[#103552] text-white rounded-xl text-sm font-bold hover:bg-[#103552] transition-all active:scale-95"
         >
           Coba Lagi
         </button>
@@ -259,7 +259,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
       {/* Premium Header Section */}
       <div className="bg-[#1A1C1E] rounded-[3.5rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-slate-900/20 border border-white/5">
         {/* Animated Background Elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32 animate-pulse" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#103552]/10 rounded-full blur-[100px] -mr-32 -mt-32 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-[80px] -ml-20 -mb-20" />
         
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
@@ -274,12 +274,12 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-indigo-500/10">
-                    <User className="w-16 h-16 text-indigo-400" />
+                  <div className="w-full h-full flex items-center justify-center bg-[#103552]/10">
+                    <User className="w-16 h-16 text-[#96D1C6]" />
                   </div>
                 )}
               </div>
-              <button className="absolute -bottom-2 -right-2 p-3 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-indigo-500 transition-all hover:scale-110 border-4 border-[#1A1C1E]">
+              <button className="absolute -bottom-2 -right-2 p-3 bg-[#103552] text-white rounded-2xl shadow-xl hover:bg-[#103552] transition-all hover:scale-110 border-4 border-[#1A1C1E]">
                 <Camera className="w-5 h-5" />
               </button>
             </div>
@@ -287,7 +287,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
             <div className="text-center md:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                 <h1 className="text-4xl font-black tracking-tight leading-none">{p?.name || 'User Profile'}</h1>
-                <span className="px-3 py-1 bg-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-indigo-500/30 backdrop-blur-md">
+                <span className="px-3 py-1 bg-[#103552]/20 text-[#96D1C6] text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-[#103552]/30 backdrop-blur-md">
                    {p?.is_admin === 'admin' ? 'Admin Access' : 'Employee Account'}
                 </span>
               </div>
@@ -366,7 +366,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
         <div className="lg:col-span-4 space-y-8">
           <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/20">
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
-               <div className="w-1.5 h-6 bg-indigo-500 rounded-full" />
+               <div className="w-1.5 h-6 bg-[#103552] rounded-full" />
                Attendance Summary
             </h3>
             <div className="space-y-4">
@@ -379,7 +379,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-10 rounded-[3rem] text-white shadow-2xl shadow-indigo-600/30">
+          <div className="bg-gradient-to-br from-[#103552] to-[#185B5A] p-10 rounded-[3rem] text-white shadow-2xl shadow-[#103552]/30">
              <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center border border-white/20">
                    <ShieldCheck className="w-6 h-6" />
@@ -418,7 +418,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 block">Role <span className="text-slate-300 normal-case tracking-normal font-bold">(read only)</span></label>
                 <div className="flex flex-wrap gap-2">
                   {(p?.roles || []).map((role: string) => (
-                    <span key={role} className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-wider border border-indigo-100">
+                    <span key={role} className="px-3 py-1.5 bg-[#96D1C6]/20 text-[#103552] rounded-lg text-[10px] font-black uppercase tracking-wider border border-[#96D1C6]/30">
                       {role}
                     </span>
                   ))}
@@ -460,7 +460,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
           <Section title="Salary Details" icon={Briefcase}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
               <div className="space-y-6">
-                <h4 className="text-xs font-black text-indigo-600 uppercase tracking-widest">Penjumlahan Gaji</h4>
+                <h4 className="text-xs font-black text-[#103552] uppercase tracking-widest">Penjumlahan Gaji</h4>
                 <SalaryField label="Gaji Pokok" value={formatCurrency(p?.gaji_pokok)} />
                 <SalaryField label="Tunjangan Makan" value={formatCurrency(p?.tunjangan_makan)} unit="/ Hari" />
                 <SalaryField label="Tunjangan Transport" value={formatCurrency(p?.tunjangan_transport)} unit="/ Hari" />
@@ -490,7 +490,7 @@ export function ProfilePage({ onBack, onLogout }: ProfilePageProps) {
             <button
               onClick={handleSubmit}
               disabled={saving}
-              className="px-12 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 disabled:opacity-70 flex items-center gap-3"
+              className="px-12 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95 disabled:opacity-70 flex items-center gap-3"
             >
               {saving ? (
                 <>
@@ -515,7 +515,7 @@ function Section({ title, icon: Icon, children }: { title: string, icon: any, ch
   return (
     <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-200/30">
       <div className="flex items-center gap-4 mb-10">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-inner">
+        <div className="w-12 h-12 rounded-2xl bg-[#96D1C6]/20 flex items-center justify-center text-[#103552] shadow-inner">
           <Icon className="w-6 h-6" />
         </div>
         <h2 className="text-2xl font-black text-slate-900 tracking-tight">{title}</h2>
@@ -554,7 +554,7 @@ function CompactField({
       </label>
       <div className={cn(
         "relative flex items-center bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 transition-all",
-        disabled ? "opacity-60 cursor-not-allowed bg-slate-100" : "focus-within:border-indigo-300 focus-within:bg-white focus-within:shadow-lg focus-within:shadow-indigo-500/5"
+        disabled ? "opacity-60 cursor-not-allowed bg-slate-100" : "focus-within:border-[#103552]/40 focus-within:bg-white focus-within:shadow-lg focus-within:shadow-[#103552]/20/5"
       )}>
         {isTextArea ? (
           <textarea
@@ -617,7 +617,7 @@ function SalaryField({ label, value, unit = "/ Bulan", isDeduction = false }: { 
         </div>
         <div className={cn(
           "px-4 py-3 text-[10px] font-black uppercase tracking-widest border-l border-slate-100",
-          isDeduction ? "bg-rose-50 text-rose-500" : "bg-indigo-50 text-indigo-600"
+          isDeduction ? "bg-rose-50 text-rose-500" : "bg-[#96D1C6]/20 text-[#103552]"
         )}>
           {unit}
         </div>
@@ -628,7 +628,7 @@ function SalaryField({ label, value, unit = "/ Bulan", isDeduction = false }: { 
 
 function StatSummaryCard({ label, value, subValue, icon: Icon, color }: { label: string, value: string, subValue: string, icon: any, color: 'indigo' | 'emerald' | 'blue' | 'purple' }) {
   const colors = {
-    indigo: "bg-indigo-50 text-indigo-600 border-indigo-100",
+    indigo: "bg-[#96D1C6]/20 text-[#103552] border-[#96D1C6]/30",
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
     blue: "bg-blue-50 text-blue-600 border-blue-100",
     purple: "bg-purple-50 text-purple-600 border-purple-100"

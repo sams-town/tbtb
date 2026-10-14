@@ -25,7 +25,7 @@ export function MobileLayout({ children }: MobileLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-200/50 flex flex-col items-center">
+    <div className="min-h-screen bg-[#F0F0F0] flex flex-col items-center">
       <div className="w-full max-w-[480px] min-h-screen bg-slate-50 relative pb-28 shadow-[0_0_50px_rgba(0,0,0,0.1)] border-x border-slate-200 overflow-x-hidden">
         <main className="relative z-10 min-h-screen">
           {children}
@@ -42,7 +42,7 @@ export function MobileLayout({ children }: MobileLayoutProps) {
                 onClick={() => navigate('/absen')}
                 className={cn(
                   "w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl transition-all border-4 border-white active:scale-95 z-50",
-                  location.pathname === '/absen' ? "bg-indigo-600 text-white shadow-indigo-500/40" : "bg-slate-900 text-white shadow-slate-900/20"
+                  location.pathname === '/absen' ? "bg-[#E09132] text-white shadow-[#E09132]/40" : "bg-[#103552] text-white shadow-[#103552]/30"
                 )}
               >
                 <Fingerprint className="w-8 h-8" />
@@ -64,7 +64,7 @@ function NavButton({ icon: Icon, label, active = false, onClick }: { icon: any, 
       onClick={onClick}
       className={cn(
         "flex flex-col items-center gap-1 transition-colors min-w-[60px]",
-        active ? "text-indigo-600" : "text-slate-400 hover:text-slate-600"
+        active ? "text-[#E09132]" : "text-slate-400 hover:text-slate-600"
       )}
     >
       <Icon className="w-6 h-6" />

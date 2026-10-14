@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -71,7 +71,7 @@ export function MobileVisitPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-32">
       {/* Header */}
-      <div className="bg-indigo-700 pt-12 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-indigo-500/20">
+      <div className="bg-[#103552] pt-12 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-[#103552]/20/20">
         <div className="flex items-center justify-between relative z-10 text-white mb-8">
           <div className="flex items-center gap-4">
             <button onClick={() => navigate('/beranda')} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
@@ -79,7 +79,7 @@ export function MobileVisitPage() {
             </button>
             <h1 className="text-xl font-black tracking-tight">Kunjungan & Tugas</h1>
           </div>
-          <button className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-indigo-700 shadow-lg active:scale-95">
+          <button className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#103552] shadow-lg active:scale-95">
             <Plus className="w-6 h-6" />
           </button>
         </div>
@@ -92,7 +92,7 @@ export function MobileVisitPage() {
                onClick={() => setActiveTab(tab)}
                className={cn(
                  "px-6 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all whitespace-nowrap",
-                 activeTab === tab ? "bg-white text-indigo-700 shadow-lg" : "bg-white/10 text-white/60 backdrop-blur-md"
+                 activeTab === tab ? "bg-white text-[#103552] shadow-lg" : "bg-white/10 text-white/60 backdrop-blur-md"
                )}
              >
                {tab}
@@ -105,7 +105,7 @@ export function MobileVisitPage() {
       <div className="mt-8 px-6 space-y-4 -mt-10 relative z-20">
         {loading ? (
           <div className="flex flex-col items-center py-20 gap-3">
-            <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sinkronisasi data...</p>
           </div>
         ) : data.length === 0 ? (

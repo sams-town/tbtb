@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -216,7 +216,7 @@ export function MobileOvertimeEntryPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-32">
       {/* Header */}
-      <div className="bg-indigo-700 pt-12 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-indigo-500/20">
+      <div className="bg-[#103552] pt-12 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-[#103552]/20/20">
         <div className="flex items-center gap-4 relative z-10 text-white">
           <button onClick={() => navigate('/beranda')} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
             <ChevronLeft className="w-6 h-6" />
@@ -258,12 +258,12 @@ export function MobileOvertimeEntryPage() {
             <div className="space-y-2">
                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal</label>
                <div className="relative">
-                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500" />
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#185B5A]" />
                   <input 
                     type="date" 
                     value={formData.tanggal}
                     onChange={(e) => setFormData({...formData, tanggal: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                </div>
             </div>
@@ -272,12 +272,12 @@ export function MobileOvertimeEntryPage() {
               <div className="space-y-2">
                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Jam Mulai</label>
                  <div className="relative">
-                    <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500" />
+                    <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#185B5A]" />
                     <input 
                       type="time" 
                       value={formData.jam_lembur}
                       onChange={(e) => setFormData({...formData, jam_lembur: e.target.value})}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                     />
                  </div>
               </div>
@@ -300,13 +300,13 @@ export function MobileOvertimeEntryPage() {
             <div className="space-y-2">
                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Durasi (Jam)</label>
                <div className="relative">
-                  <Timer className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500" />
+                  <Timer className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#185B5A]" />
                   <input 
                     type="number" 
                     placeholder="Contoh: 2"
                     value={formData.lama_lembur}
                     onChange={(e) => setFormData({...formData, lama_lembur: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                </div>
             </div>
@@ -314,23 +314,23 @@ export function MobileOvertimeEntryPage() {
             <div className="space-y-2">
                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Keterangan Pekerjaan</label>
                <div className="relative">
-                  <FileText className="absolute left-4 top-5 w-5 h-5 text-indigo-500" />
+                  <FileText className="absolute left-4 top-5 w-5 h-5 text-[#185B5A]" />
                   <textarea 
                     placeholder="Apa yang Anda kerjakan saat lembur?"
                     value={formData.keterangan}
                     onChange={(e) => setFormData({...formData, keterangan: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all min-h-[120px] resize-none"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all min-h-[120px] resize-none"
                   />
                </div>
             </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Manager (Divisi)</label>
                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-500" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#185B5A]" />
                     <select 
                       value={formData.id_manager}
                       onChange={(e) => setFormData({...formData, id_manager: e.target.value})}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-6 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all appearance-none"
                     >
                       <option value="">Pilih Manager</option>
                       {managers.map(m => (
@@ -352,12 +352,12 @@ export function MobileOvertimeEntryPage() {
                        className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
                        accept="image/*,.pdf,.doc,.docx"
                      />
-                     <div className="w-full border-2 border-dashed border-slate-200 rounded-[2rem] py-10 flex flex-col items-center justify-center gap-4 bg-slate-50 group-hover:bg-indigo-50 group-hover:border-indigo-200 transition-all">
-                       <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-slate-400 group-hover:text-indigo-500 shadow-sm border border-slate-100 group-hover:border-indigo-100 transition-all">
+                     <div className="w-full border-2 border-dashed border-slate-200 rounded-[2rem] py-10 flex flex-col items-center justify-center gap-4 bg-slate-50 group-hover:bg-[#96D1C6]/20 group-hover:border-[#96D1C6]/50 transition-all">
+                       <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-slate-400 group-hover:text-[#185B5A] shadow-sm border border-slate-100 group-hover:border-[#96D1C6]/30 transition-all">
                          <UploadCloud className="w-8 h-8" />
                        </div>
                        <div className="text-center">
-                         <p className="text-sm font-black text-slate-600 group-hover:text-indigo-600 transition-all">Pilih atau Seret Dokumen Berkas Lembur</p>
+                         <p className="text-sm font-black text-slate-600 group-hover:text-[#103552] transition-all">Pilih atau Seret Dokumen Berkas Lembur</p>
                          <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Image, PDF, DOC (Max 5MB)</p>
                        </div>
                      </div>
@@ -367,7 +367,7 @@ export function MobileOvertimeEntryPage() {
                      {filePreview ? (
                        <img src={filePreview} className="w-16 h-16 rounded-2xl object-cover shadow-sm border border-white" alt="Preview" />
                      ) : (
-                       <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm">
+                       <div className="w-16 h-16 bg-[#96D1C6]/30 rounded-2xl flex items-center justify-center text-[#185B5A] shadow-sm">
                          <FileText className="w-8 h-8" />
                        </div>
                      )}
@@ -389,7 +389,7 @@ export function MobileOvertimeEntryPage() {
                <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 py-6 rounded-3xl text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full bg-[#103552] py-6 rounded-3xl text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-[#103552]/30 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
                 <>

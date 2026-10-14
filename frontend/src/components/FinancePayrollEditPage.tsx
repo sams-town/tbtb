@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
     X, Save, User, Calendar, Percent, Briefcase, Hash, DollarSign,
     Utensils, Truck, HeartPulse, Shield, FileText, MinusCircle, PlusCircle,
@@ -131,7 +131,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
 
     if (loading) return (
         <div className="h-screen flex items-center justify-center bg-slate-50">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#103552]"></div>
         </div>
     );
 
@@ -192,7 +192,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                             type="button"
                             onClick={() => handleSave()}
                             disabled={saving}
-                            className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white text-sm font-bold rounded-lg transition-all shadow-sm shadow-indigo-200 active:translate-y-px"
+                            className="flex items-center gap-2 px-6 py-2 bg-[#103552] hover:bg-[#103552] disabled:bg-slate-300 text-white text-sm font-bold rounded-lg transition-all shadow-sm shadow-[#96D1C6]/50 active:translate-y-px"
                         >
                             {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
                             {!saving && <ChevronRight className="w-4 h-4 ml-1" />}
@@ -207,9 +207,9 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                         {/* Left Column: Profile Card & General Info */}
                         <div className="col-span-12 lg:col-span-3 space-y-6">
                             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                                <div className="h-20 bg-gradient-to-r from-slate-800 to-indigo-950" />
+                                <div className="h-20 bg-gradient-to-r from-slate-800 to-[#103552]" />
                                 <div className="px-6 pb-6 -mt-10 text-center">
-                                    <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-lg mb-3 border border-slate-100 uppercase text-2xl font-black text-indigo-600">
+                                    <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-lg mb-3 border border-slate-100 uppercase text-2xl font-black text-[#103552]">
                                         {(formData.employee?.name || formData.user?.name || '').substring(0, 2)}
                                     </div>
                                     <h2 className="text-lg font-bold truncate">{formData.employee?.name || formData.user?.name}</h2>
@@ -223,7 +223,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 value={formData.no_gaji}
                                                 onChange={e => handleChange('no_gaji', e.target.value)}
                                                 onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                         <div className="grid grid-cols-2 gap-3">
@@ -232,7 +232,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     value={formData.bulan}
                                                     onChange={e => handleChange('bulan', e.target.value)}
                                                     onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
-                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                             </Field>
                                             <Field label="Tahun">
@@ -240,7 +240,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     value={formData.tahun}
                                                     onChange={e => handleChange('tahun', e.target.value)}
                                                     onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
-                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                             </Field>
                                         </div>
@@ -249,7 +249,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 value={formData.persentase_kehadiran}
                                                 onChange={e => handleChange('persentase_kehadiran', e.target.value)}
                                                 onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                     </div>
@@ -264,7 +264,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                         value={formData.tanggal_mulai?.substring(0, 10)}
                                         onChange={e => handleChange('tanggal_mulai', e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
-                                        className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                        className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                     />
                                 </Field>
                                 <Field label="Tgl Akhir">
@@ -273,7 +273,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                         value={formData.tanggal_akhir?.substring(0, 10)}
                                         onChange={e => handleChange('tanggal_akhir', e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && e.preventDefault()}
-                                        className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                        className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                     />
                                 </Field>
                             </section>
@@ -304,7 +304,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     const val = e.target.value.replace(/[^0-9.]/g, '');
                                                     handleChange('gaji_pokok', val);
                                                 }}
-                                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                                                className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                                             />
                                         </div>
                                     </Field>
@@ -318,7 +318,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                         inputMode="decimal"
                                                         value={formData.jumlah_tunjangan_makan || 0}
                                                         onChange={e => handleChange('jumlah_tunjangan_makan', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                        className="w-20 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                        className="w-20 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     />
                                                     <span className="text-[10px] text-slate-400 font-black uppercase">Kali</span>
                                                 </div>
@@ -327,7 +327,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.uang_tunjangan_makan || 0}
                                                     onChange={e => handleChange('uang_tunjangan_makan', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                                 <p className="text-[10px] font-bold text-slate-400 italic">Total: Rp {new Intl.NumberFormat('id-ID').format(formData.total_tunjangan_makan || 0)}</p>
                                             </div>
@@ -340,7 +340,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                         inputMode="decimal"
                                                         value={formData.jumlah_tunjangan_transport || 0}
                                                         onChange={e => handleChange('jumlah_tunjangan_transport', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                        className="w-20 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                        className="w-20 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     />
                                                     <span className="text-[10px] text-slate-400 font-black uppercase">Kali</span>
                                                 </div>
@@ -349,7 +349,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.uang_tunjangan_transport || 0}
                                                     onChange={e => handleChange('uang_tunjangan_transport', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                                 <p className="text-[10px] font-bold text-slate-400 italic">Total: Rp {new Intl.NumberFormat('id-ID').format(formData.total_tunjangan_transport || 0)}</p>
                                             </div>
@@ -363,7 +363,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 inputMode="decimal"
                                                 value={formData.total_tunjangan_bpjs_kesehatan || 0}
                                                 onChange={e => handleChange('total_tunjangan_bpjs_kesehatan', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                         <Field label="BPJS Ketenagakerjaan (Tun)">
@@ -372,7 +372,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 inputMode="decimal"
                                                 value={formData.total_tunjangan_bpjs_ketenagakerjaan || 0}
                                                 onChange={e => handleChange('total_tunjangan_bpjs_ketenagakerjaan', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                     </div>
@@ -385,7 +385,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.jumlah_lembur || 0}
                                                     onChange={e => handleChange('jumlah_lembur', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     placeholder="Jam"
                                                 />
                                                 <input
@@ -393,7 +393,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.uang_lembur || 0}
                                                     onChange={e => handleChange('uang_lembur', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     placeholder="Uang /jam"
                                                 />
                                             </div>
@@ -405,7 +405,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.jumlah_kehadiran || 0}
                                                     onChange={e => handleChange('jumlah_kehadiran', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     placeholder="Kali"
                                                 />
                                                 <input
@@ -413,7 +413,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.uang_kehadiran || 0}
                                                     onChange={e => handleChange('uang_kehadiran', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     placeholder="Uang Bonus"
                                                 />
                                             </div>
@@ -432,7 +432,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.bonus_pribadi || 0}
                                                     onChange={e => handleChange('bonus_pribadi', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                             </Field>
                                             <Field label="Team">
@@ -441,7 +441,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.bonus_team || 0}
                                                     onChange={e => handleChange('bonus_team', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                             </Field>
                                             <Field label="Jackpot">
@@ -450,7 +450,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.bonus_jackpot || 0}
                                                     onChange={e => handleChange('bonus_jackpot', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                             </Field>
                                         </div>
@@ -461,7 +461,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.total_reimbursement || 0}
                                                     onChange={e => handleChange('total_reimbursement', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                             </Field>
                                             <Field label="Total THR">
@@ -470,7 +470,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.total_thr || 0}
                                                     onChange={e => handleChange('total_thr', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                 />
                                             </Field>
                                         </div>
@@ -500,7 +500,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 inputMode="decimal"
                                                 value={formData.total_potongan_bpjs_kesehatan || 0}
                                                 onChange={e => handleChange('total_potongan_bpjs_kesehatan', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                         <Field label="BPJS Ket (Potongan)">
@@ -509,7 +509,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 inputMode="decimal"
                                                 value={formData.total_potongan_bpjs_ketenagakerjaan || 0}
                                                 onChange={e => handleChange('total_potongan_bpjs_ketenagakerjaan', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                     </div>
@@ -523,7 +523,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                         inputMode="decimal"
                                                         value={formData.jumlah_mangkir || 0}
                                                         onChange={e => handleChange('jumlah_mangkir', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                         placeholder="Hari"
                                                     />
                                                     <input
@@ -531,7 +531,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                         inputMode="decimal"
                                                         value={formData.uang_mangkir || 0}
                                                         onChange={e => handleChange('uang_mangkir', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                         placeholder="Rp /hari"
                                                     />
                                                 </div>
@@ -541,7 +541,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                         inputMode="decimal"
                                                         value={formData.jumlah_izin || 0}
                                                         onChange={e => handleChange('jumlah_izin', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                         placeholder="Hari"
                                                     />
                                                     <input
@@ -549,7 +549,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                         inputMode="decimal"
                                                         value={formData.uang_izin || 0}
                                                         onChange={e => handleChange('uang_izin', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                         placeholder="Rp /hari"
                                                     />
                                                 </div>
@@ -562,7 +562,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.jumlah_terlambat || 0}
                                                     onChange={e => handleChange('jumlah_terlambat', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     placeholder="Menit"
                                                 />
                                                 <input
@@ -570,7 +570,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                     inputMode="decimal"
                                                     value={formData.uang_terlambat || 0}
                                                     onChange={e => handleChange('uang_terlambat', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                                     placeholder="Rp /menit"
                                                 />
                                             </div>
@@ -584,7 +584,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 inputMode="decimal"
                                                 value={formData.bayar_kasbon || 0}
                                                 onChange={e => handleChange('bayar_kasbon', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                         <Field label="Loss / Lainnya">
@@ -593,7 +593,7 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                                 inputMode="decimal"
                                                 value={formData.loss || 0}
                                                 onChange={e => handleChange('loss', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#103552]/10"
                                             />
                                         </Field>
                                     </div>
@@ -601,9 +601,9 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                             </section>
 
                             <section className="bg-slate-900 rounded-2xl shadow-2xl p-8 text-white relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-indigo-500/20 transition-all duration-700" />
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#103552]/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-[#103552]/20 transition-all duration-700" />
 
-                                <h3 className="text-xs font-black text-indigo-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                                <h3 className="text-xs font-black text-[#96D1C6] uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                                     <FileText className="w-4 h-4" />
                                     Ringkasan Perhitungan
                                 </h3>
@@ -619,10 +619,10 @@ export function FinancePayrollEditPage({ id, onBack, onSaveSuccess }: FinancePay
                                     </div>
                                     <div className="h-px bg-white/10 my-4" />
                                     <div className="space-y-2">
-                                        <span className="text-[9px] font-black text-indigo-300 uppercase tracking-widest leading-none">Netto Salary (Gaji Bersih)</span>
+                                        <span className="text-[9px] font-black text-[#96D1C6] uppercase tracking-widest leading-none">Netto Salary (Gaji Bersih)</span>
                                         <div className="flex items-baseline gap-2">
                                             <span className="text-lg font-bold text-slate-500">Rp</span>
-                                            <h4 className="text-4xl font-black tracking-tighter italic text-indigo-50">
+                                            <h4 className="text-4xl font-black tracking-tighter italic text-[#96D1C6]/20">
                                                 {new Intl.NumberFormat('id-ID').format(formData.grand_total || 0)}
                                             </h4>
                                         </div>

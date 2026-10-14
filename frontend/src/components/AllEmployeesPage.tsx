@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -119,7 +119,7 @@ function initials(name: string) {
 }
 
 const avatarColors = [
-  'bg-violet-500', 'bg-indigo-500', 'bg-sky-500', 'bg-emerald-500',
+  'bg-[#185B5A]', 'bg-[#103552]', 'bg-sky-500', 'bg-emerald-500',
   'bg-amber-500', 'bg-rose-500', 'bg-pink-500', 'bg-teal-500',
 ];
 
@@ -456,7 +456,7 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 <div className="flex items-center gap-1.5 shrink-0">
                   <div className={cn(
                     'w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all',
-                    step === s ? 'bg-indigo-600 text-white' : STEPS.indexOf(step) > i ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'
+                    step === s ? 'bg-[#103552] text-white' : STEPS.indexOf(step) > i ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'
                   )}>
                     {STEPS.indexOf(step) > i ? '✓' : i + 1}
                   </div>
@@ -474,9 +474,9 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
           {/* UPLOAD */}
           {step === 'upload' && (
             <div className="p-7 space-y-5">
-              <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
+              <div className="flex items-center justify-between p-4 rounded-2xl bg-[#96D1C6]/20 border border-[#96D1C6]/30">
                 <div className="flex items-center gap-3">
-                  <FileSpreadsheet className="w-8 h-8 text-indigo-600 shrink-0" />
+                  <FileSpreadsheet className="w-8 h-8 text-[#103552] shrink-0" />
                   <div>
                     <p className="text-sm font-bold text-slate-800">Download Template Excel</p>
                     <p className="text-[11px] text-slate-500">Isi data pegawai sesuai format template agar import berhasil</p>
@@ -484,7 +484,7 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 </div>
                 <button
                   onClick={generateImportTemplate}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 shrink-0"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[#103552] hover:bg-[#103552] text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-[#96D1C6]/50 shrink-0"
                 >
                   <Download className="w-3.5 h-3.5" /> Download Template
                 </button>
@@ -496,7 +496,7 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
                   'border-2 border-dashed rounded-2xl p-14 text-center cursor-pointer transition-all',
-                  isDragOver ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50/60'
+                  isDragOver ? 'border-[#103552]/60 bg-[#96D1C6]/20' : 'border-slate-200 hover:border-[#103552]/40 hover:bg-slate-50/60'
                 )}
               >
                 <input
@@ -507,8 +507,8 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
                   onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }}
                 />
                 <div className="flex flex-col items-center gap-3">
-                  <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center transition-all', isDragOver ? 'bg-indigo-100' : 'bg-slate-100')}>
-                    <Upload className={cn('w-7 h-7', isDragOver ? 'text-indigo-600' : 'text-slate-400')} />
+                  <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center transition-all', isDragOver ? 'bg-[#96D1C6]/30' : 'bg-slate-100')}>
+                    <Upload className={cn('w-7 h-7', isDragOver ? 'text-[#103552]' : 'text-slate-400')} />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-700">{isDragOver ? 'Lepaskan file di sini' : 'Drag & drop file di sini'}</p>
@@ -589,8 +589,8 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
           {/* IMPORTING */}
           {step === 'importing' && (
             <div className="p-12 flex flex-col items-center gap-6">
-              <div className="w-20 h-20 rounded-3xl bg-indigo-50 flex items-center justify-center">
-                <Loader2 className="w-9 h-9 text-indigo-600 animate-spin" />
+              <div className="w-20 h-20 rounded-3xl bg-[#96D1C6]/20 flex items-center justify-center">
+                <Loader2 className="w-9 h-9 text-[#103552] animate-spin" />
               </div>
               <div className="text-center">
                 <p className="text-base font-bold text-slate-800">Sedang mengimport data...</p>
@@ -599,11 +599,11 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
               <div className="w-full max-w-xs">
                 <div className="flex justify-between text-xs text-slate-500 mb-2">
                   <span>Progress</span>
-                  <span className="font-bold text-indigo-600">{progress}%</span>
+                  <span className="font-bold text-[#103552]">{progress}%</span>
                 </div>
                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-indigo-500 rounded-full"
+                    className="h-full bg-[#103552] rounded-full"
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 0.2 }}
                   />
@@ -686,7 +686,7 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
               </button>
               <div className="flex items-center gap-3">
                 {errorCount > 0 && validCount > 0 && <p className="text-xs text-amber-600 font-semibold">{errorCount} baris akan dilewati</p>}
-                <button onClick={handleImport} disabled={validCount === 0} className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-indigo-200">
+                <button onClick={handleImport} disabled={validCount === 0} className="flex items-center gap-2 px-6 py-2.5 bg-[#103552] hover:bg-[#103552] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-[#96D1C6]/50">
                   <Upload className="w-4 h-4" /> Import {validCount} Pegawai <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -696,7 +696,7 @@ function ImportModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
           {step === 'done' && (
             <>
               <div />
-              <button onClick={onClose} className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-indigo-200">
+              <button onClick={onClose} className="flex items-center gap-2 px-6 py-2.5 bg-[#103552] hover:bg-[#103552] text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-[#96D1C6]/50">
                 <CheckCircle2 className="w-4 h-4" /> Selesai
               </button>
             </>
@@ -767,7 +767,7 @@ function QRModal({ employee, onClose }: { employee: Employee; onClose: () => voi
             <p>{employee.lokasi?.nama_lokasi ?? '-'}</p>
             <p>Berlaku s/d {formatDate(employee.masa_berlaku)}</p>
           </div>
-          <button onClick={handleDownload} className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-all shrink-0 shadow-md shadow-indigo-200">
+          <button onClick={handleDownload} className="flex items-center gap-1.5 px-3.5 py-2 bg-[#103552] hover:bg-[#103552] text-white text-xs font-semibold rounded-xl transition-all shrink-0 shadow-md shadow-[#96D1C6]/50">
             <Download className="w-3.5 h-3.5" /> Download
           </button>
         </div>
@@ -1269,7 +1269,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                     onClick={() => { handleExport('pkwt'); setShowExportDropdown(false); }}
                     className="w-full text-left px-5 py-3 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors flex items-center gap-2.5"
                   >
-                    <FileText className="w-4 h-4 text-indigo-500" /> Export PKWT
+                    <FileText className="w-4 h-4 text-[#185B5A]" /> Export PKWT
                   </button>
                 </motion.div>
               )}
@@ -1280,7 +1280,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-4">
           {[
-            { label: 'Total Pegawai', value: meta.total, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
+            { label: 'Total Pegawai', value: meta.total, icon: Users, color: 'text-[#103552]', bg: 'bg-[#96D1C6]/20', border: 'border-[#96D1C6]/30' },
             { label: 'Aktif', value: meta.total, icon: UserCheck, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
             { label: 'Cuti', value: '-', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
             { label: 'Baru Bulan Ini', value: '-', icon: TrendingUp, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
@@ -1306,7 +1306,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                 <input
                   type="text"
                   placeholder="Cari nama, email, atau username..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   value={searchInput}
                   onChange={(e) => handleSearchInput(e.target.value)}
                 />
@@ -1316,7 +1316,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                 <select 
                   value={selectedLokasi}
                   onChange={(e) => { setSelectedLokasi(e.target.value); setPage(1); }}
-                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-indigo-400 min-w-[160px]"
+                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-[#103552]/60 min-w-[160px]"
                 >
                   <option value="">Semua Lokasi</option>
                   {locations.map((l: any) => (
@@ -1331,7 +1331,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                 <select 
                   value={selectedJabatan}
                   onChange={(e) => { setSelectedJabatan(e.target.value); setPage(1); }}
-                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-indigo-400 min-w-[170px]"
+                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-[#103552]/60 min-w-[170px]"
                 >
                   <option value="">Semua Divisi</option>
                   <option value="kosong">Tanpa Divisi</option>
@@ -1347,7 +1347,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                 <select 
                   value={selectedRole}
                   onChange={(e) => { setSelectedRole(e.target.value); setPage(1); }}
-                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-indigo-400 min-w-[160px]"
+                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-[#103552]/60 min-w-[160px]"
                 >
                   <option value="">Semua Role</option>
                   {roles.map((r: any) => (
@@ -1362,7 +1362,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                 <select
                   value={selectedStatusKerja}
                   onChange={(e) => { setSelectedStatusKerja(e.target.value); setPage(1); }}
-                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-indigo-400 min-w-[160px]"
+                  className="appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all focus:outline-none focus:border-[#103552]/60 min-w-[160px]"
                 >
                   <option value="">Semua Status</option>
                   <option value="tetap">Pegawai Tetap</option>
@@ -1379,7 +1379,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
                 <AlertCircle className="w-8 h-8 text-rose-400" />
                 <p className="text-sm font-semibold text-slate-600">{error}</p>
-                 <button onClick={() => fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja)} className="text-indigo-600 text-sm font-semibold hover:underline">Coba lagi</button>
+                 <button onClick={() => fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRole, selectedStatusKerja)} className="text-[#103552] text-sm font-semibold hover:underline">Coba lagi</button>
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center py-20 gap-3 text-slate-400">
@@ -1425,11 +1425,11 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                       </td>
                       <td className="py-3.5 px-4"><span className="text-xs text-slate-600 whitespace-nowrap">{emp.jabatan?.nama_jabatan ?? '-'}</span></td>
                       <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-[11px] font-semibold capitalize border border-indigo-100 whitespace-nowrap">{emp.roles[0] ?? '-'}</span>
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[#96D1C6]/20 text-[#103552] text-[11px] font-semibold capitalize border border-[#96D1C6]/30 whitespace-nowrap">{emp.roles[0] ?? '-'}</span>
                       </td>
                       <td className="py-3.5 px-4">
                         <span className={cn('inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize border whitespace-nowrap',
-                          emp.is_admin === 'admin' ? 'bg-violet-50 text-violet-700 border-violet-100' : 'bg-slate-100 text-slate-600 border-slate-200')}>
+                          emp.is_admin === 'admin' ? 'bg-[#96D1C6]/20 text-violet-700 border-[#96D1C6]/30' : 'bg-slate-100 text-slate-600 border-slate-200')}>
                           {emp.is_admin ?? 'user'}
                         </span>
                       </td>
@@ -1441,25 +1441,25 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                       </td>
                       <td className="py-3.5 px-4">
                         <span className={cn('inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold border whitespace-nowrap uppercase tracking-wider',
-                          !emp.is_keluar ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-slate-100 text-slate-400 border-slate-200')}>
+                          !emp.is_keluar ? 'bg-[#96D1C6]/20 text-[#103552] border-[#96D1C6]/30' : 'bg-slate-100 text-slate-400 border-slate-200')}>
                           {!emp.is_keluar ? 'Aktif' : 'Sudah Keluar'}
                         </span>
                       </td>
                       <td className="py-3.5 px-4"><span className="text-xs text-slate-500 whitespace-nowrap">{formatDate(emp.masa_berlaku)}</span></td>
                       <td className="py-3.5 px-4">
-                        <button onClick={() => setQrEmployee(emp)} className="group/q flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all">
-                          <QrCode className="w-3 h-3 text-slate-400 group-hover/q:text-indigo-500 transition-colors" />
-                          <span className="text-[11px] font-semibold text-slate-600 group-hover/q:text-indigo-600 transition-colors whitespace-nowrap">Qrcode</span>
+                        <button onClick={() => setQrEmployee(emp)} className="group/q flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 hover:border-[#103552]/40 hover:bg-[#96D1C6]/20 transition-all">
+                          <QrCode className="w-3 h-3 text-slate-400 group-hover/q:text-[#185B5A] transition-colors" />
+                          <span className="text-[11px] font-semibold text-slate-600 group-hover/q:text-[#103552] transition-colors whitespace-nowrap">Qrcode</span>
                         </button>
                       </td>
                       <td className="py-3.5 px-4 z-10 relative">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => navigate(`/all-employees/${emp.id}`)} className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all" title="Edit"><Edit2 className="w-4 h-4" /></button>
+                          <button onClick={() => navigate(`/all-employees/${emp.id}`)} className="p-1.5 rounded-lg text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/20 transition-all" title="Edit"><Edit2 className="w-4 h-4" /></button>
                           <button onClick={() => setPwEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 transition-all" title="Edit Password"><Key className="w-4 h-4" /></button>
                           <button onClick={() => setMappingShiftEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all" title="Mapping Shift"><Map className="w-4 h-4" /></button>
                           <button onClick={() => setContractEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Kontrak"><ScrollText className="w-4 h-4" /></button>
                           <button onClick={() => setMappingEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all" title="Mapping Dinas Luar"><FileText className="w-4 h-4" /></button>
-                          <button onClick={() => setFaceRecEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all" title="Face Recognition"><ScanFace className="w-4 h-4" /></button>
+                          <button onClick={() => setFaceRecEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-[#185B5A] hover:bg-[#96D1C6]/20 transition-all" title="Face Recognition"><ScanFace className="w-4 h-4" /></button>
                           <button onClick={() => setDeleteConfirmEmployee(emp)} className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Hapus"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       </td>
@@ -1476,7 +1476,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                 Halaman <span className="font-semibold text-slate-600">{meta.page}</span> dari <span className="font-semibold text-slate-600">{meta.totalPages}</span>
               </p>
               <div className="flex items-center gap-1.5">
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={meta.page === 1} className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={meta.page === 1} className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-[#103552] hover:border-[#96D1C6]/50 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 {pageNumbers.map((pg, i) =>
@@ -1484,12 +1484,12 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
                     <span key={`dots-${i}`} className="w-8 h-8 flex items-center justify-center text-xs text-slate-400">…</span>
                   ) : (
                     <button key={pg} onClick={() => setPage(Number(pg))} className={cn('w-8 h-8 rounded-lg text-xs font-semibold transition-all',
-                      pg === meta.page ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200' : 'border border-slate-200 text-slate-500 hover:border-indigo-200 hover:text-indigo-600')}>
+                      pg === meta.page ? 'bg-[#103552] text-white shadow-sm shadow-[#96D1C6]/50' : 'border border-slate-200 text-slate-500 hover:border-[#96D1C6]/50 hover:text-[#103552]')}>
                       {pg}
                     </button>
                   )
                 )}
-                <button onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))} disabled={meta.page === meta.totalPages} className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                <button onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))} disabled={meta.page === meta.totalPages} className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-[#103552] hover:border-[#96D1C6]/50 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

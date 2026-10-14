@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Search, ArrowUpDown, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -102,7 +102,7 @@ export function LaporanKinerjaPage() {
               onChange={(e) => setStartDate(e.target.value)}
               onFocus={(e) => e.target.type = 'date'}
               onBlur={(e) => { if (!e.target.value) e.target.type = 'text'; }}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all w-48"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all w-48"
             />
             <input
               type="text"
@@ -111,7 +111,7 @@ export function LaporanKinerjaPage() {
               onChange={(e) => setEndDate(e.target.value)}
               onFocus={(e) => e.target.type = 'date'}
               onBlur={(e) => { if (!e.target.value) e.target.type = 'text'; }}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all w-48"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all w-48"
             />
           </div>
 
@@ -124,7 +124,7 @@ export function LaporanKinerjaPage() {
               placeholder="Cari nama pegawai atau jenis kinerja..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
             />
           </div>
         </div>
@@ -170,7 +170,7 @@ export function LaporanKinerjaPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin mx-auto"></div></td>
+                  <td colSpan={6} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin mx-auto"></div></td>
                 </tr>
               ) : paginatedData.length === 0 ? (
                 <tr>
@@ -204,7 +204,7 @@ export function LaporanKinerjaPage() {
               <button
                 onClick={handlePrevPage}
                 disabled={currentPage === 1}
-                className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-slate-400"
+                className="p-2 text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/20 rounded-lg transition-all disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-slate-400"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -245,7 +245,7 @@ export function LaporanKinerjaPage() {
                         className={cn(
                           "w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg text-xs font-bold transition-all",
                           currentPage === page
-                            ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 ring-2 ring-indigo-600/20"
+                            ? "bg-[#103552] text-white shadow-lg shadow-[#103552]/30 ring-2 ring-[#103552]/20"
                             : "text-slate-500 hover:bg-slate-100 border border-transparent hover:border-slate-200"
                         )}
                       >
@@ -259,7 +259,7 @@ export function LaporanKinerjaPage() {
               <button
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
-                className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-slate-400"
+                className="p-2 text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/20 rounded-lg transition-all disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-slate-400"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import * as XLSX from 'xlsx';
 import {
@@ -98,7 +98,7 @@ export function FinancePajakPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] pb-20">
+        <div className="min-h-screen bg-[#F0F0F0] pb-20">
             <div className="p-4 lg:p-10 max-w-[1700px] mx-auto space-y-8">
                 {/* Header Section */}
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 px-4">
@@ -115,18 +115,18 @@ export function FinancePajakPage() {
                 <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-wrap items-center gap-4">
                     <div className="flex items-center gap-4 flex-1 min-w-[300px]">
                         <div className="relative flex-1">
-                            <select value={bulan} onChange={e => setBulan(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none cursor-pointer">
+                            <select value={bulan} onChange={e => setBulan(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none appearance-none cursor-pointer">
                                 {months.map(m => <option key={m} value={m}>{m}</option>)}
                             </select>
                         </div>
                         <div className="relative flex-1">
-                            <select value={tahun} onChange={e => setTahun(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none appearance-none cursor-pointer">
+                            <select value={tahun} onChange={e => setTahun(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none appearance-none cursor-pointer">
                                 {years.map(y => <option key={y} value={y}>{y}</option>)}
                             </select>
                         </div>
                         <div className="relative flex-[2] min-w-[200px] group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
-                            <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari nama pegawai..." className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-[#185B5A] transition-colors" />
+                            <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari nama pegawai..." className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none" />
                         </div>
                     </div>
                 </div>
@@ -147,7 +147,7 @@ export function FinancePajakPage() {
                                     <th className="py-7 px-8 text-center bg-slate-50/50">Penghasilan Netto Setahun</th>
                                     <th className="py-7 px-8 text-center font-black text-slate-900 border-x border-slate-100 bg-slate-50/80">PTKP</th>
                                     <th className="py-7 px-8 text-center">PKP Setahun</th>
-                                    <th className="py-7 px-8 text-center font-black text-indigo-600 bg-indigo-50">PPH 21 Setahun</th>
+                                    <th className="py-7 px-8 text-center font-black text-[#103552] bg-[#96D1C6]/20">PPH 21 Setahun</th>
                                     <th className="py-7 px-8 text-center font-black text-emerald-600 bg-emerald-50">PPH 21 Sebulan</th>
                                 </tr>
                             </thead>
@@ -155,7 +155,7 @@ export function FinancePajakPage() {
                                 {loading && data.length === 0 ? (
                                     <tr>
                                         <td colSpan={12} className="py-32 text-center">
-                                            <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
+                                            <div className="w-12 h-12 border-4 border-[#96D1C6]/30 border-t-[#103552] rounded-full animate-spin mx-auto mb-4" />
                                             <p className="text-xs font-black text-slate-300 uppercase tracking-widest">Memuat Laporan...</p>
                                         </td>
                                     </tr>
@@ -182,7 +182,7 @@ export function FinancePajakPage() {
                                             <td className="py-6 px-8 text-center font-bold text-slate-600 text-sm italic">{fmt(row.netto_setahun)}</td>
                                             <td className="py-6 px-8 text-center font-black text-slate-900 text-sm border-x border-slate-100">{fmt(row.ptkp)}</td>
                                             <td className="py-6 px-8 text-center font-bold text-amber-600 text-sm">{fmt(row.pk_setahun)}</td>
-                                            <td className="py-6 px-8 text-center font-black text-indigo-700 text-sm bg-indigo-50/30">{fmt(row.pph21_setahun)}</td>
+                                            <td className="py-6 px-8 text-center font-black text-[#103552] text-sm bg-[#96D1C6]/20/30">{fmt(row.pph21_setahun)}</td>
                                             <td className="py-6 px-8 text-center font-black text-emerald-700 text-sm bg-emerald-50/30">{fmt(row.pph21_sebulan)}</td>
                                         </tr>
                                     ))
@@ -196,7 +196,7 @@ export function FinancePajakPage() {
                 <div className="flex justify-end pr-4">
                     <div className="flex items-center gap-1">
                         <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 text-sm">‹</button>
-                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-600 text-white font-black text-sm">1</button>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#103552] text-white font-black text-sm">1</button>
                         <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 text-sm font-bold">2</button>
                         <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 text-sm font-bold">3</button>
                         <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 text-sm">›</button>

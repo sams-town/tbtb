@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -217,7 +217,7 @@ export function MobileNotificationsPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       {/* ─── HEADER ─── */}
-      <div className="bg-gradient-to-br from-indigo-700 to-violet-600 pt-14 pb-8 px-6 sticky top-0 z-[100] overflow-hidden shadow-lg">
+      <div className="bg-gradient-to-br from-[#103552] to-[#185B5A] pt-14 pb-8 px-6 sticky top-0 z-[100] overflow-hidden shadow-lg">
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
         <div className="relative z-10 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -258,7 +258,7 @@ export function MobileNotificationsPage() {
           onClick={() => setActiveTab('all')}
           className={cn(
             "flex-1 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
-            activeTab === 'all' ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "bg-slate-50 text-slate-400"
+            activeTab === 'all' ? "bg-[#103552] text-white shadow-lg shadow-[#96D1C6]/50" : "bg-slate-50 text-slate-400"
           )}
         >
           Semua {notifications.length > 0 && `(${notifications.length})`}
@@ -267,7 +267,7 @@ export function MobileNotificationsPage() {
           onClick={() => setActiveTab('unread')}
           className={cn(
             "flex-1 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
-            activeTab === 'unread' ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "bg-slate-50 text-slate-400"
+            activeTab === 'unread' ? "bg-[#103552] text-white shadow-lg shadow-[#96D1C6]/50" : "bg-slate-50 text-slate-400"
           )}
         >
           Belum Dibaca {notifications.filter(n => n.unread).length > 0 && `(${notifications.filter(n => n.unread).length})`}
@@ -278,7 +278,7 @@ export function MobileNotificationsPage() {
       <div className="px-5 py-6 pb-32">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-[#103552]/20 border-t-[#103552] rounded-full animate-spin" />
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Memuat...</p>
           </div>
         ) : filteredNotifications.length > 0 ? (
@@ -293,12 +293,12 @@ export function MobileNotificationsPage() {
                 className={cn(
                   "p-5 rounded-[2rem] border transition-all active:scale-[0.98] relative",
                   notif.unread 
-                    ? "bg-white border-indigo-100 shadow-xl shadow-indigo-500/5" 
+                    ? "bg-white border-[#96D1C6]/30 shadow-xl shadow-[#103552]/20/5" 
                     : "bg-slate-50/50 border-slate-100"
                 )}
               >
                 {notif.unread && (
-                  <div className="absolute top-6 left-2 w-1.5 h-1.5 bg-indigo-600 rounded-full" />
+                  <div className="absolute top-6 left-2 w-1.5 h-1.5 bg-[#103552] rounded-full" />
                 )}
                 
                 <div className="flex gap-4">
@@ -340,7 +340,7 @@ export function MobileNotificationsPage() {
 
                 {(notif.action || notif.type === 'alert' || notif.type === 'request' || notif.message?.toLowerCase().includes('kontrak') || notif.message?.toLowerCase().includes('pkwt') || notif.message?.toLowerCase().includes('cuti') || notif.message?.toLowerCase().includes('lembur') || notif.message?.toLowerCase().includes('izin')) && (
                   <div className="mt-4 flex justify-end">
-                    <button className="px-5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-all">
+                    <button className="px-5 py-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#96D1C6]/30 transition-all">
                       Lihat Detail
                     </button>
                   </div>
@@ -375,7 +375,7 @@ function getIcon(type: Notification['type'], className = 'w-3 h-3') {
 function getIconBg(type: Notification['type']) {
   switch (type) {
     case 'request': return 'bg-emerald-500';
-    case 'mention': return 'bg-indigo-500';
+    case 'mention': return 'bg-[#103552]';
     case 'system': return 'bg-amber-500';
     case 'alert': return 'bg-rose-500';
     default: return 'bg-slate-500';

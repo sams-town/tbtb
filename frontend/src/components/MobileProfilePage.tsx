@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -80,18 +80,18 @@ export function MobileProfilePage({ onLogout, settings }: { onLogout?: () => voi
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans pb-32 overflow-x-hidden">
+    <div className="min-h-screen bg-[#F0F0F0] font-sans pb-32 overflow-x-hidden">
       {/* Premium Header Profile */}
-      <div className="bg-indigo-700 pt-14 pb-24 px-6 rounded-b-[4rem] relative shadow-2xl shadow-indigo-500/20 overflow-hidden">
+      <div className="bg-[#103552] pt-14 pb-24 px-6 rounded-b-[4rem] relative shadow-2xl shadow-[#103552]/20/20 overflow-hidden">
         {/* Floating Blobs */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl -ml-10 -mb-10" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#96D1C6]/20 rounded-full blur-2xl -ml-10 -mb-10" />
 
         <div className="flex items-center justify-between relative z-10 text-white mb-8">
            <button onClick={() => navigate('/beranda')} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 active:scale-90 transition-all">
@@ -112,12 +112,12 @@ export function MobileProfilePage({ onLogout, settings }: { onLogout?: () => voi
                  {profile?.foto_karyawan ? (
                    <img src={profile.foto_karyawan} alt="Avatar" className="w-full h-full object-cover" />
                  ) : (
-                   <div className="w-full h-full flex items-center justify-center text-indigo-100">
+                   <div className="w-full h-full flex items-center justify-center text-[#96D1C6]/30">
                       <User className="w-14 h-14 opacity-20" />
                    </div>
                  )}
               </div>
-              <button className="absolute -bottom-1 -right-1 w-10 h-10 bg-white text-indigo-600 rounded-2xl border-4 border-indigo-700 flex items-center justify-center shadow-xl active:scale-95 transition-all">
+              <button className="absolute -bottom-1 -right-1 w-10 h-10 bg-white text-[#103552] rounded-2xl border-4 border-[#103552] flex items-center justify-center shadow-xl active:scale-95 transition-all">
                  <Camera className="w-5 h-5" />
               </button>
            </div>
@@ -173,7 +173,7 @@ export function MobileProfilePage({ onLogout, settings }: { onLogout?: () => voi
             >
               {/* Personal Info */}
               <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 space-y-2">
-                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                <p className="text-[10px] font-black text-[#185B5A] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                    <User className="w-3 h-3" /> Data Personal
                 </p>
                 <InfoItem icon={Mail} label="Alamat Email" value={profile?.email} />
@@ -184,25 +184,25 @@ export function MobileProfilePage({ onLogout, settings }: { onLogout?: () => voi
               </div>
 
               {/* ID Cards */}
-              <div className="bg-indigo-950 text-white rounded-[2.5rem] p-8 shadow-xl shadow-indigo-900/10 space-y-6">
-                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="bg-[#103552] text-white rounded-[2.5rem] p-8 shadow-xl shadow-[#103552]/10 space-y-6">
+                <p className="text-[10px] font-black text-[#96D1C6] uppercase tracking-[0.2em] flex items-center gap-2">
                    <ShieldCheck className="w-3 h-3" /> Identitas & Dokumen
                 </p>
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none">NIK KTP</p>
+                    <p className="text-[10px] font-black text-[#96D1C6] uppercase tracking-widest leading-none">NIK KTP</p>
                     <p className="text-sm font-black mt-2 tracking-tight">{profile?.ktp || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none">Username</p>
+                    <p className="text-[10px] font-black text-[#96D1C6] uppercase tracking-widest leading-none">Username</p>
                     <p className="text-sm font-black mt-2 tracking-tight">@{profile?.username || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none">BPJS Kesehatan</p>
+                    <p className="text-[10px] font-black text-[#96D1C6] uppercase tracking-widest leading-none">BPJS Kesehatan</p>
                     <p className="text-sm font-black mt-2 tracking-tight">{profile?.bpjs_kesehatan || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest leading-none">BPJS TK</p>
+                    <p className="text-[10px] font-black text-[#96D1C6] uppercase tracking-widest leading-none">BPJS TK</p>
                     <p className="text-sm font-black mt-2 tracking-tight">{profile?.bpjs_ketenagakerjaan || '-'}</p>
                   </div>
                 </div>
@@ -219,15 +219,15 @@ export function MobileProfilePage({ onLogout, settings }: { onLogout?: () => voi
               className="space-y-6"
             >
               <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex flex-col items-center">
-                 <div className="w-20 h-20 bg-indigo-50 rounded-[1.8rem] flex items-center justify-center mb-6">
-                   <CalendarDays className="w-10 h-10 text-indigo-600" />
+                 <div className="w-20 h-20 bg-[#96D1C6]/20 rounded-[1.8rem] flex items-center justify-center mb-6">
+                   <CalendarDays className="w-10 h-10 text-[#103552]" />
                  </div>
                  <h3 className="text-2xl font-black text-slate-800 tabular-nums">{profile?.izin_cuti || 0} Hari</h3>
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Sisa Jatah Cuti Tahunan</p>
               </div>
 
               <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 space-y-4">
-                 <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-2">Riwayat Kontrak</p>
+                 <p className="text-[10px] font-black text-[#185B5A] uppercase tracking-[0.2em] mb-2">Riwayat Kontrak</p>
                  <div className="flex gap-4">
                     <div className="flex-1 p-5 bg-slate-50 rounded-[1.8rem] border border-slate-100">
                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mulai Kontrak</p>
@@ -340,7 +340,7 @@ function TabButton({ active, onClick, icon: Icon, label }: { active: boolean, on
       onClick={onClick}
       className={cn(
         "flex-1 flex items-center justify-center gap-2 py-3.5 px-3 rounded-3xl transition-all whitespace-nowrap",
-        active ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30" : "bg-transparent text-slate-400 hover:text-slate-600"
+        active ? "bg-[#103552] text-white shadow-lg shadow-[#103552]/20/30" : "bg-transparent text-slate-400 hover:text-slate-600"
       )}
     >
       <Icon className={cn("w-4 h-4", active ? "text-white" : "text-slate-300")} />
@@ -392,7 +392,7 @@ function PenaltyRow({ label, value, unit, highlight }: { label: string, value: a
     <div className="flex items-center justify-between py-5 first:pt-4 last:pb-4">
        <span className="text-xs font-bold text-slate-600 uppercase tracking-tighter">{label}</span>
        <div className="text-right">
-          <p className={cn("text-xs font-black tabular-nums", highlight ? "text-indigo-600" : "text-rose-600")}>
+          <p className={cn("text-xs font-black tabular-nums", highlight ? "text-[#103552]" : "text-rose-600")}>
             Rp {formatCurrency(value)}
           </p>
           <p className="text-[9px] font-bold text-slate-300 uppercase tracking-[0.2em]">{unit}</p>

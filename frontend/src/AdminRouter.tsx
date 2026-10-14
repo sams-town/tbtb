@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -376,14 +376,14 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
         {/* Navigation Buttons */}
         <button
           onClick={() => scroll('left')}
-          className="absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-[#F97316] text-white rounded-full shadow-xl shadow-orange-500/40 flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all hover:scale-110 active:scale-95 translate-x-4 group-hover/carousel:translate-x-0"
+          className="absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-[#E09132] text-white rounded-full shadow-xl shadow-orange-500/40 flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all hover:scale-110 active:scale-95 translate-x-4 group-hover/carousel:translate-x-0"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
 
         <button
           onClick={() => scroll('right')}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-[#F97316] text-white rounded-full shadow-xl shadow-orange-500/40 flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all hover:scale-110 active:scale-95 -translate-x-4 group-hover/carousel:translate-x-0"
+          className="absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-[#E09132] text-white rounded-full shadow-xl shadow-orange-500/40 flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all hover:scale-110 active:scale-95 -translate-x-4 group-hover/carousel:translate-x-0"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
@@ -403,12 +403,12 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
 
 
   return (
-    <div className="h-screen flex bg-[#F8FAFC] overflow-hidden">
+    <div className="h-screen flex bg-[#F0F0F0] overflow-hidden">
       {/* Sidebar */}
       <motion.aside
         initial={false}
         animate={{ width: isSidebarCollapsed ? 100 : 288 }}
-        className="bg-[#1A1C1E] text-white flex flex-col sticky top-0 h-screen overflow-hidden shadow-[20px_0_40px_rgba(0,0,0,0.2)] z-50 shrink-0 border-r border-white/5"
+        className="bg-[#103552] text-white flex flex-col sticky top-0 h-screen overflow-hidden shadow-[20px_0_40px_rgba(0,0,0,0.2)] z-50 shrink-0 border-r border-white/5"
       >
         {/* Fixed Header */}
         <div className={cn("p-8 flex items-center transition-all duration-300 shrink-0", isSidebarCollapsed ? "justify-center" : "gap-4")}>
@@ -428,7 +428,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
               <span className="text-2xl font-black tracking-tighter block bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent italic">
                 {settings?.name?.split(' ')[0] || 'HRIS'}
               </span>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] -mt-1 block">
+              <span className="text-[10px] font-black text-[#96D1C6]/60 uppercase tracking-[0.3em] -mt-1 block">
                 {settings?.name?.split(' ').slice(1).join(' ') || '---------------'}
               </span>
             </motion.div>
@@ -582,14 +582,14 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 )}
               >
                 {['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) && (
-                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F97316] rounded-r-full shadow-[0_0_15px_rgba(249,115,22,0.8)]" />
+                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
                 )}
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                    ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "bg-[#F97316]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                    ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
                   )}>
-                    <Clock className={cn("w-4 h-4 transition-colors", ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "text-[#F97316]" : "text-white/40 group-hover:text-white")} />
+                    <Clock className={cn("w-4 h-4 transition-colors", ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
                   </div>
                   {!isSidebarCollapsed && <span>Absensi</span>}
                 </div>
@@ -629,14 +629,14 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 )}
               >
                 {['overtime-entry', 'overtime-data'].includes(currentPage) && (
-                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F97316] rounded-r-full shadow-[0_0_15px_rgba(249,115,22,0.8)]" />
+                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
                 )}
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                    ['overtime-entry', 'overtime-data'].includes(currentPage) ? "bg-[#F97316]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                    ['overtime-entry', 'overtime-data'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
                   )}>
-                    <TrendingUp className={cn("w-4 h-4 transition-colors", ['overtime-entry', 'overtime-data'].includes(currentPage) ? "text-[#F97316]" : "text-white/40 group-hover:text-white")} />
+                    <TrendingUp className={cn("w-4 h-4 transition-colors", ['overtime-entry', 'overtime-data'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
                   </div>
                   {!isSidebarCollapsed && <span>Overtime</span>}
                 </div>
@@ -671,14 +671,14 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 )}
               >
                 {['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) && (
-                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F97316] rounded-r-full shadow-[0_0_15px_rgba(249,115,22,0.8)]" />
+                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
                 )}
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                    ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "bg-[#F97316]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                    ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
                   )}>
-                    <Activity className={cn("w-4 h-4 transition-colors", ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "text-[#F97316]" : "text-white/40 group-hover:text-white")} />
+                    <Activity className={cn("w-4 h-4 transition-colors", ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
                   </div>
                   {!isSidebarCollapsed && <span>Visit & Kinerja</span>}
                 </div>
@@ -741,14 +741,14 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                   )}
                 >
                   {['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) && (
-                    <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F97316] rounded-r-full shadow-[0_0_15px_rgba(249,115,22,0.8)]" />
+                    <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
                   )}
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                      ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "bg-[#F97316]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                      ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
                     )}>
-                      <DollarSign className={cn("w-4 h-4 transition-colors", ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "text-[#F97316]" : "text-white/40 group-hover:text-white")} />
+                      <DollarSign className={cn("w-4 h-4 transition-colors", ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
                     </div>
                     {!isSidebarCollapsed && <span>Keuangan & Target</span>}
                   </div>
@@ -803,7 +803,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
         </div>
 
         {/* Fixed Footer */}
-        <div className="p-6 border-t border-white/5 shrink-0 bg-[#1A1C1E]">
+        <div className="p-6 border-t border-white/5 shrink-0 bg-[#103552]">
           <button
             onClick={handleLogout}
             className={cn(
@@ -825,7 +825,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F8FAFC]">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F0F0F0]">
         {/* Top Header */}
         <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between px-10 shrink-0 z-40">
           <div className="flex items-center gap-6">
@@ -841,7 +841,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 className={cn(
                   "px-6 py-3 rounded-2xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest",
                   currentPage === 'dashboard'
-                    ? "bg-[#F97316] text-white shadow-[0_10px_20px_rgba(249,115,22,0.3)] hover:bg-[#EA580C]"
+                    ? "bg-[#E09132] text-white shadow-[0_10px_20px_rgba(224,145,50,0.3)] hover:bg-[#C97E28]"
                     : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50"
                 )}
               >
@@ -861,13 +861,13 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                   className={cn(
                     "p-3 rounded-2xl transition-all relative group border shadow-sm",
                     isNotificationsOpen || currentPage === 'notifications'
-                      ? "bg-indigo-50 border-indigo-200 text-indigo-600"
-                      : "bg-white border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50"
+                      ? "bg-[#103552]/10 border-[#103552]/30 text-[#103552]"
+                      : "bg-white border-slate-200 text-slate-400 hover:text-[#103552] hover:border-[#103552]/30 hover:bg-[#103552]/5"
                   )}
                 >
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-[0_4px_12px_rgba(244,63,94,0.4)]">
+                    <span className="absolute -top-1.5 -right-1.5 bg-[#E09132] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-[0_4px_12px_rgba(224,145,50,0.4)]">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -884,7 +884,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                       <div className="bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
                         <div className="p-6 border-b border-slate-50 flex items-center justify-between">
                           <h3 className="text-sm font-black text-slate-900 tracking-tight uppercase">NOTIFIKASI</h3>
-                          {unreadCount > 0 && <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">{unreadCount} UNREAD</span>}
+                          {unreadCount > 0 && <span className="text-[10px] font-black text-[#E09132] bg-[#E09132]/10 px-2 py-1 rounded-lg">{unreadCount} UNREAD</span>}
                         </div>
                         <div className="max-h-[400px] overflow-y-auto">
                           {previewNotifications.length > 0 ? (
@@ -902,11 +902,11 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                                   }}
                                   className={cn(
                                     "w-full p-4 flex gap-4 text-left border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-all",
-                                    isUnread ? "bg-indigo-50/20" : ""
+                                    isUnread ? "bg-[#103552]/5" : ""
                                   )}
                                 >
-                                  <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center shrink-0">
-                                    <Bell className="w-4 h-4 text-indigo-600" />
+                                  <div className="w-10 h-10 rounded-xl bg-[#96D1C6]/30 flex items-center justify-center shrink-0">
+                                    <Bell className="w-4 h-4 text-[#103552]" />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className={cn("text-xs font-bold truncate mb-0.5", isUnread ? "text-slate-900" : "text-slate-500")}>
@@ -919,7 +919,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                                       {new Date(n.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                     </p>
                                   </div>
-                                  {isUnread && <div className="w-2 h-2 bg-indigo-600 rounded-full mt-2 shadow-[0_0_8px_rgba(79,70,229,0.4)]"></div>}
+                                  {isUnread && <div className="w-2 h-2 bg-[#103552] rounded-full mt-2 shadow-[0_0_8px_rgba(16,53,82,0.4)]"></div>}
                                 </button>
                               );
                             })
@@ -932,7 +932,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                         </div>
                         <button
                           onClick={() => { setIsNotificationsOpen(false); setCurrentPage('notifications'); }}
-                          className="w-full p-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest text-center bg-slate-50/50 hover:bg-slate-50 transition-all"
+                          className="w-full p-4 text-[10px] font-black text-[#103552] uppercase tracking-widest text-center bg-slate-50/50 hover:bg-slate-50 transition-all"
                         >
                           Lihat Semua Notifikasi
                         </button>
@@ -955,11 +955,11 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                   className="flex items-center gap-4 pl-2 group"
                 >
                   <div className="text-right hidden sm:block">
-                    <p className="text-sm font-black text-slate-900 leading-none group-hover:text-indigo-600 transition-colors tracking-tight">{user?.name || 'Super Admin'}</p>
-                    <p className="text-[9px] text-indigo-500 font-black mt-1.5 uppercase tracking-[0.2em]">{user?.jabatan?.nama_jabatan || user?.roles?.[0] || 'Member Access'}</p>
+                    <p className="text-sm font-black text-slate-900 leading-none group-hover:text-[#103552] transition-colors tracking-tight">{user?.name || 'Super Admin'}</p>
+                    <p className="text-[9px] text-[#E09132] font-black mt-1.5 uppercase tracking-[0.2em]">{user?.jabatan?.nama_jabatan || user?.roles?.[0] || 'Member Access'}</p>
                   </div>
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-100 border-2 border-white shadow-xl overflow-hidden group-hover:scale-105 transition-transform group-hover:rotate-2">
+                    <div className="w-12 h-12 rounded-2xl bg-[#96D1C6]/30 border-2 border-white shadow-xl overflow-hidden group-hover:scale-105 transition-transform group-hover:rotate-2">
                       <img src="https://picsum.photos/seed/admin/120/120" alt="Admin" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full shadow-lg"></div>
@@ -983,14 +983,14 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                         <div className="py-2">
                           <button
                             onClick={() => { setCurrentPage('profile'); setIsProfileMenuOpen(false); }}
-                            className="w-full flex items-center gap-3 px-5 py-3 text-sm font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
+                            className="w-full flex items-center gap-3 px-5 py-3 text-sm font-bold text-slate-600 hover:bg-[#103552]/5 hover:text-[#103552] transition-all"
                           >
                             <User className="w-4 h-4" />
                             Account
                           </button>
                           <button
                             onClick={() => { setCurrentPage('change-password'); setIsProfileMenuOpen(false); }}
-                            className="w-full flex items-center gap-3 px-5 py-3 text-sm font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
+                            className="w-full flex items-center gap-3 px-5 py-3 text-sm font-bold text-slate-600 hover:bg-[#103552]/5 hover:text-[#103552] transition-all"
                           >
                             <Lock className="w-4 h-4" />
                             Change Password
@@ -1043,7 +1043,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                             newDate.setMonth(newDate.getMonth() - 1);
                             setCalendarDate(newDate);
                           }}
-                          className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-600 transition-all hover:text-indigo-600 active:scale-90"
+                          className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-600 transition-all hover:text-[#103552] active:scale-90"
                         >
                           <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -1053,7 +1053,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                             newDate.setMonth(newDate.getMonth() + 1);
                             setCalendarDate(newDate);
                           }}
-                          className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-600 transition-all hover:text-indigo-600 active:scale-90"
+                          className="p-3 hover:bg-white hover:shadow-md rounded-xl text-slate-600 transition-all hover:text-[#103552] active:scale-90"
                         >
                           <ChevronRight className="w-5 h-5" />
                         </button>
@@ -1084,7 +1084,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                           "Upcoming Events"
                         )}
                       </h2>
-                      <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mt-3">Attendance & Events Calendar</p>
+                      <p className="text-[10px] font-black text-[#185B5A] uppercase tracking-[0.3em] mt-3">Attendance & Events Calendar</p>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -1131,12 +1131,12 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                                   cells.push(
                                     <td key={j} className={cn(
                                       "h-44 p-4 border-r border-b border-slate-100 align-top transition-all relative group cursor-pointer",
-                                      isToday ? "bg-indigo-50/30" : "hover:bg-slate-50/50"
+                                      isToday ? "bg-[#96D1C6]/20/30" : "hover:bg-slate-50/50"
                                     )}>
                                       <div className="flex justify-between items-center mb-3">
                                         <span className={cn(
                                           "text-sm font-black transition-colors",
-                                          isToday ? "text-indigo-600" : "text-slate-300 group-hover:text-slate-900"
+                                          isToday ? "text-[#103552]" : "text-slate-300 group-hover:text-slate-900"
                                         )}>
                                           {currentDay.toString().padStart(2, '0')}
                                         </span>
@@ -1156,7 +1156,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                                       </div>
                                       {isToday && (
                                         <div className="absolute bottom-4 right-4">
-                                          <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                                          <div className="w-2 h-2 bg-[#103552] rounded-full"></div>
                                         </div>
                                       )}
                                     </td>
@@ -1433,15 +1433,15 @@ function SidebarItem({ icon: Icon, label, active = false, badge = undefined, col
         {active && (
           <motion.div
             layoutId="active-pill"
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#F97316] rounded-r-full shadow-[0_0_15px_rgba(249,115,22,0.8)]"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]"
           />
         )}
         <div className="flex items-center gap-3">
           <div className={cn(
             "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-            active ? "bg-[#F97316]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+            active ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
           )}>
-            <Icon className={cn("w-4 h-4 transition-colors shrink-0", active ? "text-[#F97316]" : "text-white/40 group-hover:text-white")} />
+            <Icon className={cn("w-4 h-4 transition-colors shrink-0", active ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
           </div>
           {!collapsed && <span className="tracking-tight">{label}</span>}
         </div>
@@ -1466,18 +1466,18 @@ function SidebarSubItem({ label, onClick, active }: { label: string, onClick?: (
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-3 px-8 py-2.5 text-xs font-bold transition-all relative group",
-        active ? "text-[#F97316]" : "text-white/30 hover:text-white"
+        active ? "text-[#E09132]" : "text-white/30 hover:text-white"
       )}
     >
       <div className={cn(
         "w-1.5 h-1.5 rounded-full transition-all",
-        active ? "bg-[#F97316] shadow-[0_0_8px_rgba(249,115,22,0.8)] scale-125" : "bg-white/10 group-hover:bg-white/30"
+        active ? "bg-[#E09132] shadow-[0_0_8px_rgba(224,145,50,0.8)] scale-125" : "bg-white/10 group-hover:bg-white/30"
       )}></div>
       <span className="tracking-tight">{label}</span>
       {active && (
         <motion.div
           layoutId="sub-active-line"
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#F97316] rounded-l-full"
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#E09132] rounded-l-full"
         />
       )}
     </button>
@@ -1491,7 +1491,7 @@ function CalendarViewButton({ label, active = false, onClick }: { label: string,
       className={cn(
         "px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-all rounded-xl",
         active
-          ? "bg-white text-indigo-600 shadow-sm"
+          ? "bg-white text-[#103552] shadow-sm"
           : "text-slate-500 hover:text-slate-900"
       )}>
       {label}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeft, 
@@ -437,7 +437,7 @@ export function MobileLeavePage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24">
       {/* ─── HEADER ─── */}
-      <div className="bg-gradient-to-br from-indigo-700 to-indigo-600 pt-14 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-indigo-500/20">
+      <div className="bg-gradient-to-br from-[#103552] to-[#103552] pt-14 pb-24 px-6 rounded-b-[3.5rem] relative shadow-2xl shadow-[#103552]/20/20">
         <div className="flex items-center justify-between relative z-10 text-white">
           <div className="flex items-center gap-4">
             <button 
@@ -469,7 +469,7 @@ export function MobileLeavePage() {
               onClick={() => handleTabChange('my')}
               className={cn(
                 "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                activeSubTab === 'my' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500"
+                activeSubTab === 'my' ? "bg-white text-[#103552] shadow-sm" : "text-slate-500"
               )}
             >
               Pengajuan Saya
@@ -478,7 +478,7 @@ export function MobileLeavePage() {
               onClick={() => handleTabChange('approval')}
               className={cn(
                 "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
-                activeSubTab === 'approval' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500"
+                activeSubTab === 'approval' ? "bg-white text-[#103552] shadow-sm" : "text-slate-500"
               )}
             >
               Persetujuan Cuti
@@ -487,8 +487,8 @@ export function MobileLeavePage() {
         )}
 
         {activeSubTab === 'approval' && location.state?.userId && viewState === 'list' && (
-          <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-3xl flex items-center justify-between mb-4">
-            <span className="text-[10px] font-bold text-indigo-900 leading-tight">
+          <div className="bg-[#96D1C6]/20 border border-[#96D1C6]/30 p-4 rounded-3xl flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold text-[#103552] leading-tight">
               Menampilkan pengajuan untuk karyawan tertentu
             </span>
             <button
@@ -496,7 +496,7 @@ export function MobileLeavePage() {
                 navigate('/leave', { replace: true, state: {} });
                 handleTabChange('approval');
               }}
-              className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline"
+              className="text-[10px] font-black text-[#103552] uppercase tracking-widest hover:underline"
             >
               Tampilkan Semua
             </button>
@@ -508,16 +508,16 @@ export function MobileLeavePage() {
           <>
             {loading ? (
               <div className="flex flex-col items-center py-20 gap-3">
-                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Memuat data...</p>
               </div>
             ) : leaves.length === 0 ? (
               <div className="flex flex-col items-center py-20 bg-white rounded-[2.5rem] shadow-xl border border-slate-100">
-                <div className="w-20 h-20 bg-indigo-50 rounded-[1.5rem] flex items-center justify-center mb-5">
-                  <Calendar className="w-10 h-10 text-indigo-300" />
+                <div className="w-20 h-20 bg-[#96D1C6]/20 rounded-[1.5rem] flex items-center justify-center mb-5">
+                  <Calendar className="w-10 h-10 text-[#96D1C6]" />
                 </div>
                 <p className="text-sm font-black text-slate-800">Belum ada pengajuan</p>
-                <button onClick={openAdd} className="mt-4 text-[10px] text-indigo-600 font-black uppercase tracking-widest px-6 py-2 bg-indigo-50 rounded-full border border-indigo-100 active:scale-95 transition-all">Ajukan Sekarang</button>
+                <button onClick={openAdd} className="mt-4 text-[10px] text-[#103552] font-black uppercase tracking-widest px-6 py-2 bg-[#96D1C6]/20 rounded-full border border-[#96D1C6]/30 active:scale-95 transition-all">Ajukan Sekarang</button>
               </div>
             ) : (
               <div className="space-y-4">
@@ -546,7 +546,7 @@ export function MobileLeavePage() {
                           </div>
                           <div>
                             {activeSubTab === 'approval' && (
-                              <p className="text-[9px] font-black text-indigo-600 uppercase tracking-widest mb-0.5 leading-none">
+                              <p className="text-[9px] font-black text-[#103552] uppercase tracking-widest mb-0.5 leading-none">
                                 {item.pemohon?.name || item.users?.name || 'Karyawan'}
                               </p>
                             )}
@@ -575,17 +575,17 @@ export function MobileLeavePage() {
                         
                         {item.foto_cuti && (
                           <div className="mt-4 flex items-center gap-2 pt-4 border-t border-slate-100">
-                             <ImageIcon className="w-4 h-4 text-indigo-400" />
-                             <a href={formatPhotoUrl(item.foto_cuti)} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-indigo-600 uppercase tracking-widest underline decoration-indigo-200 underline-offset-4">
+                             <ImageIcon className="w-4 h-4 text-[#96D1C6]" />
+                             <a href={formatPhotoUrl(item.foto_cuti)} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-[#103552] uppercase tracking-widest underline decoration-[#96D1C6]/50 underline-offset-4">
                                Lihat Lampiran Bukti
                              </a>
                           </div>
                         )}
 
                         {item.catatan && (
-                          <div className="mt-4 p-4 bg-indigo-50 border border-indigo-100 rounded-2xl">
-                             <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">Catatan Admin:</p>
-                             <p className="text-xs font-bold text-indigo-900">{item.catatan}</p>
+                          <div className="mt-4 p-4 bg-[#96D1C6]/20 border border-[#96D1C6]/30 rounded-2xl">
+                             <p className="text-[9px] font-black text-[#96D1C6] uppercase tracking-widest mb-1">Catatan Admin:</p>
+                             <p className="text-xs font-bold text-[#103552]">{item.catatan}</p>
                           </div>
                         )}
 
@@ -643,21 +643,21 @@ export function MobileLeavePage() {
           >
             <div className="space-y-4">
               {templateUrl && (
-                <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-3xl flex flex-col gap-3">
+                <div className="bg-[#96D1C6]/20 border border-[#96D1C6]/30 p-4 rounded-3xl flex flex-col gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm">
+                    <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-[#103552] shadow-sm">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[10px] font-black text-indigo-900 uppercase tracking-widest leading-none">Unduh Formulir Cuti</p>
-                      <p className="text-[9px] font-bold text-indigo-400 mt-1 leading-tight">Silakan unduh, isi, dan tanda tangani formulir sebelum dikirim.</p>
+                      <p className="text-[10px] font-black text-[#103552] uppercase tracking-widest leading-none">Unduh Formulir Cuti</p>
+                      <p className="text-[9px] font-bold text-[#96D1C6] mt-1 leading-tight">Silakan unduh, isi, dan tanda tangani formulir sebelum dikirim.</p>
                     </div>
                   </div>
                   <a 
                     href={templateUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="w-full py-3 bg-white border border-indigo-200 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-[0.1em] shadow-sm active:scale-95 transition-all"
+                    className="w-full py-3 bg-white border border-[#96D1C6]/50 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black text-[#103552] uppercase tracking-[0.1em] shadow-sm active:scale-95 transition-all"
                   >
                     <Download className="w-4 h-4" />
                     Unduh File Template
@@ -673,7 +673,7 @@ export function MobileLeavePage() {
                   <select 
                     value={formData.nama_cuti}
                     onChange={(e) => setFormData({...formData, nama_cuti: e.target.value})}
-                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none"
+                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all appearance-none"
                   >
                     <option value="">Pilih Jenis</option>
                     <option value="Cuti Tahunan">Cuti Tahunan</option>
@@ -696,7 +696,7 @@ export function MobileLeavePage() {
                   <select 
                     value={formData.id_manager}
                     onChange={(e) => setFormData({...formData, id_manager: e.target.value})}
-                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all appearance-none"
+                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all appearance-none"
                   >
                     <option value="">Pilih Manager</option>
                     {managers.map(m => (
@@ -715,7 +715,7 @@ export function MobileLeavePage() {
                     type="date"
                     value={formData.tanggal_mulai}
                     onChange={(e) => setFormData({...formData, tanggal_mulai: e.target.value})}
-                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
               </div>
@@ -730,7 +730,7 @@ export function MobileLeavePage() {
                     value={formData.tanggal_akhir}
                     onChange={(e) => setFormData({...formData, tanggal_akhir: e.target.value})}
                     min={formData.tanggal_mulai}
-                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    className="w-full pl-11 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
                   />
                 </div>
               </div>
@@ -742,7 +742,7 @@ export function MobileLeavePage() {
                   value={formData.alasan_cuti}
                   onChange={(e) => setFormData({...formData, alasan_cuti: e.target.value})}
                   placeholder="Mengapa Anda mengajukan izin ini?"
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all min-h-[100px] resize-none"
+                  className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all min-h-[100px] resize-none"
                 />
               </div>
 
@@ -765,7 +765,7 @@ export function MobileLeavePage() {
                     </div>
                   ) : (
                     <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 mb-3">
-                      <UploadCloud className="w-6 h-6 text-indigo-400" />
+                      <UploadCloud className="w-6 h-6 text-[#96D1C6]" />
                     </div>
                   )}
                   <p className="text-xs font-bold text-slate-600 mt-2">{photoFile ? photoFile.name : 'Pilih Foto / Dokumen'}</p>
@@ -777,7 +777,7 @@ export function MobileLeavePage() {
             <button 
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full py-5 rounded-[1.5rem] bg-indigo-600 text-white font-black uppercase tracking-[0.15em] shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 transition-all active:scale-95 border-b-4 border-indigo-800 active:border-b-0 disabled:opacity-50"
+              className="w-full py-5 rounded-[1.5rem] bg-[#103552] text-white font-black uppercase tracking-[0.15em] shadow-xl shadow-[#103552]/30 flex items-center justify-center gap-3 transition-all active:scale-95 border-b-4 border-[#103552] active:border-b-0 disabled:opacity-50"
             >
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                 <>

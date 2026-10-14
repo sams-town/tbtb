@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   ShieldCheck,
@@ -152,7 +152,7 @@ export function RolesPage() {
 
         <button
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95"
+          className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95"
         >
           <Plus className="w-5 h-5" />
           Tambah Role
@@ -161,7 +161,7 @@ export function RolesPage() {
 
       {/* Stats Cards for Roles */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <RoleStatCard label="Total Roles" value={loading ? '...' : String(roles.length)} icon={ShieldCheck} color="text-indigo-600" bg="bg-indigo-50" />
+        <RoleStatCard label="Total Roles" value={loading ? '...' : String(roles.length)} icon={ShieldCheck} color="text-[#103552]" bg="bg-[#96D1C6]/20" />
         <RoleStatCard label="Active Guards" value="1" icon={Lock} color="text-emerald-600" bg="bg-emerald-50" />
         <RoleStatCard label="System Roles" value={loading ? '...' : String(roles.length)} icon={Shield} color="text-amber-600" bg="bg-amber-50" />
       </div>
@@ -175,7 +175,7 @@ export function RolesPage() {
             <input
               type="text"
               placeholder="Search roles..."
-              className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
             />
           </div>
 
@@ -190,7 +190,7 @@ export function RolesPage() {
         <div className="overflow-x-auto scrollbar-hide">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
-              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+              <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
               <p className="text-sm font-bold text-slate-400">Memuat data roles...</p>
             </div>
           ) : error ? (
@@ -201,7 +201,7 @@ export function RolesPage() {
               <p className="text-sm font-bold text-slate-600">{error}</p>
               <button
                 onClick={fetchRoles}
-                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95"
+                className="px-6 py-2.5 bg-[#103552] text-white rounded-xl text-sm font-bold hover:bg-[#103552] transition-all active:scale-95"
               >
                 Coba Lagi
               </button>
@@ -226,7 +226,7 @@ export function RolesPage() {
                     </td>
                     <td className="py-6 px-8">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                        <div className="w-8 h-8 rounded-lg bg-[#96D1C6]/20 flex items-center justify-center text-[#103552]">
                           <Shield className="w-4 h-4" />
                         </div>
                         <span className="text-sm font-black text-slate-900">{role.name}</span>
@@ -239,7 +239,7 @@ export function RolesPage() {
                     </td>
                     <td className="py-6 px-8">
                       <div className="flex items-center justify-end gap-2  transition-opacity">
-                        <button onClick={() => setEditingRole(role)} className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90 shadow-sm">
+                        <button onClick={() => setEditingRole(role)} className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90 shadow-sm">
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
@@ -264,7 +264,7 @@ export function RolesPage() {
             <button className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 cursor-not-allowed opacity-50" disabled>
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button className="w-10 h-10 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+            <button className="w-10 h-10 rounded-xl text-xs font-black bg-[#103552] text-white shadow-lg shadow-[#103552]/20">
               1
             </button>
             <button className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 cursor-not-allowed opacity-50" disabled>

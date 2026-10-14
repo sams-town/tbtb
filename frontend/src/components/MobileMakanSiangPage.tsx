@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   UtensilsCrossed,
@@ -144,7 +144,7 @@ export function MobileMakanSiangPage() {
     return (
       <div className="min-h-screen bg-[#F0F4FF] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+          <Loader2 className="w-10 h-10 text-[#185B5A] animate-spin" />
           <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Memuat data...</p>
         </div>
       </div>
@@ -193,7 +193,7 @@ export function MobileMakanSiangPage() {
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Hari Ini</p>
             <button
               onClick={() => fetchData(userData?.id)}
-              className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all active:scale-90"
+              className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:text-[#103552] transition-all active:scale-90"
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -253,7 +253,7 @@ export function MobileMakanSiangPage() {
                 onChange={(e) => setKeterangan(e.target.value)}
                 placeholder="Keterangan (opsional)..."
                 rows={2}
-                className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 resize-none outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all placeholder:text-slate-300"
+                className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 resize-none outline-none focus:border-[#103552]/40 focus:ring-2 focus:ring-[#96D1C6]/30 transition-all placeholder:text-slate-300"
               />
 
               <div className="grid grid-cols-2 gap-3">
@@ -306,7 +306,7 @@ export function MobileMakanSiangPage() {
           className="w-full flex items-center justify-between mb-4"
         >
           <h2 className="text-base font-black text-slate-800 tracking-tight">Riwayat 14 Hari</h2>
-          <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">
+          <span className="text-[10px] font-black text-[#103552] uppercase tracking-widest">
             {showHistory ? 'Sembunyikan' : 'Tampilkan'}
           </span>
         </button>

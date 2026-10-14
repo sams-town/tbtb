@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   MapPin, 
@@ -238,7 +238,7 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+        <Loader2 className="w-10 h-10 text-[#185B5A] animate-spin" />
         <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Menyiapkan Data...</p>
       </div>
     );
@@ -255,9 +255,9 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
       className="max-w-5xl mx-auto space-y-10 pb-20"
     >
       {/* Premium Indigo Header */}
-      <div className={cn("bg-indigo-700 text-white relative overflow-hidden shadow-2xl shadow-indigo-500/20", isMobileView ? "rounded-b-[3rem] p-6 pt-12 -mx-6 mb-6" : "rounded-[3rem] p-8")}>
+      <div className={cn("bg-[#103552] text-white relative overflow-hidden shadow-2xl shadow-[#103552]/20/20", isMobileView ? "rounded-b-[3rem] p-6 pt-12 -mx-6 mb-6" : "rounded-[3rem] p-8")}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl -ml-10 -mb-10" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#96D1C6]/20 rounded-full blur-2xl -ml-10 -mb-10" />
         
         <div className={cn("relative z-10 flex gap-6", isMobileView ? "flex-col items-center justify-center" : "flex-col md:flex-row items-center justify-between")}>
           <div className="flex items-center gap-6">
@@ -268,14 +268,14 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
               <h1 className="text-3xl font-black tracking-tight">{userData?.name || 'Pegawai MeAndPay'}</h1>
               <div className={cn("flex items-center gap-2 mt-1", isMobileView ? "justify-center" : "justify-center md:justify-start")}>
                 <span className="px-3 py-1 bg-emerald-400 text-emerald-950 text-[10px] font-black uppercase tracking-widest rounded-full">Active</span>
-                <span className="text-indigo-200 text-xs font-bold uppercase tracking-widest">{userData?.jabatan?.nama_jabatan || 'Staff'}</span>
+                <span className="text-[#96D1C6]/60 text-xs font-bold uppercase tracking-widest">{userData?.jabatan?.nama_jabatan || 'Staff'}</span>
               </div>
             </div>
           </div>
           
           <div className={cn("flex flex-col gap-2", isMobileView ? "items-center" : "items-center md:items-end")}>
              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/20">
-                <Fingerprint className="w-5 h-5 text-indigo-300" />
+                <Fingerprint className="w-5 h-5 text-[#96D1C6]" />
                 <div>
                    <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">ID System</p>
                    <p className="text-sm font-black">{userData?.username || 'EMP-001'}</p>
@@ -289,11 +289,11 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
       <div className={cn("grid gap-8 items-stretch", isMobileView ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2")}>
         <motion.div 
           whileHover={{ y: -5 }}
-          className={cn("bg-white border border-slate-100 shadow-2xl shadow-indigo-500/5 flex flex-col items-center justify-center text-center relative overflow-hidden group", isMobileView ? "rounded-[2.5rem] p-8 space-y-6 mx-auto w-full" : "rounded-[3.5rem] p-12 space-y-8")}
+          className={cn("bg-white border border-slate-100 shadow-2xl shadow-[#103552]/20/5 flex flex-col items-center justify-center text-center relative overflow-hidden group", isMobileView ? "rounded-[2.5rem] p-8 space-y-6 mx-auto w-full" : "rounded-[3.5rem] p-12 space-y-8")}
         >
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
-          <div className="w-24 h-24 bg-indigo-50 rounded-[2rem] flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
-            <Clock className="w-12 h-12 text-indigo-600" />
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#185B5A] via-purple-500 to-pink-500" />
+          <div className="w-24 h-24 bg-[#96D1C6]/20 rounded-[2rem] flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
+            <Clock className="w-12 h-12 text-[#103552]" />
           </div>
           <div className="space-y-2">
             <h2 className="text-7xl font-black text-slate-900 tabular-nums tracking-tighter">
@@ -308,13 +308,13 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
 
         <motion.div 
           whileHover={{ y: -5 }}
-          className={cn("bg-[#2D455C] shadow-2xl shadow-indigo-500/10 flex flex-col justify-between relative overflow-hidden text-white", isMobileView ? "rounded-[2.5rem] p-8" : "rounded-[3.5rem] p-12")}
+          className={cn("bg-[#2D455C] shadow-2xl shadow-[#103552]/20/10 flex flex-col justify-between relative overflow-hidden text-white", isMobileView ? "rounded-[2.5rem] p-8" : "rounded-[3.5rem] p-12")}
         >
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-indigo-300" />
+                <Calendar className="w-6 h-6 text-[#96D1C6]" />
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Today's Schedule</p>
@@ -347,7 +347,7 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
               </div>
               <p className="text-[11px] font-bold text-white/60">{todayMapping?.users?.lokasi?.nama_lokasi || 'Kantor Pusat'}</p>
             </div>
-            <button className="text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors">Lihat Radius</button>
+            <button className="text-[10px] font-black uppercase tracking-widest text-[#96D1C6] hover:text-[#96D1C6] transition-colors">Lihat Radius</button>
           </div>
         </motion.div>
       </div>
@@ -411,11 +411,11 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
                 >
                   <div className={cn(
                     "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
-                    photo ? "bg-emerald-500 text-white" : "bg-white text-slate-400 group-hover:text-indigo-600 shadow-sm"
+                    photo ? "bg-emerald-500 text-white" : "bg-white text-slate-400 group-hover:text-[#103552] shadow-sm"
                   )}>
                     <Camera className="w-6 h-6" />
                   </div>
-                  <span className={cn("text-[10px] font-black uppercase tracking-widest", photo ? "text-emerald-700" : "text-slate-500 group-hover:text-indigo-600")}>
+                  <span className={cn("text-[10px] font-black uppercase tracking-widest", photo ? "text-emerald-700" : "text-slate-500 group-hover:text-[#103552]")}>
                     {photo ? 'Foto Ready' : 'Ambil Selfie'}
                   </span>
                   {photo && (
@@ -434,11 +434,11 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
                 >
                   <div className={cn(
                     "w-14 h-14 rounded-2xl flex items-center justify-center transition-all",
-                    location ? "bg-emerald-500 text-white" : "bg-white text-slate-400 group-hover:text-indigo-600 shadow-sm"
+                    location ? "bg-emerald-500 text-white" : "bg-white text-slate-400 group-hover:text-[#103552] shadow-sm"
                   )}>
                     <MapPin className="w-6 h-6" />
                   </div>
-                  <span className={cn("text-[10px] font-black uppercase tracking-widest", location ? "text-emerald-700" : "text-slate-500 group-hover:text-indigo-600")}>
+                  <span className={cn("text-[10px] font-black uppercase tracking-widest", location ? "text-emerald-700" : "text-slate-500 group-hover:text-[#103552]")}>
                     {location ? 'Lokasi OK' : 'Cek Lokasi'}
                   </span>
                 </button>
@@ -483,7 +483,7 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
                 <textarea
                   value={keterangan}
                   onChange={e => setKeterangan(e.target.value)}
-                  className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all min-h-[120px] resize-none"
+                  className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-3xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all min-h-[120px] resize-none"
                   placeholder={`Contoh: ${isCheckedIn ? 'Pekerjaan hari ini selesai, semua target terpenuhi.' : 'Mulai absen masuk, siap bekerja.'}`}
                 />
               </div>
@@ -512,12 +512,12 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
                 </div>
               ) : (
                 <div className="space-y-8">
-                  <div className="p-6 bg-indigo-50 rounded-3xl border border-indigo-100 flex items-center justify-between">
+                  <div className="p-6 bg-[#96D1C6]/20 rounded-3xl border border-[#96D1C6]/30 flex items-center justify-between">
                     <div>
-                      <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">Sudah Absen Masuk</p>
-                      <p className="text-2xl font-black text-indigo-700 tabular-nums">{todayMapping.jam_absen}</p>
+                      <p className="text-[9px] font-black text-[#96D1C6] uppercase tracking-widest mb-1">Sudah Absen Masuk</p>
+                      <p className="text-2xl font-black text-[#103552] tabular-nums">{todayMapping.jam_absen}</p>
                     </div>
-                    <CheckCircle2 className="w-10 h-10 text-indigo-500/40" />
+                    <CheckCircle2 className="w-10 h-10 text-[#185B5A]/40" />
                   </div>
                   <div className="text-center space-y-2">
                     <h3 className="text-2xl font-black text-slate-800">Absen Pulang</h3>
@@ -556,8 +556,8 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
             >
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
-                    <Camera className="w-5 h-5 text-indigo-600" />
+                  <div className="w-10 h-10 bg-[#96D1C6]/20 rounded-xl flex items-center justify-center">
+                    <Camera className="w-5 h-5 text-[#103552]" />
                   </div>
                   <h3 className="font-black text-slate-800 tracking-tight">Security Selfie</h3>
                 </div>
@@ -574,7 +574,7 @@ export function AbsenPage({ isMobileView = false }: { isMobileView?: boolean, ke
 
               <button 
                 onClick={capturePhoto}
-                className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-indigo-700 active:scale-95 transition-all shadow-xl shadow-indigo-600/30"
+                className="w-full py-5 bg-[#103552] text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-[#103552] active:scale-95 transition-all shadow-xl shadow-[#103552]/30"
               >
                 <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
                   <div className="w-3 h-3 bg-white rounded-full" />

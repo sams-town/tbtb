@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Plus, Edit, Trash2, ArrowUpDown, X } from 'lucide-react';
 import { useToast } from './Toast';
@@ -137,7 +137,7 @@ export function FinanceStatusPajakPage() {
                             placeholder="Search...."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-md px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                            className="w-full bg-white border border-slate-200 rounded-md px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-[#103552]/20"
                         />
                     </div>
                 </div>
@@ -155,7 +155,7 @@ export function FinanceStatusPajakPage() {
                             {loading ? (
                                 <tr>
                                     <td colSpan={4} className="py-12 text-center">
-                                        <div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin mx-auto"></div>
+                                        <div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin mx-auto"></div>
                                     </td>
                                 </tr>
                             ) : filteredData.length === 0 ? (
@@ -221,7 +221,7 @@ export function FinanceStatusPajakPage() {
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                             placeholder="Contoh: TK/0"
-                                            className="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+                                            className="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#103552]/20 transition-all outline-none"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
@@ -232,7 +232,7 @@ export function FinanceStatusPajakPage() {
                                             value={formData.ptkp}
                                             onChange={(e) => setFormData({ ...formData, ptkp: e.target.value })}
                                             placeholder="Contoh: 54000000"
-                                            className="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+                                            className="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#103552]/20 transition-all outline-none"
                                         />
                                     </div>
                                 </div>
@@ -248,7 +248,7 @@ export function FinanceStatusPajakPage() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="flex-1 px-6 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-extrabold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50"
+                                        className="flex-1 px-6 py-4 bg-[#103552] text-white rounded-2xl text-sm font-extrabold shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 disabled:opacity-50"
                                     >
                                         {isSubmitting ? 'Menyimpan...' : 'Simpan Data'}
                                     </button>

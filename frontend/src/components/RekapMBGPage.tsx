@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'motion/react';
 import {
   UtensilsCrossed,
@@ -10,7 +10,6 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
-  Clock,
   Users,
   TrendingUp,
   RefreshCw,
@@ -51,25 +50,28 @@ export function RekapMBGPage() {
   const [summary, setSummary] = React.useState<SummaryItem[]>([]);
   const [search, setSearch] = React.useState('');
   const [view, setView] = React.useState<'summary' | 'detail'>('summary');
-  const [startDate, setStartDate] = React.useState(
-    new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-      .toISOString()
-      .split('T')[0]
-  );
-  const [endDate, setEndDate] = React.useState(
-    new Date().toISOString().split('T')[0]
-  );
+
+  // Filter: bulan (1–12) dan tahun
+  const now = new Date();
+  const [bulan, setBulan] = React.useState<number>(now.getMonth() + 1);
+  const [tahun, setTahun] = React.useState<number>(now.getFullYear());
 
   // Pagination
   const [currentPage, setCurrentPage] = React.useState(1);
   const pageSize = 20;
 
+  // Label bulan–tahun untuk nama file export
+  const bulanLabel = new Date(tahun, bulan - 1, 1).toLocaleDateString('id-ID', {
+    month: 'long',
+    year: 'numeric',
+  });
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      const url = new URL(`${BASE_URL}/makan-siang`);
-      url.searchParams.append('start_date', startDate);
-      url.searchParams.append('end_date', endDate);
+      const url = new URL(`${BASE_URL}/mbg/rekap/bulanan`);
+      url.searchParams.append('bulan', String(bulan));
+      url.searchParams.append('tahun', String(tahun));
 
       const res = await fetch(url.toString(), {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -126,9 +128,8 @@ export function RekapMBGPage() {
     s.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const filteredRecords = records.filter(
-    (r) =>
-      (r.user?.name || '').toLowerCase().includes(search.toLowerCase())
+  const filteredRecords = records.filter((r) =>
+    (r.user?.name || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const paginatedRecords = filteredRecords.slice(
@@ -140,7 +141,6 @@ export function RekapMBGPage() {
   // Stats
   const totalHadir = records.filter((r) => r.status === 'hadir').length;
   const totalTidak = records.filter((r) => r.status === 'tidak_hadir').length;
-  const totalBelum = records.filter((r) => !r.status).length;
   const pctHadir =
     records.length > 0 ? Math.round((totalHadir / records.length) * 100) : 0;
 
@@ -158,7 +158,7 @@ export function RekapMBGPage() {
       const ws = XLSX.utils.aoa_to_sheet([header, ...data]);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Rekap MBG');
-      XLSX.writeFile(wb, `Rekap_MBG_${startDate}_${endDate}.xlsx`);
+      XLSX.writeFile(wb, `Rekap_MBG_${bulan}_${tahun}.xlsx`);
     } else {
       const header = ['Nama', 'Tanggal', 'Status', 'Keterangan'];
       const data = filteredRecords.map((r) => [
@@ -170,16 +170,28 @@ export function RekapMBGPage() {
       const ws = XLSX.utils.aoa_to_sheet([header, ...data]);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Detail MBG');
-      XLSX.writeFile(wb, `Detail_MBG_${startDate}_${endDate}.xlsx`);
+      XLSX.writeFile(wb, `Detail_MBG_${bulan}_${tahun}.xlsx`);
     }
     addToast({ type: 'success', title: 'Berhasil', message: 'File Excel berhasil diunduh.' });
   };
 
-  const statusBadge = (status: string | null | undefined) => {
-    if (status === 'hadir') return { text: 'Hadir', cls: 'bg-emerald-50 text-emerald-600' };
-    if (status === 'tidak_hadir') return { text: 'Tidak Hadir', cls: 'bg-rose-50 text-rose-600' };
-    return { text: 'Belum', cls: 'bg-slate-100 text-slate-400' };
-  };
+  // Opsi tahun: 3 tahun ke belakang s.d. tahun ini
+  const tahunOptions = Array.from({ length: 4 }, (_, i) => now.getFullYear() - i);
+
+  const bulanOptions = [
+    { value: 1, label: 'Januari' },
+    { value: 2, label: 'Februari' },
+    { value: 3, label: 'Maret' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'Mei' },
+    { value: 6, label: 'Juni' },
+    { value: 7, label: 'Juli' },
+    { value: 8, label: 'Agustus' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'Oktober' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'Desember' },
+  ];
 
   return (
     <motion.div
@@ -213,33 +225,45 @@ export function RekapMBGPage() {
       {/* Filter Bar */}
       <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 flex flex-col md:flex-row gap-4 items-end">
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Bulan */}
           <div>
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
-              Tanggal Mulai
+              Bulan
             </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all"
-            />
+            <select
+              value={bulan}
+              onChange={(e) => setBulan(Number(e.target.value))}
+              className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:border-[#103552]/40 focus:ring-2 focus:ring-[#96D1C6]/30 transition-all cursor-pointer"
+            >
+              {bulanOptions.map((b) => (
+                <option key={b.value} value={b.value}>
+                  {b.label}
+                </option>
+              ))}
+            </select>
           </div>
+          {/* Tahun */}
           <div>
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">
-              Tanggal Akhir
+              Tahun
             </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all"
-            />
+            <select
+              value={tahun}
+              onChange={(e) => setTahun(Number(e.target.value))}
+              className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:border-[#103552]/40 focus:ring-2 focus:ring-[#96D1C6]/30 transition-all cursor-pointer"
+            >
+              {tahunOptions.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-2 px-8 py-3.5 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-60 whitespace-nowrap"
+          className="flex items-center gap-2 px-8 py-3.5 bg-[#103552] text-white rounded-2xl font-black text-sm shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 disabled:opacity-60 whitespace-nowrap"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
           Tampilkan
@@ -249,7 +273,7 @@ export function RekapMBGPage() {
       {/* Summary Stats */}
       {records.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="Total Entri" value={records.length} icon={Users} color="text-indigo-600 bg-indigo-50" />
+          <StatCard label="Total Entri" value={records.length} icon={Users} color="text-[#103552] bg-[#96D1C6]/20" />
           <StatCard label="Hadir" value={totalHadir} icon={CheckCircle2} color="text-emerald-600 bg-emerald-50" />
           <StatCard label="Tidak Hadir" value={totalTidak} icon={XCircle} color="text-rose-600 bg-rose-50" />
           <StatCard label="% Hadir" value={`${pctHadir}%`} icon={TrendingUp} color="text-amber-600 bg-amber-50" />
@@ -264,7 +288,7 @@ export function RekapMBGPage() {
               onClick={() => setView('summary')}
               className={cn(
                 'px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all',
-                view === 'summary' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-700'
+                view === 'summary' ? 'bg-white text-[#103552] shadow-sm' : 'text-slate-400 hover:text-slate-700'
               )}
             >
               Ringkasan
@@ -273,7 +297,7 @@ export function RekapMBGPage() {
               onClick={() => setView('detail')}
               className={cn(
                 'px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl transition-all',
-                view === 'detail' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-700'
+                view === 'detail' ? 'bg-white text-[#103552] shadow-sm' : 'text-slate-400 hover:text-slate-700'
               )}
             >
               Detail
@@ -287,7 +311,7 @@ export function RekapMBGPage() {
               placeholder="Cari nama pegawai..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-2xl outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+              className="w-full pl-11 pr-4 py-3 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-2xl outline-none focus:border-[#103552]/40 focus:ring-2 focus:ring-[#96D1C6]/30 transition-all shadow-sm"
             />
           </div>
         </div>
@@ -298,7 +322,7 @@ export function RekapMBGPage() {
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-16 text-center">
           <UtensilsCrossed className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <p className="text-sm font-black text-slate-400 uppercase tracking-widest">
-            Pilih rentang tanggal dan klik Tampilkan
+            Pilih bulan &amp; tahun lalu klik Tampilkan
           </p>
         </div>
       )}
@@ -306,39 +330,26 @@ export function RekapMBGPage() {
       {/* Summary Table */}
       {records.length > 0 && view === 'summary' && (
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-slate-400" />
+            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{bulanLabel}</span>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/60">
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    #
-                  </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Nama Pegawai
-                  </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Jabatan
-                  </th>
-                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Hadir
-                  </th>
-                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Tdk Hadir
-                  </th>
-                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Total Hari
-                  </th>
-                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    % Hadir
-                  </th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">#</th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nama Pegawai</th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jabatan</th>
+                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Hadir</th>
+                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tdk Hadir</th>
+                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Hari</th>
+                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">% Hadir</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSummary.map((s, i) => (
-                  <tr
-                    key={s.user_id}
-                    className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors"
-                  >
+                  <tr key={s.user_id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 text-xs font-bold text-slate-400">{i + 1}</td>
                     <td className="px-6 py-4">
                       <p className="text-sm font-black text-slate-800">{s.name}</p>
@@ -367,9 +378,7 @@ export function RekapMBGPage() {
                             style={{ width: `${s.persentase}%` }}
                           />
                         </div>
-                        <span className="text-xs font-black text-slate-700 w-10 text-right">
-                          {s.persentase}%
-                        </span>
+                        <span className="text-xs font-black text-slate-700 w-10 text-right">{s.persentase}%</span>
                       </div>
                     </td>
                   </tr>
@@ -390,35 +399,26 @@ export function RekapMBGPage() {
       {/* Detail Table */}
       {records.length > 0 && view === 'detail' && (
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-slate-400" />
+            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{bulanLabel}</span>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/60">
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    #
-                  </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Nama
-                  </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Tanggal
-                  </th>
-                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Status
-                  </th>
-                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Keterangan
-                  </th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">#</th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nama</th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal</th>
+                  <th className="text-center px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="text-left px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Keterangan</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedRecords.map((rec, i) => {
                   const badge = statusBadge(rec.status);
                   return (
-                    <tr
-                      key={rec.id}
-                      className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors"
-                    >
+                    <tr key={rec.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
                       <td className="px-6 py-4 text-xs font-bold text-slate-400">
                         {(currentPage - 1) * pageSize + i + 1}
                       </td>
@@ -476,7 +476,7 @@ export function RekapMBGPage() {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => p - 1)}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-30 transition-all"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:bg-[#96D1C6]/20 hover:text-[#103552] disabled:opacity-30 transition-all"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -486,7 +486,7 @@ export function RekapMBGPage() {
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => p + 1)}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-30 transition-all"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:bg-[#96D1C6]/20 hover:text-[#103552] disabled:opacity-30 transition-all"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Search, Plus, ArrowUpDown, Eye, Edit, Trash2, ChevronDown } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -189,33 +189,33 @@ export function RapatPage() {
         <form onSubmit={handleSubmit} className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 space-y-6">
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-700">Nama Pertemuan</label>
-            <input type="text" value={formData.nama} onChange={e => setFormData({ ...formData, nama: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+            <input type="text" value={formData.nama} onChange={e => setFormData({ ...formData, nama: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Tanggal</label>
-              <input type="date" value={formData.tanggal} onChange={e => setFormData({ ...formData, tanggal: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+              <input type="date" value={formData.tanggal} onChange={e => setFormData({ ...formData, tanggal: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Jam Mulai</label>
-              <input type="time" value={formData.mulai} onChange={e => setFormData({ ...formData, mulai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+              <input type="time" value={formData.mulai} onChange={e => setFormData({ ...formData, mulai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Jam Selesai</label>
-              <input type="time" value={formData.selesai} onChange={e => setFormData({ ...formData, selesai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+              <input type="time" value={formData.selesai} onChange={e => setFormData({ ...formData, selesai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Lokasi Pertemuan</label>
-              <input type="text" value={formData.lokasi} onChange={e => setFormData({ ...formData, lokasi: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+              <input type="text" value={formData.lokasi} onChange={e => setFormData({ ...formData, lokasi: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Jenis Pertemuan</label>
               <div className="relative">
-                <select value={formData.jenis} onChange={e => setFormData({ ...formData, jenis: e.target.value })} className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer">
+                <select value={formData.jenis} onChange={e => setFormData({ ...formData, jenis: e.target.value })} className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer">
                   <option value="">Pilih Jenis Pertemuan</option>
                   <option value="Online">Pertemuan Online</option>
                   <option value="Offline">Pertemuan Offline</option>
@@ -230,7 +230,7 @@ export function RapatPage() {
             <div className="w-full max-h-48 overflow-y-auto bg-slate-50 border border-slate-200 rounded-xl p-4 gap-2 grid grid-cols-2">
               {loadingEmployees ? <span className="text-sm text-slate-400">Loading...</span> : employees.map(emp => (
                 <label key={emp.id} className="flex items-center gap-3 cursor-pointer p-2 hover:bg-white rounded-lg transition-colors">
-                  <input type="checkbox" checked={formData.peserta_ids.includes(emp.id)} onChange={() => handleCheckboxChange(emp.id, 'add')} className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+                  <input type="checkbox" checked={formData.peserta_ids.includes(emp.id)} onChange={() => handleCheckboxChange(emp.id, 'add')} className="w-4 h-4 text-[#103552] rounded border-slate-300 focus:ring-[#103552]" />
                   <span className="text-sm font-semibold text-slate-700">{emp.name}</span>
                 </label>
               ))}
@@ -239,7 +239,7 @@ export function RapatPage() {
 
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-700">Detail Pertemuan</label>
-            <textarea value={formData.detail} onChange={e => setFormData({ ...formData, detail: e.target.value })} className="w-full min-h-[120px] resize-y bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+            <textarea value={formData.detail} onChange={e => setFormData({ ...formData, detail: e.target.value })} className="w-full min-h-[120px] resize-y bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
           </div>
 
           <button type="submit" disabled={isSubmitting} className="px-8 py-3 bg-[#1e3a5f] text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-500/20 hover:bg-[#152a45] active:scale-95 disabled:opacity-70 transition-all">
@@ -254,7 +254,7 @@ export function RapatPage() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-800 tracking-tight">Rapat</h1>
-        <button onClick={() => setIsAdding(true)} className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2 text-sm">
+        <button onClick={() => setIsAdding(true)} className="px-6 py-2.5 bg-[#103552] text-white rounded-xl font-bold shadow-lg shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 flex items-center gap-2 text-sm">
           <Plus className="w-4 h-4" />
           Tambah
         </button>
@@ -264,8 +264,8 @@ export function RapatPage() {
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <input type="text" placeholder="Tanggal Mulai" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 w-48" />
-            <input type="text" placeholder="Tanggal Akhir" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 w-48" />
+            <input type="text" placeholder="Tanggal Mulai" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 w-48" />
+            <input type="text" placeholder="Tanggal Akhir" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'} className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 w-48" />
           </div>
           <button className="p-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-all">
             <Search className="w-5 h-5" />
@@ -289,7 +289,7 @@ export function RapatPage() {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loadingTable ? (
-                <tr><td colSpan={11} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin mx-auto"></div></td></tr>
+                <tr><td colSpan={11} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin mx-auto"></div></td></tr>
               ) : rapatData.length === 0 ? (
                 <tr><td colSpan={11} className="py-20 text-center font-bold text-slate-400">Tidak ada data rapat.</td></tr>
               ) : rapatData.map((row, index) => (
@@ -302,7 +302,7 @@ export function RapatPage() {
                   <td className="py-4 px-8 text-xs font-medium text-slate-500 truncate max-w-[150px]" title={row.lokasi}>{row.lokasi}</td>
                   <td className="py-4 px-8 text-xs font-medium text-slate-500 italic max-w-[150px] truncate" title={row.detail}>"{row.detail}"</td>
                   <td className="py-4 px-8">
-                    <span className={cn("px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest whitespace-nowrap", row.jenis === 'Internal' ? "bg-indigo-50 text-indigo-600" : "bg-amber-50 text-amber-600")}>
+                    <span className={cn("px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest whitespace-nowrap", row.jenis === 'Internal' ? "bg-[#96D1C6]/20 text-[#103552]" : "bg-amber-50 text-amber-600")}>
                       {row.jenis}
                     </span>
                   </td>
@@ -310,7 +310,7 @@ export function RapatPage() {
                   <td className="py-4 px-8 text-xs font-medium text-slate-500 italic max-w-[150px] truncate" title={row.notulen}>"{row.notulen || '-'}"</td>
                   <td className="py-4 px-8">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setViewData(row)} className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors"><Eye className="w-4 h-4" /></button>
+                      <button onClick={() => setViewData(row)} className="p-1.5 text-slate-400 hover:text-[#103552] transition-colors"><Eye className="w-4 h-4" /></button>
                       <button onClick={() => {
                         setEditData({
                           ...row,
@@ -388,27 +388,27 @@ export function RapatPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 block">Nama Pertemuan</label>
-                  <input type="text" value={editData.nama || ''} onChange={e => setEditData({ ...editData, nama: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  <input type="text" value={editData.nama || ''} onChange={e => setEditData({ ...editData, nama: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 block">Tanggal</label>
-                  <input type="date" value={editData.tanggal || ''} onChange={e => setEditData({ ...editData, tanggal: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  <input type="date" value={editData.tanggal || ''} onChange={e => setEditData({ ...editData, tanggal: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 block">Jam Mulai</label>
-                  <input type="time" value={editData.mulai || ''} onChange={e => setEditData({ ...editData, mulai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  <input type="time" value={editData.mulai || ''} onChange={e => setEditData({ ...editData, mulai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 block">Jam Selesai</label>
-                  <input type="time" value={editData.selesai || ''} onChange={e => setEditData({ ...editData, selesai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  <input type="time" value={editData.selesai || ''} onChange={e => setEditData({ ...editData, selesai: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 block">Lokasi</label>
-                  <input type="text" value={editData.lokasi || ''} onChange={e => setEditData({ ...editData, lokasi: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  <input type="text" value={editData.lokasi || ''} onChange={e => setEditData({ ...editData, lokasi: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 block">Jenis Pertemuan</label>
-                  <select value={editData.jenis || ''} onChange={e => setEditData({ ...editData, jenis: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20">
+                  <select value={editData.jenis || ''} onChange={e => setEditData({ ...editData, jenis: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20">
                     <option value="Internal">Internal</option>
                     <option value="External">External</option>
                   </select>
@@ -420,7 +420,7 @@ export function RapatPage() {
                 <div className="w-full max-h-40 overflow-y-auto bg-slate-50 border border-slate-200 rounded-xl p-4 gap-2 grid grid-cols-2">
                   {loadingEmployees ? <span className="text-sm text-slate-400">Loading...</span> : employees.map(emp => (
                     <label key={emp.id} className="flex items-center gap-3 cursor-pointer p-1 hover:bg-white rounded transition-colors">
-                      <input type="checkbox" checked={editData.peserta_ids?.includes(emp.id)} onChange={() => handleCheckboxChange(emp.id, 'edit')} className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500" />
+                      <input type="checkbox" checked={editData.peserta_ids?.includes(emp.id)} onChange={() => handleCheckboxChange(emp.id, 'edit')} className="w-4 h-4 text-[#103552] rounded border-slate-300 focus:ring-[#103552]" />
                       <span className="text-sm font-medium text-slate-700">{emp.name}</span>
                     </label>
                   ))}
@@ -429,17 +429,17 @@ export function RapatPage() {
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 block">Detail Pertemuan</label>
-                <textarea value={editData.detail || ''} onChange={e => setEditData({ ...editData, detail: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 min-h-[100px]" />
+                <textarea value={editData.detail || ''} onChange={e => setEditData({ ...editData, detail: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20 min-h-[100px]" />
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 block">Isi Notulensi Rapat</label>
-                <textarea value={editData.notulen === '-' ? '' : (editData.notulen || '')} onChange={e => setEditData({ ...editData, notulen: e.target.value })} placeholder="Masukkan notulensi disini..." className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 min-h-[100px]" />
+                <textarea value={editData.notulen === '-' ? '' : (editData.notulen || '')} onChange={e => setEditData({ ...editData, notulen: e.target.value })} placeholder="Masukkan notulensi disini..." className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-[#103552]/20 min-h-[100px]" />
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
                 <button type="button" onClick={() => setEditData(null)} className="px-6 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm">Batal</button>
-                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all text-sm disabled:opacity-70">
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2.5 bg-[#103552] text-white font-bold rounded-xl hover:bg-[#103552] transition-all text-sm disabled:opacity-70">
                   {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
               </div>

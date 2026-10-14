@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Search, ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -52,7 +52,7 @@ export function KinerjaPegawaiPage() {
               placeholder="Cari nama pegawai..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-600 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
             />
           </div>
           <button onClick={fetchData} className="p-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
@@ -88,7 +88,7 @@ export function KinerjaPegawaiPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={4} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-indigo-500/20 border-t-indigo-600 animate-spin mx-auto"></div></td></tr>
+                <tr><td colSpan={4} className="py-20 text-center"><div className="w-8 h-8 rounded-full border-4 border-[#103552]/20 border-t-[#103552] animate-spin mx-auto"></div></td></tr>
               ) : data.length === 0 ? (
                 <tr><td colSpan={4} className="py-12 text-center text-sm font-medium text-slate-400">Pegawai tidak ditemukan.</td></tr>
               ) : data.map((item, index) => (
@@ -116,7 +116,7 @@ export function KinerjaPegawaiPage() {
           <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button className="w-8 h-8 rounded-lg bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-600/20">1</button>
+          <button className="w-8 h-8 rounded-lg bg-[#103552] text-white text-xs font-bold shadow-lg shadow-[#103552]/20">1</button>
           <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
             <ChevronRight className="w-4 h-4" />
           </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import {
@@ -270,7 +270,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
     }
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC]">
+        <div className="min-h-screen bg-[#F0F0F0]">
             <div className="p-6 lg:p-10 mx-auto space-y-6">
 
                 {/* Header Section from User Screenshot */}
@@ -349,13 +349,13 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                             </div>
                             <div className="relative">
                                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="pl-10 pr-6 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 w-full sm:w-64" />
+                                <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="pl-10 pr-6 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#103552]/20 w-full sm:w-64" />
                             </div>
                         </div>
 
                         <div className="flex items-center gap-4 text-slate-500 self-end">
                             <label className="text-sm font-bold cursor-pointer">Select All</label>
-                            <input type="checkbox" checked={data.length > 0 && selectedIds.length === data.length} onChange={e => handleSelectAll(e.target.checked)} className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                            <input type="checkbox" checked={data.length > 0 && selectedIds.length === data.length} onChange={e => handleSelectAll(e.target.checked)} className="w-5 h-5 rounded border-slate-300 text-[#103552] focus:ring-[#103552] cursor-pointer" />
                         </div>
                     </div>
 
@@ -393,7 +393,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                 {loading ? (
                                     <tr>
                                         <td colSpan={8} className="py-20 text-center">
-                                            <div className="w-10 h-10 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin mx-auto" />
+                                            <div className="w-10 h-10 border-4 border-slate-100 border-t-[#103552] rounded-full animate-spin mx-auto" />
                                         </td>
                                     </tr>
                                 ) : data.length === 0 ? (
@@ -402,7 +402,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                     </tr>
                                 ) : (
                                     data.map((row, idx) => (
-                                        <tr key={row.id} className={cn("hover:bg-slate-50/50 transition-colors", selectedIds.includes(row.id.toString()) && "bg-indigo-50/30")}>
+                                        <tr key={row.id} className={cn("hover:bg-slate-50/50 transition-colors", selectedIds.includes(row.id.toString()) && "bg-[#96D1C6]/20/30")}>
                                             <td className="py-5 px-6">
                                                 <input type="checkbox" checked={selectedIds.includes(row.id.toString())} onChange={e => handleSelectItem(row.id.toString(), e.target.checked)} className="w-4 h-4 cursor-pointer" />
                                             </td>
@@ -414,7 +414,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                             <td className="py-5 px-6 text-sm font-black text-slate-700">{fmt(row.grand_total)}</td>
                                             <td className="py-5 px-6">
                                                 <div className="flex items-center justify-center gap-3">
-                                                    <button onClick={() => handlePrint(row.id.toString())} className="text-indigo-600 hover:scale-110 transition-transform"><Printer className="w-5 h-5" /></button>
+                                                    <button onClick={() => handlePrint(row.id.toString())} className="text-[#103552] hover:scale-110 transition-transform"><Printer className="w-5 h-5" /></button>
                                                     <button onClick={() => setEditingId(row.id.toString())} className="text-amber-400 hover:scale-110 transition-transform"><Edit className="w-5 h-5" /></button>
                                                     <button onClick={() => setDeleteConfirm({ isOpen: true, type: 'single', id: row.id.toString() })} className="text-rose-600 hover:scale-110 transition-transform"><Trash2 className="w-5 h-5" /></button>
                                                 </div>
@@ -489,7 +489,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                         >
                             <div className="p-8 space-y-6">
                                 <div className="flex items-center gap-4 mb-2">
-                                    <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                                    <div className="w-12 h-12 bg-[#96D1C6]/20 rounded-2xl flex items-center justify-center text-[#103552]">
                                         <Settings className="w-6 h-6" />
                                     </div>
                                     <div>
@@ -505,7 +505,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                             <select
                                                 value={genData.bulan}
                                                 onChange={e => setGenData({ ...genData, bulan: e.target.value })}
-                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 appearance-none"
+                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-[#103552]/10 appearance-none"
                                             >
                                                 {months.map(m => <option key={m} value={m}>{m}</option>)}
                                             </select>
@@ -515,7 +515,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                             <input
                                                 value={genData.tahun}
                                                 onChange={e => setGenData({ ...genData, tahun: e.target.value })}
-                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
+                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-[#103552]/10"
                                             />
                                         </div>
                                     </div>
@@ -526,7 +526,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                             type="date"
                                             value={genData.tanggal_mulai}
                                             onChange={e => setGenData({ ...genData, tanggal_mulai: e.target.value })}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-[#103552]/10"
                                         />
                                     </div>
 
@@ -536,7 +536,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                             type="date"
                                             value={genData.tanggal_akhir}
                                             onChange={e => setGenData({ ...genData, tanggal_akhir: e.target.value })}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-[#103552]/10"
                                         />
                                     </div>
 
@@ -554,7 +554,7 @@ export function FinancePayrollPage({ onNavigate, initialFilters }: FinancePayrol
                                     <button
                                         onClick={handleGenerateAll}
                                         disabled={generating}
-                                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white rounded-[1.25rem] font-black text-[13px] transition-all shadow-xl shadow-indigo-200 flex items-center justify-center gap-2 active:scale-95"
+                                        className="w-full py-4 bg-[#103552] hover:bg-[#103552] disabled:bg-slate-300 text-white rounded-[1.25rem] font-black text-[13px] transition-all shadow-xl shadow-[#96D1C6]/50 flex items-center justify-center gap-2 active:scale-95"
                                     >
                                         {generating ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Zap className="w-4 h-4" />}
                                         GENERATE ALL PAYROLL
@@ -950,7 +950,7 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
             >
                 <div className="p-8 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                        <div className="w-12 h-12 bg-[#96D1C6]/20 rounded-2xl flex items-center justify-center text-[#103552]">
                             <ClipboardList className="w-6 h-6" />
                         </div>
                         <div>
@@ -966,26 +966,26 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
                 <div className="p-8 flex-1 overflow-y-auto min-h-0 space-y-6">
                     {step === 'upload' && (
                         <div className="space-y-6">
-                            <div className="flex flex-col items-center justify-center border-2 border-dashed border-indigo-200 hover:border-indigo-500 bg-indigo-50/20 hover:bg-indigo-50/50 rounded-3xl p-12 transition-all group relative cursor-pointer">
+                            <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#96D1C6]/50 hover:border-[#103552] bg-[#96D1C6]/20/20 hover:bg-[#96D1C6]/20/50 rounded-3xl p-12 transition-all group relative cursor-pointer">
                                 <input
                                     type="file"
                                     accept=".xlsx,.xls,.csv"
                                     onChange={handleFileChange}
                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                 />
-                                <div className="w-16 h-16 bg-white shadow-xl shadow-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform mb-4">
+                                <div className="w-16 h-16 bg-white shadow-xl shadow-[#96D1C6]/30 rounded-2xl flex items-center justify-center text-[#103552] group-hover:scale-110 transition-transform mb-4">
                                     <ClipboardList className="w-8 h-8" />
                                 </div>
                                 <h4 className="text-base font-black text-slate-800 mb-1">Pilih File Spreadsheet</h4>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6">Mendukung format .xlsx, .xls, .csv</p>
-                                <div className="px-6 py-2.5 bg-indigo-600 text-white text-xs font-black uppercase rounded-xl tracking-wider shadow-lg shadow-indigo-200 group-hover:bg-indigo-700 transition-colors">
+                                <div className="px-6 py-2.5 bg-[#103552] text-white text-xs font-black uppercase rounded-xl tracking-wider shadow-lg shadow-[#96D1C6]/50 group-hover:bg-[#103552] transition-colors">
                                     Browse Files
                                 </div>
                             </div>
 
                             <div className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100">
                                 <div className="flex gap-4 items-center">
-                                    <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center font-black text-sm">?</div>
+                                    <div className="w-10 h-10 bg-[#96D1C6]/30 text-[#103552] rounded-xl flex items-center justify-center font-black text-sm">?</div>
                                     <div>
                                         <h5 className="text-sm font-black text-slate-800 leading-tight">Gunakan Template yang Benar</h5>
                                         <p className="text-[11px] font-bold text-slate-400 leading-none">Unduh format Excel standar untuk meminimalisir kegagalan mapping.</p>
@@ -995,7 +995,7 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
                                     onClick={handleDownloadTemplate}
                                     className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 shrink-0"
                                 >
-                                    <Download className="w-4 h-4 text-indigo-600" />
+                                    <Download className="w-4 h-4 text-[#103552]" />
                                     DOWNLOAD TEMPLATE
                                 </button>
                             </div>
@@ -1033,14 +1033,14 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
                                 <select
                                     value={bulan}
                                     onChange={e => setBulan(e.target.value)}
-                                    className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 appearance-none min-w-[120px]"
+                                    className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-[#103552]/10 appearance-none min-w-[120px]"
                                 >
                                     {months.map(m => <option key={m} value={m}>{m}</option>)}
                                 </select>
                                 <select
                                     value={tahun}
                                     onChange={e => setTahun(e.target.value)}
-                                    className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 min-w-[100px]"
+                                    className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-[#103552]/10 min-w-[100px]"
                                 >
                                     {years.map(y => <option key={y} value={y}>{y}</option>)}
                                 </select>
@@ -1094,7 +1094,7 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
 
                     {step === 'importing' && (
                         <div className="flex flex-col items-center justify-center py-12 space-y-6">
-                            <div className="w-16 h-16 rounded-3xl bg-indigo-50 flex items-center justify-center text-indigo-600 animate-bounce">
+                            <div className="w-16 h-16 rounded-3xl bg-[#96D1C6]/20 flex items-center justify-center text-[#103552] animate-bounce">
                                 <ClipboardList className="w-8 h-8" />
                             </div>
                             <div className="text-center space-y-2">
@@ -1103,7 +1103,7 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
                             </div>
                             <div className="w-full max-w-md bg-slate-100 h-2.5 rounded-full overflow-hidden">
                                 <motion.div
-                                    className="bg-indigo-600 h-full rounded-full"
+                                    className="bg-[#103552] h-full rounded-full"
                                     initial={{ width: '0%' }}
                                     animate={{ width: `${progress}%` }}
                                     transition={{ duration: 0.5 }}
@@ -1146,7 +1146,7 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
                             <button
                                 onClick={handleImportSubmit}
                                 disabled={validCount === 0}
-                                className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-indigo-100 transition-all active:scale-95"
+                                className="px-8 py-3.5 bg-[#103552] hover:bg-[#103552] disabled:bg-slate-300 text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-[#96D1C6]/30 transition-all active:scale-95"
                             >
                                 IMPORT SEKARANG ({validCount} Data)
                             </button>
@@ -1155,7 +1155,7 @@ function PayrollImportModal({ isOpen, onClose, onSuccess, currentBulan, currentT
                     {step === 'done' && (
                         <button
                             onClick={onClose}
-                            className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-indigo-100 transition-all active:scale-95"
+                            className="px-8 py-3.5 bg-[#103552] hover:bg-[#103552] text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-[#96D1C6]/30 transition-all active:scale-95"
                         >
                             TUTUP DIALOG
                         </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Plus, Edit, Trash2, X } from 'lucide-react';
 import { useToast } from './Toast';
@@ -172,9 +172,9 @@ export function FinanceKategoriReimbursementPage() {
                             placeholder="Cari kategori..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-400"
+                            className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-[#103552]/20 transition-all placeholder:text-slate-400"
                         />
-                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#185B5A] transition-colors">
                             <Search className="w-5 h-5" />
                         </div>
                     </div>
@@ -195,7 +195,7 @@ export function FinanceKategoriReimbursementPage() {
                             {loading && data.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="py-20 text-center">
-                                        <div className="w-10 h-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
+                                        <div className="w-10 h-10 border-4 border-[#96D1C6]/30 border-t-[#103552] rounded-full animate-spin mx-auto"></div>
                                         <p className="text-sm font-bold text-slate-400 mt-4">Memuat data...</p>
                                     </td>
                                 </tr>
@@ -211,7 +211,7 @@ export function FinanceKategoriReimbursementPage() {
                                             <span className="text-sm font-bold text-slate-700">{row.name}</span>
                                         </td>
                                         <td className="py-5 px-6">
-                                            <span className="text-sm font-black text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                                            <span className="text-sm font-black text-[#103552] bg-[#96D1C6]/20 px-3 py-1.5 rounded-lg border border-[#96D1C6]/30">
                                                 {formatCurrency(row.jumlah)}
                                             </span>
                                         </td>
@@ -281,7 +281,7 @@ export function FinanceKategoriReimbursementPage() {
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                             placeholder="Contoh: Bensin Pertalite"
-                                            className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+                                            className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#103552]/20 transition-all outline-none"
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-6">
@@ -293,7 +293,7 @@ export function FinanceKategoriReimbursementPage() {
                                                 value={formData.jumlah}
                                                 onChange={(e) => setFormData({ ...formData, jumlah: e.target.value })}
                                                 placeholder="Contoh: 200000"
-                                                className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none font-mono"
+                                                className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#103552]/20 transition-all outline-none font-mono"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -301,7 +301,7 @@ export function FinanceKategoriReimbursementPage() {
                                             <select
                                                 value={formData.status}
                                                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                                className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none appearance-none cursor-pointer"
+                                                className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#103552]/20 transition-all outline-none appearance-none cursor-pointer"
                                             >
                                                 <option value="Aktif">Aktif</option>
                                                 <option value="Non-Aktif">Non-Aktif</option>
@@ -321,7 +321,7 @@ export function FinanceKategoriReimbursementPage() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="flex-1 px-8 py-5 bg-indigo-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 disabled:opacity-50"
+                                        className="flex-1 px-8 py-5 bg-[#103552] text-white rounded-2xl text-sm font-black shadow-xl shadow-[#103552]/20 hover:bg-[#103552] transition-all active:scale-95 disabled:opacity-50"
                                     >
                                         {isSubmitting ? 'Menyimpan...' : 'Simpan Kategori'}
                                     </button>

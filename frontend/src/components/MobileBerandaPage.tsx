@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -157,14 +157,14 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
   };
 
   const layananObj = [
-    { label: 'Absensi',       icon: Fingerprint,       color: 'from-indigo-500 to-indigo-600', path: '/absen', perm: '' },
+    { label: 'Absensi',       icon: Fingerprint,       color: 'from-[#185B5A] to-[#103552]', path: '/absen', perm: '' },
     { label: 'Cuti & Izin',   icon: Calendar,          color: 'from-sky-500 to-sky-600',       path: '/leave', perm: '' },
     { label: 'Dinas Luar',    icon: Navigation,        color: 'from-amber-500 to-amber-600',   path: '/attendance-dinas', perm: '' },
     { label: 'Lembur',        icon: Zap,               color: 'from-yellow-400 to-orange-500', path: '/overtime-entry', perm: '' },
     { label: 'Makan Siang',   icon: UtensilsCrossed,   color: 'from-orange-500 to-amber-500',  path: '/makan-siang', perm: '' },
     { label: 'Lokasi',        icon: MapPin,            color: 'from-rose-500 to-pink-600',     path: '/locations', perm: 'lokasi-kantor.view' },
     { label: 'Password',      icon: Lock,              color: 'from-slate-600 to-slate-700',   path: '/change-password', perm: '' },
-    { label: 'Lainnya',       icon: LayoutGrid,        color: 'from-violet-500 to-purple-600', path: '#', perm: '' },
+    { label: 'Lainnya',       icon: LayoutGrid,        color: 'from-[#185B5A] to-purple-600', path: '#', perm: '' },
   ];
 
   const allMenusObj = [
@@ -174,12 +174,12 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
     { label: 'Dinas Luar',         icon: FileText,      color: 'bg-amber-50 text-amber-600',   path: '/attendance-dinas', perm: '' },
     { label: 'Lembur',             icon: Zap,           color: 'bg-yellow-50 text-yellow-600', path: '/overtime-entry', perm: '' },
     { label: 'Request Location',   icon: MapIcon,       color: 'bg-orange-50 text-orange-600', path: '/locations', perm: 'lokasi-kantor.view' },
-    { label: 'Change Password',    icon: Lock,          color: 'bg-indigo-50 text-indigo-600', path: '/change-password', perm: '' },
+    { label: 'Change Password',    icon: Lock,          color: 'bg-[#96D1C6]/20 text-[#103552]', path: '/change-password', perm: '' },
     { label: 'Pegawai',            icon: Users,         color: 'bg-teal-50 text-teal-600',     path: '/employees', perm: 'pegawai.view' },
     { label: 'Payroll',            icon: DollarSign,    color: 'bg-sky-50 text-sky-600',       path: '#', perm: 'payroll.view' },
     { label: 'Dokumen',            icon: FileStack,     color: 'bg-amber-50 text-amber-600',   path: '/documents', perm: 'dokumen.view' },
     { label: 'Kasbon',             icon: Wallet,        color: 'bg-blue-50 text-blue-600',     path: '/finance-kasbon', perm: 'kasbon.view' },
-    { label: 'History Absen',      icon: History,       color: 'bg-indigo-50 text-indigo-600', path: '/attendance', perm: '' },
+    { label: 'History Absen',      icon: History,       color: 'bg-[#96D1C6]/20 text-[#103552]', path: '/attendance', perm: '' },
     { label: 'History Dinas',      icon: Calendar,      color: 'bg-rose-50 text-rose-600',     path: '/data-dinas', perm: '' },
     { label: 'History Lembur',     icon: Activity,      color: 'bg-orange-50 text-orange-600', path: '/overtime-data', perm: '' },
     { label: 'Euforia',            icon: Sparkles,      color: 'bg-teal-50 text-teal-600',     path: '#', perm: '' },
@@ -188,7 +188,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
     { label: 'Pengajuan Keuangan', icon: Banknote,      color: 'bg-blue-50 text-blue-600',     path: '/finance-pengajuan', perm: 'list-pengajuan-keuangan.view' },
     { label: 'Kunjungan',          icon: Navigation,    color: 'bg-amber-50 text-amber-600',   path: '/visit-kunjungan', perm: '' },
     { label: 'Kinerja Pegawai',    icon: Briefcase,     color: 'bg-sky-50 text-sky-600',       path: '/kinerja-pegawai', perm: 'kinerja-pegawai.view' },
-    { label: 'Penugasan',          icon: ClipboardList, color: 'bg-indigo-50 text-indigo-600', path: '/visit-penugasan', perm: '' },
+    { label: 'Penugasan',          icon: ClipboardList, color: 'bg-[#96D1C6]/20 text-[#103552]', path: '/visit-penugasan', perm: '' },
     { label: 'Rapat Kerja',        icon: Presentation,  color: 'bg-rose-50 text-rose-600',     path: '/visit-rapat', perm: '' },
     { label: 'Pegawai Keluar',     icon: UserMinus,     color: 'bg-rose-50 text-rose-600',     path: '/resignations', perm: 'exit.view' },
     { label: 'Visit Dokter',       icon: Stethoscope,   color: 'bg-sky-50 text-sky-600',       path: '/visit-dokter', perm: '' },
@@ -227,11 +227,11 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
     <div className="min-h-screen bg-[#F0F4FF] pb-28 font-sans">
 
       {/* ─── HERO HEADER ─── */}
-      <div className="relative bg-gradient-to-br from-indigo-700 via-indigo-600 to-violet-600 pt-14 pb-32 px-6 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[#103552] via-[#0D4156] to-[#185B5A] pt-14 pb-32 px-6 overflow-hidden">
         {/* Decorative blobs */}
         <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-violet-400/20 rounded-full blur-3xl" />
-        <div className="absolute top-20 left-1/2 w-32 h-32 bg-sky-400/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#96D1C6]/20 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-1/2 w-32 h-32 bg-[#96D1C6]/10 rounded-full blur-2xl" />
 
         {/* Top Row */}
         <div className="relative z-10 flex items-center justify-between mb-6">
@@ -260,7 +260,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
             >
               <Bell className="w-5 h-5 text-white" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[9px] font-black rounded-full border-2 border-[#545CEB] flex items-center justify-center shadow-lg">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#E09132] text-white text-[9px] font-black rounded-full border-2 border-[#103552] flex items-center justify-center shadow-lg">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -283,13 +283,13 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-500/10 p-6 border border-white"
+          className="bg-white rounded-[2.5rem] shadow-2xl shadow-[#103552]/10 p-6 border border-white"
         >
           <div className="grid grid-cols-3 gap-2 divide-x divide-slate-100">
             {/* Jam Kerja (Shift) */}
             <div className="flex flex-col items-center text-center px-2">
-              <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center mb-2">
-                <Clock className="w-4 h-4 text-indigo-500" />
+              <div className="w-9 h-9 bg-[#96D1C6]/30 rounded-xl flex items-center justify-center mb-2">
+                <Clock className="w-4 h-4 text-[#185B5A]" />
               </div>
               <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Jam Kerja</p>
               <p className="text-[11px] font-black text-slate-800">
@@ -340,7 +340,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
           {/* Finance Quick Stats */}
           <div className="mt-5 pt-5 border-t border-slate-50 grid grid-cols-3 gap-3">
             {[
-              { label: 'Payroll', icon: DollarSign, color: 'text-indigo-500 bg-indigo-50', value: null, path: '/payroll' },
+              { label: 'Payroll', icon: DollarSign, color: 'text-[#185B5A] bg-[#96D1C6]/20', value: null, path: '/payroll' },
               { label: 'Reimburse', icon: HandCoins, color: 'text-emerald-500 bg-emerald-50', value: `Rp ${Number(userData?.saldo_kasbon || 0).toLocaleString('id-ID')}`, path: '/finance-reimbursement' },
               { label: 'Kasbon', icon: Wallet, color: 'text-amber-500 bg-amber-50', value: 'Rp 0', path: '/finance-kasbon' },
             ].map((item, i) => (
@@ -364,7 +364,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
           transition={{ delay: 0.2 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => navigate('/absen')}
-          className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 rounded-[2rem] p-6 flex items-center justify-between shadow-xl shadow-indigo-500/25 overflow-hidden relative"
+          className="w-full bg-gradient-to-r from-[#E09132] to-[#C97E28] rounded-[2rem] p-6 flex items-center justify-between shadow-xl shadow-[#E09132]/25 overflow-hidden relative"
         >
           <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full" />
           <div className="absolute right-4 bottom-0 w-20 h-20 bg-white/5 rounded-full" />
@@ -373,7 +373,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
             <p className="text-lg font-black text-white tracking-tight">Rekam Kehadiran</p>
           </div>
           <div className="relative z-10 w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg">
-            <Fingerprint className="w-8 h-8 text-indigo-600" />
+            <Fingerprint className="w-8 h-8 text-[#E09132]" />
           </div>
         </motion.button>
       </div>
@@ -384,7 +384,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
           <h2 className="text-base font-black text-slate-800 tracking-tight">Layanan Cepat</h2>
           <button
             onClick={() => setIsAllMenuOpen(true)}
-            className="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1"
+            className="text-[10px] font-black text-[#E09132] uppercase tracking-widest flex items-center gap-1"
           >
             Semua <ChevronRight className="w-3 h-3" />
           </button>
@@ -417,14 +417,14 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
       <div className="mt-8 px-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-black text-slate-800 tracking-tight">Aktivitas Terakhir</h2>
-          <button onClick={() => navigate('/attendance')} className="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1">
+          <button onClick={() => navigate('/attendance')} className="text-[10px] font-black text-[#E09132] uppercase tracking-widest flex items-center gap-1">
             Lihat <ArrowUpRight className="w-3 h-3" />
           </button>
         </div>
 
         <div className="space-y-3">
           {[
-            { label: 'Riwayat Absensi', path: '/attendance', icon: History, color: 'bg-indigo-50 text-indigo-600', desc: 'Lihat log masuk & pulang' },
+            { label: 'Riwayat Absensi', path: '/attendance', icon: History, color: 'bg-[#96D1C6]/20 text-[#103552]', desc: 'Lihat log masuk & pulang' },
             { label: 'Riwayat Dinas', path: '/data-dinas', icon: Navigation, color: 'bg-amber-50 text-amber-600', desc: 'Laporan perjalanan dinas' },
             { label: 'Riwayat Lembur', path: '/overtime-data', icon: Zap, color: 'bg-orange-50 text-orange-600', desc: 'Catatan jam lembur' },
           ].map((item, i) => (
@@ -460,7 +460,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
             className="fixed inset-0 z-[200] bg-[#F0F4FF] flex flex-col"
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-br from-indigo-700 to-violet-600 pt-14 pb-8 px-6 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#103552] to-[#185B5A] pt-14 pb-8 px-6 relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
               <div className="relative z-10 flex items-center justify-between">
                 <div>

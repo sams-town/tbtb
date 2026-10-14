@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   MapPin,
@@ -190,7 +190,7 @@ export function LocationsPage() {
             </button>
             <button
               onClick={() => setIsAdding(true)}
-              className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95"
+              className="flex items-center gap-2 px-8 py-4 bg-[#103552] text-white rounded-2xl text-sm font-black transition-all shadow-xl shadow-[#103552]/20 hover:bg-[#103552] active:scale-95"
             >
               <Plus className="w-5 h-5" />
               Tambah
@@ -202,7 +202,7 @@ export function LocationsPage() {
           <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input type="text" placeholder="Search location..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" />
+              <input type="text" placeholder="Search location..." className="w-full pl-12 pr-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all" />
             </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
               {loading ? 'Loading...' : `Showing ${locations.length} Locations`}
@@ -212,7 +212,7 @@ export function LocationsPage() {
           <div className="overflow-x-auto scrollbar-hide">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+                <Loader2 className="w-8 h-8 text-[#185B5A] animate-spin" />
                 <p className="text-sm font-bold text-slate-400">Memuat data lokasi...</p>
               </div>
             ) : error ? (
@@ -223,7 +223,7 @@ export function LocationsPage() {
                 <p className="text-sm font-bold text-slate-600">{error}</p>
                 <button
                   onClick={fetchLocations}
-                  className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95"
+                  className="px-6 py-2.5 bg-[#103552] text-white rounded-xl text-sm font-bold hover:bg-[#103552] transition-all active:scale-95"
                 >
                   Coba Lagi
                 </button>
@@ -250,7 +250,7 @@ export function LocationsPage() {
                       <td className="py-6 px-8 text-sm font-black text-slate-300 group-hover:text-slate-900 transition-colors">{(index + 1).toString().padStart(2, '0')}</td>
                       <td className="py-6 px-8">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                          <div className="w-8 h-8 rounded-lg bg-[#96D1C6]/20 flex items-center justify-center text-[#103552]">
                             <MapPin className="w-4 h-4" />
                           </div>
                           <span className="text-sm font-black text-slate-900">{item.nama_lokasi}</span>
@@ -289,7 +289,7 @@ export function LocationsPage() {
                               <Check className="w-4 h-4" />
                             </button>
                           )}
-                          <button onClick={() => setEditingId(item.id)} className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all active:scale-90" title="Edit">
+                          <button onClick={() => setEditingId(item.id)} className="p-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl hover:bg-[#103552] hover:text-white transition-all active:scale-90" title="Edit">
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button onClick={() => setDeletingId(item.id)} className="p-2.5 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all active:scale-90" title="Delete">

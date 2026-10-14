@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     Search, Plus, Edit, Trash2, ArrowLeft, Target,
@@ -13,13 +13,13 @@ const fmt = (val: any) =>
 
 const inputCls = [
     'w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-bold',
-    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400',
+    'placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552]/60',
     'transition-all duration-200'
 ].join(' ');
 
 const tableInputCls = [
     'w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 font-bold',
-    'placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-400',
+    'placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#103552]/10 focus:border-[#103552]/60',
     'transition-all duration-200'
 ].join(' ');
 
@@ -268,7 +268,7 @@ export function FinanceTargetPage() {
                 <div>
                     <Field label="Nomor Target Kinerja">
                         <input required type="text" placeholder="TK/000000" value={form.nomor} onChange={e => setForm({ ...form, nomor: e.target.value })}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 font-bold focus:ring-4 focus:ring-indigo-100 transition-all outline-none" />
+                            className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 font-bold focus:ring-4 focus:ring-[#96D1C6]/30 transition-all outline-none" />
                     </Field>
                 </div>
 
@@ -354,7 +354,7 @@ export function FinanceTargetPage() {
                     <div className="flex items-center gap-4">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0">Jackpot</label>
                         <input type="number" value={form.jackpot} onChange={e => setForm({ ...form, jackpot: e.target.value })}
-                            className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-slate-800 font-bold focus:ring-4 focus:ring-indigo-100 outline-none transition-all shadow-sm" />
+                            className="w-full px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-slate-800 font-bold focus:ring-4 focus:ring-[#96D1C6]/30 outline-none transition-all shadow-sm" />
                     </div>
                 </div>
 
@@ -369,14 +369,14 @@ export function FinanceTargetPage() {
     );
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] pb-20">
+        <div className="min-h-screen bg-[#F0F0F0] pb-20">
             {deleteTarget && <DeleteModal name={deleteTarget.nomor || deleteTarget.users?.name} onConfirm={confirmDelete} onCancel={() => setDeleteTarget(null)} />}
 
             {view === 'form' ? renderForm() : (
                 <div className="p-4 lg:p-8 max-w-[1700px] mx-auto space-y-8">
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-5">
-                            <div className="w-14 h-14 rounded-[1.5rem] bg-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-200">
+                            <div className="w-14 h-14 rounded-[1.5rem] bg-[#103552] flex items-center justify-center shadow-xl shadow-[#96D1C6]/50">
                                 <Trophy className="w-7 h-7 text-white" />
                             </div>
                             <div>
@@ -388,7 +388,7 @@ export function FinanceTargetPage() {
                             <div className="relative group">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                                 <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Cari nama pegawai..."
-                                    className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none" />
+                                    className="w-full sm:w-72 pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-[#103552]/10 transition-all outline-none" />
                             </div>
                             <button onClick={() => { setForm(blankForm()); setRows([blankRow()]); setEditingId(null); setView('form'); }}
                                 className="px-8 py-4 bg-slate-900 hover:bg-black text-white rounded-2xl font-black text-sm flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-slate-200">
@@ -415,7 +415,7 @@ export function FinanceTargetPage() {
                                     {loading && data.length === 0 ? (
                                         <tr>
                                             <td colSpan={13} className="py-24 text-center">
-                                                <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mx-auto" />
+                                                <div className="w-12 h-12 border-4 border-[#96D1C6]/30 border-t-[#103552] rounded-full animate-spin mx-auto" />
                                                 <p className="text-xs font-black text-slate-400 mt-6 uppercase tracking-[0.3em]">Loading Database...</p>
                                             </td>
                                         </tr>
@@ -433,13 +433,13 @@ export function FinanceTargetPage() {
                                             <tr key={row.id} className="hover:bg-slate-50/50 transition-colors group">
                                                 <td className="py-6 px-8 text-xs font-bold text-slate-300">{idx + 1}.</td>
                                                 <td className="py-6 px-8">
-                                                    <span className="px-3 py-1.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-lg border border-indigo-100">
+                                                    <span className="px-3 py-1.5 bg-[#96D1C6]/20 text-[#103552] text-[10px] font-black rounded-lg border border-[#96D1C6]/30">
                                                         {row.target_kinerjas?.nomor || row.nomor}
                                                     </span>
                                                 </td>
                                                 <td className="py-6 px-8">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-black text-xs shadow-lg shadow-indigo-100">
+                                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#185B5A] to-[#103552] flex items-center justify-center text-white font-black text-xs shadow-lg shadow-[#96D1C6]/30">
                                                             {row.users?.name?.charAt(0)}
                                                         </div>
                                                         <span className="text-sm font-black text-slate-800">{row.users?.name || '—'}</span>
@@ -447,7 +447,7 @@ export function FinanceTargetPage() {
                                                 </td>
                                                 <td className="py-6 px-8 text-xs font-bold text-slate-500 whitespace-nowrap">{row.jabatans?.nama_jabatan || '—'}</td>
                                                 <td className="py-6 px-8 font-black text-slate-900 text-sm">{fmt(row.target_pribadi)}</td>
-                                                <td className="py-6 px-8 font-black text-indigo-500 text-xs text-center">{row.jumlah_persen_pribadi}%</td>
+                                                <td className="py-6 px-8 font-black text-[#185B5A] text-xs text-center">{row.jumlah_persen_pribadi}%</td>
                                                 <td className="py-6 px-8 font-black text-emerald-600 text-sm">{fmt(row.bonus_pribadi)}</td>
                                                 <td className="py-6 px-8 font-black text-slate-700 text-sm">{fmt(row.target_kinerjas?.target_team)}</td>
                                                 <td className="py-6 px-8 font-black text-purple-600 text-xs text-center">{row.target_kinerjas?.jumlah_persen_team}%</td>

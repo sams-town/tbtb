@@ -1051,13 +1051,6 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (exportDropdownRef.current && !exportDropdownRef.current.contains(e.target as Node)) {
-        setShowExportDropdown(false);
-      }
-    };
-    // removed duplicate listener - handled above
-  }, []);
 
   useEffect(() => {
     const fetchFilters = async () => {

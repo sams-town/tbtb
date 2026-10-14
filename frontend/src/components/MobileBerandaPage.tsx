@@ -171,7 +171,7 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
 
   const allMenusObj = [
     { label: 'Absensi',            icon: QrCode,        color: 'bg-sky-50 text-sky-600',       path: '/absen', perm: '' },
-    { label: 'Kartu Pegawai',      icon: CreditCard,    color: 'bg-slate-50 text-slate-600',   path: '#', perm: '' },
+    { label: 'Kartu Pegawai',      icon: CreditCard,    color: 'bg-slate-50 text-slate-600',   path: '/kartu-pegawai', perm: '' },
     { label: 'Cuti & Izin',        icon: Wifi,          color: 'bg-blue-50 text-blue-600',     path: '/leave', perm: '' },
     { label: 'Dinas Luar',         icon: FileText,      color: 'bg-amber-50 text-amber-600',   path: '/attendance-dinas', perm: '' },
     { label: 'Lembur',             icon: Zap,           color: 'bg-yellow-50 text-yellow-600', path: '/overtime-entry', perm: '' },

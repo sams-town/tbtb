@@ -983,7 +983,7 @@ function QRModal({ employee, onClose }: { employee: Employee; onClose: () => voi
         <div className={cn('h-1.5 w-full', avatarColor(employee.id))} />
         <div className="flex justify-center pt-7 pb-4 px-8">
           <div className="p-4 rounded-2xl bg-white border-2 border-slate-100 shadow-sm">
-            <QRCode ref={svgRef} value={employee.username} size={180} bgColor="#ffffff" fgColor="#0f172a" level="M" />
+            <QRCode ref={svgRef} value={`https://hris-thb.id/#/card/${employee.id}`} size={180} bgColor="#ffffff" fgColor="#0f172a" level="M" />
           </div>
         </div>
         <div className="text-center pb-6 px-6">

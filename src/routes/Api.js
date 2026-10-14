@@ -217,6 +217,7 @@ router.delete("/mapping-shifts/bulk", (req, res) => mappingShiftController.bulkD
 // ========================
 const lemburUpload = createUploadMiddleware("lemburs", "lembur", undefined, undefined, false);
 router.get("/lemburs", (req, res) => lemburController.index(req, res));
+router.get("/lemburs/export", (req, res) => lemburController.exportCsv(req, res));
 router.get("/lemburs/:id", (req, res) => lemburController.show(req, res));
 router.get("/lemburs-user/:user_id", (req, res) => lemburController.showUser(req, res));
 router.post("/lemburs", lemburUpload.fields([{ name: "foto_jam_masuk", maxCount: 1 }, { name: "foto_jam_keluar", maxCount: 1 }, { name: "file_lembur", maxCount: 1 }]), (req, res) => lemburController.store(req, res));

@@ -228,6 +228,28 @@ class LemburController {
             });
         }
     }
+    /**
+     * GET /api/lemburs/export?start_date=2026-10-01&end_date=2026-10-31
+     * Export CSV lembur berdasarkan rentang tanggal
+     */
+    async exportCsv(req, res) {
+        try {
+            const { start_date, end_date } = req.query;
+            if (!start_date || !end_date) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Query 'start_date' dan 'end_date' wajib diisi."
+                });
+            }
+            const csv      = await lemburService.exportCsv(start_date, end_date);
+            const filename = `export-lembur-${start_date}-sd-${end_date}.csv`;
+            res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+            return res.status(200).send('\uFEFF' + csv); // BOM untuk Excel
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    }
 }
 
 export default new LemburController();

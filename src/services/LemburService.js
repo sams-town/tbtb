@@ -327,6 +327,110 @@ class LemburService {
         return true;
     }
 
+    /**
+     * Format detik ke string jam & menit yang rapi
+     * contoh: 3844 detik → "1j 4m"
+     */
+    formatDurasi(totalLembur) {
+        if (!totalLembur || totalLembur === "0" || totalLembur === 0) return "0j 0m";
+        const totalDetik = parseInt(totalLembur);
+        if (isNaN(totalDetik) || totalDetik <= 0) return "0j 0m";
+        const jam   = Math.floor(totalDetik / 3600);
+        const menit = Math.floor((totalDetik % 3600) / 60);
+        return `${jam}j ${menit}m`;
+    }
+
+    /**
+     * Export data lembur ke CSV berdasarkan rentang tanggal
+     * Diurutkan tanggal ASC, durasi dihitung ulang dari jam_masuk & jam_keluar
+     */
+    async exportCsv(startDate, endDate) {
+        if (!startDate || !endDate) throw new Error("start_date dan end_date wajib diisi.");
+
+        const data = await prisma.lemburs.findMany({
+            where: {
+                tanggal: {
+                    gte: startDate,
+                    lte: endDate,
+                }
+            },
+            orderBy: [
+                { tanggal: 'asc' },
+                { jam_masuk: 'asc' }
+            ],
+            include: {
+                karyawan: {
+                    select: { id: true, name: true, username: true }
+                },
+                lokasi: {
+                    select: { nama_lokasi: true }
+                },
+                approver: {
+                    select: { name: true }
+                }
+            }
+        });
+
+        // CSV escape helper
+        const e = (val) => {
+            const s = String(val ?? '');
+            if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                return `"${s.replace(/"/g, '""')}"`;
+            }
+            return s;
+        };
+
+        const diekspor = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+        const lines = [];
+
+        // Header info
+        lines.push(`Export Data Lembur`);
+        lines.push(`Periode,${startDate} s/d ${endDate}`);
+        lines.push(`Diekspor pada,${diekspor}`);
+        lines.push(`Total Data,${data.length}`);
+        lines.push('');
+
+        // Header kolom — sesuai format Excel yang ada
+        lines.push('No,Nama Pegawai,Username,Lokasi,Tanggal,Masuk Lembur,Keluar Lembur,Durasi,Notes,Status,Approver');
+
+        data.forEach((row, i) => {
+            // Hitung ulang durasi dari jam_masuk & jam_keluar
+            let durasi = '0j 0m';
+            let keluarLembur = row.jam_keluar ?? '-';
+
+            if (row.jam_masuk && row.jam_keluar) {
+                // Hitung dari jam string langsung
+                const totalDetik = this.calculateTotalLembur(row.jam_masuk, row.jam_keluar);
+                durasi = this.formatDurasi(totalDetik);
+            } else if (row.jam_masuk && !row.jam_keluar) {
+                // Belum clock out
+                durasi = 'Belum Selesai';
+                keluarLembur = '-';
+            }
+
+            // Gunakan total_lembur dari DB jika tersedia dan jam_keluar ada
+            if (row.total_lembur && row.jam_keluar) {
+                durasi = this.formatDurasi(row.total_lembur);
+            }
+
+            lines.push([
+                i + 1,
+                e(row.karyawan?.name     ?? '-'),
+                e(row.karyawan?.username ?? '-'),
+                e(row.lokasi?.nama_lokasi ?? '-'),
+                e(row.tanggal ?? '-'),
+                e(row.jam_masuk ?? '-'),
+                e(keluarLembur),
+                e(durasi),
+                e(row.notes ?? '-'),
+                e(row.status ?? '-'),
+                e(row.approver?.name ?? '-'),
+            ].join(','));
+        });
+
+        return lines.join('\r\n');
+    }
+
     calculateTotalLembur(start, end) {
         try {
             const startDate = new Date(start.replace(/-/g, "/"));

@@ -257,6 +257,8 @@ const documentUpload = createUploadMiddleware(
     10 * 1024 * 1024 // Max 10MB
 );
 router.get("/documents", (req, res) => fileController.index(req, res));
+router.get("/documents/bulk-info", (req, res) => fileController.bulkInfo(req, res));
+router.get("/documents/bulk-download", (req, res) => fileController.bulkDownload(req, res));
 router.post("/documents", documentUpload.single("file"), (req, res) => fileController.store(req, res));
 router.put("/documents/:id", documentUpload.single("file"), (req, res) => fileController.update(req, res));
 router.delete("/documents/:id", (req, res) => fileController.destroy(req, res));

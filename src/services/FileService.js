@@ -6,6 +6,12 @@ class FileService {
     async getAll(query = {}) {
         const where = {};
         if (query.user_id) where.user_id = BigInt(query.user_id);
+
+        // Filter by jenis_file (exact atau contains)
+        if (query.jenis_file) {
+            where.jenis_file = { contains: query.jenis_file };
+        }
+
         if (query.search) {
             where.OR = [
                 { jenis_file: { contains: query.search } },
@@ -90,6 +96,72 @@ class FileService {
             enriched.users = null;
         }
         return enriched;
+    }
+
+    /**
+     * Ambil list file untuk bulk download berdasarkan jenis_file dan/atau user_ids
+     * Return: array { user_name, jenis_file, fileUpload (full URL), filePath (absolute) }
+     */
+    async getBulkFiles(query = {}) {
+        const where = {};
+
+        // Filter by jenis_file
+        if (query.jenis_file) {
+            where.jenis_file = { contains: query.jenis_file };
+        }
+
+        // Filter by multiple user_ids
+        if (query.user_ids) {
+            const ids = Array.isArray(query.user_ids)
+                ? query.user_ids.map(id => BigInt(id))
+                : [BigInt(query.user_ids)];
+            where.user_id = { in: ids };
+        }
+
+        // Filter by jabatan_id (via users)
+        if (query.jabatan_id) {
+            const users = await prisma.users.findMany({
+                where: { jabatan_id: BigInt(query.jabatan_id) },
+                select: { id: true }
+            });
+            const uids = users.map(u => u.id);
+            where.user_id = { in: uids };
+        }
+
+        const data = await prisma.files.findMany({
+            where,
+            orderBy: [{ jenis_file: 'asc' }, { id: 'asc' }]
+        });
+
+        const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+
+        // Enrich dengan nama user
+        const userIds = [...new Set(data.map(d => d.user_id).filter(Boolean))];
+        let usersMap = {};
+        if (userIds.length) {
+            const users = await prisma.users.findMany({
+                where: { id: { in: userIds } },
+                select: { id: true, name: true, jabatan: { select: { nama_jabatan: true } } }
+            });
+            usersMap = Object.fromEntries(users.map(u => [u.id.toString(), u]));
+        }
+
+        return data.map(item => {
+            const user = usersMap[item.user_id?.toString()] ?? null;
+            const fileUrl = item.fileUpload
+                ? (item.fileUpload.startsWith('http')
+                    ? item.fileUpload
+                    : `${baseUrl}/uploads/${item.fileUpload}`)
+                : null;
+            return {
+                id:         item.id.toString(),
+                jenis_file: item.jenis_file,
+                fileUpload: fileUrl,
+                user_id:    item.user_id?.toString() ?? null,
+                user_name:  user?.name ?? '-',
+                jabatan:    user?.jabatan?.nama_jabatan ?? '-',
+            };
+        });
     }
 
     async delete(id) {

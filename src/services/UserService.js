@@ -46,11 +46,7 @@ class UserService {
 
         if (query.exclude_role) {
             const roleUsers = await prisma.model_has_roles.findMany({
-                where: {
-                    roles: {
-                        name: query.exclude_role
-                    }
-                },
+                where: { roles: { name: query.exclude_role } },
                 select: { model_id: true }
             });
             roleUsers.forEach(ru => excludedUserIdsSet.add(ru.model_id));
@@ -63,35 +59,21 @@ class UserService {
         if (query.status_kerja === "pkwt") {
             andConditions.push({
                 OR: [
-                    {
-                        AND: [
-                            { no_pkwt: { not: null } },
-                            { no_pkwt: { not: "" } }
-                        ]
-                    },
-                    {
-                        tanggal_berakhir_pkwt: { not: null }
-                    }
+                    { AND: [{ no_pkwt: { not: null } }, { no_pkwt: { not: "" } }] },
+                    { tanggal_berakhir_pkwt: { not: null } }
                 ]
             });
         } else if (query.status_kerja === "tetap") {
             andConditions.push({
                 AND: [
-                    {
-                        OR: [
-                            { no_pkwt: null },
-                            { no_pkwt: "" }
-                        ]
-                    },
-                    {
-                        tanggal_berakhir_pkwt: null
-                    }
+                    { OR: [{ no_pkwt: null }, { no_pkwt: "" }] },
+                    { tanggal_berakhir_pkwt: null }
                 ]
             });
         }
 
         if (filterJabatanId) {
-            andConditions.push({ jabatan_id: { in: [filterJabatanId, null] } });
+            andConditions.push({ jabatan_id: filterJabatanId });
         } else if (showEmptyJabatan) {
             andConditions.push({ jabatan_id: null });
         }
@@ -100,45 +82,49 @@ class UserService {
             andConditions.push({ lokasi_id: filterLokasiId });
         }
 
+        // ── PERBAIKAN SEARCH: sekarang aktif ──────────────────────────
         if (search) {
             andConditions.push({
                 OR: [
-                    { name: { contains: search } },
-                    { email: { contains: search } },
-                    { username: { contains: search } },
-                    { telepon: { contains: search } },
-                    { provinsi: { contains: search } },
-                    { kota_kabupaten: { contains: search } },
-                    { kecamatan: { contains: search } },
-                    { kelurahan: { contains: search } },
+                    { name:            { contains: search } },
+                    { email:           { contains: search } },
+                    { username:        { contains: search } },
+                    { telepon:         { contains: search } },
+                    { ktp:             { contains: search } },
+                    { no_pkwt:         { contains: search } },
+                    { provinsi:        { contains: search } },
+                    { kota_kabupaten:  { contains: search } },
+                    { kecamatan:       { contains: search } },
+                    { kelurahan:       { contains: search } },
                 ]
             });
         }
 
         const where = { AND: andConditions };
 
-        if (query.role) {
+        // ── MULTI-ROLE FILTER ─────────────────────────────────────────
+        // Mendukung ?role=karyawan (single) ATAU ?roles[]=karyawan&roles[]=hr (multi)
+        const roleFilter = query.roles
+            ? (Array.isArray(query.roles) ? query.roles : [query.roles])
+            : query.role
+                ? [query.role]
+                : [];
+
+        if (roleFilter.length > 0) {
             const roleUsers = await prisma.model_has_roles.findMany({
-                where: {
-                    roles: {
-                        name: query.role
-                    }
-                },
+                where: { roles: { name: { in: roleFilter } } },
                 select: { model_id: true }
             });
             const roleUserIds = roleUsers.map(ru => ru.model_id);
-            if (where.id) {
-                where.id = { ...where.id, in: roleUserIds };
-            } else {
-                where.id = { in: roleUserIds };
-            }
+            // Kombinasikan dengan notIn yang sudah ada
+            andConditions.push({ id: { in: roleUserIds } });
         }
 
         const [data, total] = await Promise.all([
             prisma.users.findMany({
                 where,
                 skip,
-                // take: limit,
+                take: limit, // ── PERBAIKAN: take aktif kembali
                 orderBy: { id: "desc" },
                 include: { jabatan: true, lokasi: true, status_pajak: true },
             }),

@@ -46,30 +46,34 @@ function serializeSetting(row) {
 
 function serializeKlaim(row) {
     if (!row) return null;
+
+    // Safe BigInt/number to string helper
+    const safe = (v) => (v != null ? v.toString() : '0');
+
     return {
-        id:        row.id.toString(),
-        user_id:   row.user_id.toString(),
+        id:        safe(row.id),
+        user_id:   safe(row.user_id),
         tanggal:   row.tanggal instanceof Date
             ? row.tanggal.toISOString().slice(0, 10)
-            : String(row.tanggal).slice(0, 10),
-        jam_klaim: row.jam_klaim,
-        harga:     row.harga.toString(),
+            : row.tanggal ? String(row.tanggal).slice(0, 10) : null,
+        jam_klaim: row.jam_klaim ?? null,
+        harga:     safe(row.harga),
         lat:       row.lat  ?? null,
-        lng:       row.lng ?? null,
+        lng:       row.lng  ?? null,
         jarak:     row.jarak ?? null,
-        status:    row.status,
+        status:    row.status ?? null,
         created_at: row.created_at?.toISOString() ?? null,
         updated_at: row.updated_at?.toISOString() ?? null,
         users: row.users ? {
-            id:      row.users.id.toString(),
-            name:    row.users.name,
+            id:      safe(row.users.id),
+            name:    row.users.name ?? null,
             jabatan: row.users.jabatan?.nama_jabatan ?? null,
             lokasi:  row.users.lokasi ? {
-                id:          row.users.lokasi.id.toString(),
-                nama_lokasi: row.users.lokasi.nama_lokasi,
-                lat_kantor:  row.users.lokasi.lat_kantor,
-                long_kantor: row.users.lokasi.long_kantor,
-                radius:      row.users.lokasi.radius,
+                id:          safe(row.users.lokasi.id),
+                nama_lokasi: row.users.lokasi.nama_lokasi ?? null,
+                lat_kantor:  row.users.lokasi.lat_kantor  ?? null,
+                long_kantor: row.users.lokasi.long_kantor ?? null,
+                radius:      row.users.lokasi.radius      ?? null,
             } : null,
         } : undefined,
     };

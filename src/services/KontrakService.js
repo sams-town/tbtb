@@ -2,21 +2,74 @@ import prisma from "../config/prisma.js";
 
 class KontrakService {
     async getAll(query = {}) {
-        const search = query.search || "";
-        const where = {
-            ... (search ? {
+        const search    = query.search || "";
+        const andConds  = [];
+
+        // ── Filter user_id ────────────────────────────────────────
+        if (query.user_id) {
+            andConds.push({ user_id: BigInt(query.user_id) });
+        }
+
+        // ── Filter jenis_kontrak ──────────────────────────────────
+        if (query.jenis_kontrak) {
+            andConds.push({ jenis_kontrak: { contains: query.jenis_kontrak } });
+        }
+
+        // ── Filter masa berlaku (akan berakhir / sudah berakhir) ──
+        if (query.status_kontrak === "aktif") {
+            andConds.push({ tanggal_selesai: { gte: new Date() } });
+        } else if (query.status_kontrak === "berakhir") {
+            andConds.push({ tanggal_selesai: { lt: new Date() } });
+        }
+
+        // ── Search: nama karyawan, jenis_kontrak, no_kontrak, keterangan ──
+        if (search) {
+            // Cari user_id yang namanya cocok dulu
+            const matchedUsers = await prisma.users.findMany({
+                where: { name: { contains: search } },
+                select: { id: true }
+            });
+            const matchedUserIds = matchedUsers.map(u => u.id);
+
+            andConds.push({
                 OR: [
                     { jenis_kontrak: { contains: search } },
-                    { keterangan: { contains: search } },
-                ],
-            } : {})
-        };
-        if (query.user_id) where.user_id = BigInt(query.user_id);
+                    { no_kontrak:    { contains: search } },
+                    { keterangan:    { contains: search } },
+                    ...(matchedUserIds.length > 0
+                        ? [{ user_id: { in: matchedUserIds } }]
+                        : [])
+                ]
+            });
+        }
+
+        const where = andConds.length > 0 ? { AND: andConds } : {};
+
         const data = await prisma.kontraks.findMany({
             where,
-            orderBy: { id: "desc" },
+            orderBy: [{ tanggal_selesai: "asc" }, { id: "desc" }],
         });
-        return { data: this.serializeList(data) };
+
+        // Enrich dengan nama karyawan
+        const userIds = [...new Set(data.map(d => d.user_id).filter(Boolean))];
+        let usersMap = {};
+        if (userIds.length) {
+            const users = await prisma.users.findMany({
+                where: { id: { in: userIds } },
+                select: { id: true, name: true, jabatan: { select: { nama_jabatan: true } } }
+            });
+            usersMap = Object.fromEntries(users.map(u => [u.id.toString(), u]));
+        }
+
+        const enriched = data.map(k => {
+            const serialized = this.serialize(k);
+            const user = usersMap[k.user_id?.toString()] ?? null;
+            serialized.nama_karyawan = user?.name ?? '-';
+            serialized.jabatan = user?.jabatan?.nama_jabatan ?? '-';
+            return serialized;
+        });
+
+        return { data: enriched };
     }
 
     async getByUserId(userId) {
@@ -24,7 +77,22 @@ class KontrakService {
             where: { user_id: BigInt(userId) },
             orderBy: { id: "desc" },
         });
-        return this.serializeList(contracts);
+
+        // Enrich dengan data karyawan
+        let user = null;
+        try {
+            user = await prisma.users.findUnique({
+                where: { id: BigInt(userId) },
+                select: { id: true, name: true, jabatan: { select: { nama_jabatan: true } } }
+            });
+        } catch (_) {}
+
+        return contracts.map(k => {
+            const s = this.serialize(k);
+            s.nama_karyawan = user?.name ?? '-';
+            s.jabatan = user?.jabatan?.nama_jabatan ?? '-';
+            return s;
+        });
     }
 
     async getById(id) {
@@ -32,7 +100,34 @@ class KontrakService {
             where: { id: BigInt(id) },
         });
         if (!kontrak) return null;
-        return this.serialize(kontrak);
+
+        const serialized = this.serialize(kontrak);
+
+        // Enrich dengan data karyawan agar halaman detail tidak blank
+        if (kontrak.user_id) {
+            const user = await prisma.users.findUnique({
+                where: { id: kontrak.user_id },
+                select: {
+                    id: true, name: true, username: true,
+                    jabatan: { select: { nama_jabatan: true } },
+                    lokasi:  { select: { nama_lokasi:  true } },
+                    foto_karyawan: true,
+                }
+            });
+            if (user) {
+                serialized.users = {
+                    id:           user.id.toString(),
+                    name:         user.name,
+                    username:     user.username,
+                    jabatan:      user.jabatan?.nama_jabatan ?? null,
+                    lokasi:       user.lokasi?.nama_lokasi   ?? null,
+                    foto_karyawan: user.foto_karyawan ?? null,
+                };
+                serialized.nama_karyawan = user.name;
+            }
+        }
+
+        return serialized;
     }
 
     async create(data) {

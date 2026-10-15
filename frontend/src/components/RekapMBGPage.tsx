@@ -156,7 +156,10 @@ export function RekapMBGPage() {
         const res  = await fetch(url.toString(), { headers: authHeader() });
         const json = await res.json();
         if (!json.success) throw new Error(json.message);
-        data = Array.isArray(json.data) ? json.data : [];
+        // Response: { data: { tanggal, total_karyawan, total_biaya, data: [...] } }
+        data = Array.isArray(json.data?.data) ? json.data.data
+             : Array.isArray(json.data)       ? json.data
+             : [];
 
       } else if (mode === 'mingguan') {
         // Panggil /mbg/rekap/harian untuk setiap hari dalam rentang 7 hari
@@ -170,7 +173,10 @@ export function RekapMBGPage() {
         const res  = await fetch(url.toString(), { headers: authHeader() });
         const json = await res.json();
         if (!json.success) throw new Error(json.message);
-        data = Array.isArray(json.data) ? json.data : [];
+        // Response: { data: { bulan, tahun, total_transaksi, total_biaya, per_karyawan, data: [...] } }
+        data = Array.isArray(json.data?.data) ? json.data.data
+             : Array.isArray(json.data)       ? json.data
+             : [];
 
       } else {
         // custom — loop per hari seperti mingguan
@@ -214,7 +220,9 @@ export function RekapMBGPage() {
       try {
         const res  = await fetch(url.toString(), { headers: authHeader() });
         const json = await res.json();
-        if (json.success && Array.isArray(json.data)) {
+        if (json.success && Array.isArray(json.data?.data)) {
+          all.push(...json.data.data);
+        } else if (json.success && Array.isArray(json.data)) {
           all.push(...json.data);
         }
       } catch (_) { /* abaikan hari yang gagal */ }

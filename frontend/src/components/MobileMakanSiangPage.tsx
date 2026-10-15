@@ -83,7 +83,13 @@ export function MobileMakanSiangPage() {
       );
       const jsonHistory = await resHistory.json();
       if (jsonHistory.success) {
-        const list = (Array.isArray(jsonHistory.data) ? jsonHistory.data : [])
+        // Response struktur: { data: { user_id, total_klaim, data: [...] } }
+        const rawList = Array.isArray(jsonHistory.data)
+          ? jsonHistory.data
+          : Array.isArray(jsonHistory.data?.data)
+            ? jsonHistory.data.data
+            : [];
+        const list = rawList
           .sort((a: any, b: any) => (b.tanggal > a.tanggal ? 1 : -1))
           .slice(0, 14)
           .map((item: any) => ({

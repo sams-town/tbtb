@@ -52,30 +52,48 @@ export function MobileMakanSiangPage() {
   const fetchData = async (userId: string) => {
     setLoading(true);
     try {
-      // Fetch today's record
+      // Fetch status klaim hari ini via MBG API
       const resToday = await fetch(
-        `${BASE_URL}/makan-siang?user_id=${userId}&tanggal=${todayStr}`,
+        `${BASE_URL}/mbg/status/${userId}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       const jsonToday = await resToday.json();
-      if (jsonToday.success) {
-        const data = Array.isArray(jsonToday.data) ? jsonToday.data[0] : jsonToday.data;
-        setTodayRecord(data || null);
+      if (jsonToday.success && jsonToday.data?.sudah_klaim) {
+        // Mapping ke format MakanSiangRecord agar UI tetap berjalan
+        const klaimData = jsonToday.data.data;
+        setTodayRecord(klaimData ? {
+          id:        klaimData.id,
+          user_id:   klaimData.user_id,
+          tanggal:   klaimData.tanggal,
+          status:    'hadir',
+          keterangan: '',
+          created_at: klaimData.created_at,
+        } : null);
+      } else {
+        setTodayRecord(null);
       }
 
-      // Fetch history (last 10)
+      // Fetch riwayat 14 hari via MBG rekap per user
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 14);
       const startStr = startDate.toLocaleDateString('en-CA');
       const resHistory = await fetch(
-        `${BASE_URL}/makan-siang?user_id=${userId}&start_date=${startStr}&end_date=${todayStr}`,
+        `${BASE_URL}/mbg/rekap/user/${userId}?start_date=${startStr}&end_date=${todayStr}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       const jsonHistory = await resHistory.json();
       if (jsonHistory.success) {
         const list = (Array.isArray(jsonHistory.data) ? jsonHistory.data : [])
           .sort((a: any, b: any) => (b.tanggal > a.tanggal ? 1 : -1))
-          .slice(0, 10);
+          .slice(0, 14)
+          .map((item: any) => ({
+            id:        item.id,
+            user_id:   item.user_id,
+            tanggal:   item.tanggal,
+            status:    'hadir' as const,
+            keterangan: '',
+            created_at: item.created_at,
+          }));
         setHistory(list);
       }
     } catch (_) {
@@ -87,29 +105,37 @@ export function MobileMakanSiangPage() {
 
   const handleSubmit = async (status: 'hadir' | 'tidak_hadir') => {
     if (!userData?.id) return;
+
+    // Hanya proses klaim "hadir" — tidak ada endpoint untuk "tidak_hadir" di MBG
+    if (status === 'tidak_hadir') {
+      addToast({ type: 'info', title: 'Info', message: 'Program MBG hanya mencatat kehadiran makan siang.' });
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const method = todayRecord?.id ? 'PUT' : 'POST';
-      const url = todayRecord?.id
-        ? `${BASE_URL}/makan-siang/${todayRecord.id}`
-        : `${BASE_URL}/makan-siang`;
+      // Ambil GPS
+      let lat = '0';
+      let long = '0';
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 })
+        );
+        lat = String(pos.coords.latitude);
+        long = String(pos.coords.longitude);
+      } catch (_) {
+        addToast({ type: 'error', title: 'GPS', message: 'Izinkan akses lokasi untuk klaim makan siang.' });
+        setSubmitting(false);
+        return;
+      }
 
-      const body: any = {
-        user_id: userData.id,
-        tanggal: todayStr,
-        status,
-        keterangan,
-      };
-
-      // Method spoofing pattern sama seperti absensi
-      const formData = new FormData();
-      Object.entries(body).forEach(([k, v]) => formData.append(k, String(v)));
-      if (method === 'PUT') formData.append('_method', 'PUT');
-
-      const res = await fetch(url, {
+      const res = await fetch(`${BASE_URL}/mbg/klaim`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ user_id: userData.id, lat, long }),
       });
       const json = await res.json();
 
@@ -117,10 +143,7 @@ export function MobileMakanSiangPage() {
         addToast({
           type: 'success',
           title: 'Berhasil',
-          message:
-            status === 'hadir'
-              ? 'Konfirmasi makan siang berhasil dicatat!'
-              : 'Keterangan tidak hadir makan siang berhasil disimpan.',
+          message: 'Klaim makan siang berhasil dicatat!',
         });
         setKeterangan('');
         fetchData(userData.id);

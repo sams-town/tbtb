@@ -17,9 +17,15 @@ import {
   Calendar,
   Zap,
   Navigation,
-  Fingerprint
+  Fingerprint,
+  Loader2,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useToast } from './Toast';
+
+const BASE_URL = import.meta.env.VITE_API_MEANDPAY;
 
 interface Notification {
   id: string;
@@ -38,9 +44,12 @@ interface Notification {
 
 export function MobileNotificationsPage() {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [activeTab, setActiveTab] = React.useState<'all' | 'unread'>('all');
   const [notifications, setNotifications] = React.useState<Notification[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [approvingId, setApprovingId] = React.useState<string | null>(null);
+  const [rejectingId, setRejectingId]   = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetchNotifications();
@@ -50,7 +59,7 @@ export function MobileNotificationsPage() {
     try {
       setLoading(true);
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/notifications?notifiable_id=${user.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/notifications?notifiable_id=${user.id}&limit=50`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const json = await res.json();
@@ -157,6 +166,125 @@ export function MobileNotificationsPage() {
       }
     } catch (err) {
       console.error('Error clearing notifications:', err);
+    }
+  };
+
+  // ── Detect entity (lembur/cuti/kasbon) dari data notifikasi ──────────────
+  const detectEntity = (notif: Notification) => {
+    let parsed: any = {};
+    try {
+      parsed = typeof notif.apiData?.data === 'string'
+        ? JSON.parse(notif.apiData.data)
+        : notif.apiData?.data || {};
+    } catch (_) {}
+
+    const msg = notif.message?.toLowerCase() || '';
+    if (parsed.lembur_id || parsed.overtime_id || msg.includes('lembur')) {
+      return { type: 'lembur', id: parsed.lembur_id || parsed.overtime_id };
+    }
+    if (parsed.cuti_id || parsed.leave_id || msg.includes('cuti') || msg.includes('izin')) {
+      return { type: 'cuti', id: parsed.cuti_id || parsed.leave_id };
+    }
+    if (parsed.kasbon_id || msg.includes('kasbon')) {
+      return { type: 'kasbon', id: parsed.kasbon_id };
+    }
+    return null;
+  };
+
+  const isPengajuan = (notif: Notification) => {
+    const msg = notif.message?.toLowerCase() || '';
+    const tipe = (notif.apiData?.type || '').toLowerCase();
+    return tipe.includes('pengajuan') ||
+           msg.includes('mengajukan') ||
+           msg.includes('pengajuan') ||
+           msg.includes('permohonan');
+  };
+
+  const handleApprove = async (notif: Notification) => {
+    const entity = detectEntity(notif);
+    if (!entity?.id) {
+      addToast({ type: 'error', title: 'Error', message: 'ID pengajuan tidak ditemukan.' });
+      return;
+    }
+    const managerId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    setApprovingId(notif.id);
+    try {
+      let res: Response;
+      if (entity.type === 'lembur') {
+        res = await fetch(`${BASE_URL}/lemburs/${entity.id}/approve`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: JSON.stringify({ approved_by: managerId }),
+        });
+      } else if (entity.type === 'cuti') {
+        res = await fetch(`${BASE_URL}/cutis/${entity.id}/approve`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: JSON.stringify({ user_approval: managerId }),
+        });
+      } else {
+        res = await fetch(`${BASE_URL}/kasbons/${entity.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: JSON.stringify({ status: 'APPROVED' }),
+        });
+      }
+      const json = await res.json();
+      if (json.success) {
+        addToast({ type: 'success', title: 'Disetujui', message: 'Pengajuan berhasil disetujui.' });
+        handleMarkAsRead(notif.id);
+        fetchNotifications();
+      } else {
+        addToast({ type: 'error', title: 'Gagal', message: json.message || 'Gagal menyetujui.' });
+      }
+    } catch (e: any) {
+      addToast({ type: 'error', title: 'Error', message: e.message });
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  const handleReject = async (notif: Notification) => {
+    const entity = detectEntity(notif);
+    if (!entity?.id) {
+      addToast({ type: 'error', title: 'Error', message: 'ID pengajuan tidak ditemukan.' });
+      return;
+    }
+    const managerId = JSON.parse(localStorage.getItem('user') || '{}').id;
+    setRejectingId(notif.id);
+    try {
+      let res: Response;
+      if (entity.type === 'lembur') {
+        res = await fetch(`${BASE_URL}/lemburs/${entity.id}/approve`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: JSON.stringify({ approved_by: managerId, status: 'Rejected' }),
+        });
+      } else if (entity.type === 'cuti') {
+        res = await fetch(`${BASE_URL}/cutis/${entity.id}/approve`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: JSON.stringify({ user_approval: managerId, status: 'Ditolak' }),
+        });
+      } else {
+        res = await fetch(`${BASE_URL}/kasbons/${entity.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: JSON.stringify({ status: 'REJECTED' }),
+        });
+      }
+      const json = await res.json();
+      if (json.success) {
+        addToast({ type: 'success', title: 'Ditolak', message: 'Pengajuan berhasil ditolak.' });
+        handleMarkAsRead(notif.id);
+        fetchNotifications();
+      } else {
+        addToast({ type: 'error', title: 'Gagal', message: json.message || 'Gagal menolak.' });
+      }
+    } catch (e: any) {
+      addToast({ type: 'error', title: 'Error', message: e.message });
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -339,8 +467,36 @@ export function MobileNotificationsPage() {
                 </div>
 
                 {(notif.action || notif.type === 'alert' || notif.type === 'request' || notif.message?.toLowerCase().includes('kontrak') || notif.message?.toLowerCase().includes('pkwt') || notif.message?.toLowerCase().includes('cuti') || notif.message?.toLowerCase().includes('lembur') || notif.message?.toLowerCase().includes('izin')) && (
-                  <div className="mt-4 flex justify-end">
-                    <button className="px-5 py-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#96D1C6]/30 transition-all">
+                  <div className="mt-4 flex gap-2 flex-wrap justify-end">
+                    {/* Tombol Setujui & Tolak — hanya untuk pengajuan */}
+                    {isPengajuan(notif) && (
+                      <>
+                        <button
+                          disabled={approvingId === notif.id || rejectingId === notif.id}
+                          onClick={(e) => { e.stopPropagation(); handleApprove(notif); }}
+                          className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all active:scale-95 disabled:opacity-50"
+                        >
+                          {approvingId === notif.id
+                            ? <Loader2 className="w-3 h-3 animate-spin" />
+                            : <ThumbsUp className="w-3 h-3" />}
+                          Setujui
+                        </button>
+                        <button
+                          disabled={approvingId === notif.id || rejectingId === notif.id}
+                          onClick={(e) => { e.stopPropagation(); handleReject(notif); }}
+                          className="flex items-center gap-1.5 px-4 py-2 bg-rose-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 transition-all active:scale-95 disabled:opacity-50"
+                        >
+                          {rejectingId === notif.id
+                            ? <Loader2 className="w-3 h-3 animate-spin" />
+                            : <ThumbsDown className="w-3 h-3" />}
+                          Tolak
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleViewDetail(notif); }}
+                      className="px-5 py-2.5 bg-[#96D1C6]/20 text-[#103552] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#96D1C6]/30 transition-all"
+                    >
                       Lihat Detail
                     </button>
                   </div>

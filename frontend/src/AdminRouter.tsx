@@ -277,28 +277,28 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
   function HRStatCard({ title, value, icon: Icon, color, bg }: { key?: string, title: string, value: string, icon: any, color: string, bg: string }) {
     return (
       <motion.div
-        whileHover={{ y: -6, scale: 1.01 }}
-        className="bg-white p-6 rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/20 flex flex-col items-center text-center group transition-all w-64 shrink-0 snap-start relative overflow-hidden cursor-pointer"
+        whileHover={{ y: -4, scale: 1.01 }}
+        className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center text-center group transition-all w-64 shrink-0 snap-start relative overflow-hidden cursor-pointer"
       >
-        {/* Professional Hover Background Layer */}
-        <div className="absolute inset-0 bg-[#2D455C] opacity-0 group-hover:opacity-100 transition-all duration-400 pointer-events-none" />
+        {/* Hover Background Layer */}
+        <div className="absolute inset-0 bg-[#103552] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none" />
 
-        {/* Decorative Radial Elements (Circles) */}
-        <div className="absolute -top-4 -right-4 w-32 h-32 bg-white/5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 delay-75 ease-out" />
-        <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 delay-150 ease-out" />
+        {/* Decorative circles */}
+        <div className="absolute -top-4 -right-4 w-32 h-32 bg-white/5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 delay-75" />
+        <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 delay-150" />
 
-        {/* Content Container */}
+        {/* Content */}
         <div className="relative z-10 flex flex-col items-center w-full">
           <div className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-all duration-500 shadow-inner group-hover:rotate-12 group-hover:scale-110",
+            "w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300 shadow-inner group-hover:rotate-6 group-hover:scale-110",
             bg, color, "group-hover:bg-white/10 group-hover:text-white"
           )}>
             <Icon className="w-7 h-7" />
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-slate-200 transition-colors duration-300">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-white/60 transition-colors duration-300">
             {title}
           </p>
-          <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-white transition-colors duration-300">
+          <h3 className="text-xl font-black text-[#103552] tracking-tight group-hover:text-white transition-colors duration-300">
             {value}
           </h3>
         </div>
@@ -320,20 +320,20 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
     };
 
     const cards = [
-      <HRStatCard key="staff" title="Total Pegawai" value={dashboardStats?.total_pegawai || '0'} icon={Users} color="text-orange-600" bg="bg-orange-50" />,
-      <HRStatCard key="masuk" title="Masuk" value={dashboardStats?.attendance?.masuk || '0'} icon={Database} color="text-emerald-600" bg="bg-emerald-50" />,
-      <HRStatCard key="alfa" title="Alfa" value={dashboardStats?.attendance?.alfa || '0'} icon={UserX} color="text-rose-600" bg="bg-rose-50" />,
-      <HRStatCard key="cuti" title="Cuti" value={dashboardStats?.attendance?.cuti || '0'} icon={CalendarIcon} color="text-amber-600" bg="bg-amber-50" />,
-      <HRStatCard key="izin" title="Izin" value={dashboardStats?.attendance?.izin || '0'} icon={FileCheck} color="text-orange-600" bg="bg-orange-50" />,
-      <HRStatCard key="sakit" title="Sakit" value={dashboardStats?.attendance?.sakit || '0'} icon={Activity} color="text-rose-600" bg="bg-rose-50" />,
-      <HRStatCard key="lembur" title="Lembur" value={dashboardStats?.attendance?.lembur || '0'} icon={Clock} color="text-emerald-600" bg="bg-emerald-50" />,
-      <HRStatCard key="telat" title="Izin Telat" value={dashboardStats?.attendance?.izin_telat || '0'} icon={AlertCircle} color="text-orange-600" bg="bg-orange-50" />,
-      <HRStatCard key="pc" title="Izin Pulang Cepat" value={dashboardStats?.attendance?.izin_pulang_cepat || '0'} icon={LogOut} color="text-blue-600" bg="bg-blue-50" />,
+      <HRStatCard key="staff"  title="Total Pegawai"   value={dashboardStats?.total_pegawai || '0'}   icon={Users}       color="text-[#103552]"   bg="bg-[#E8F4F3]" />,
+      <HRStatCard key="masuk"  title="Masuk"           value={dashboardStats?.attendance?.masuk || '0'} icon={Database}    color="text-[#185B5A]"   bg="bg-[#E8F4F3]" />,
+      <HRStatCard key="alfa"   title="Alfa"            value={dashboardStats?.attendance?.alfa || '0'}  icon={UserX}       color="text-rose-600"    bg="bg-rose-50" />,
+      <HRStatCard key="cuti"   title="Cuti"            value={dashboardStats?.attendance?.cuti || '0'}  icon={CalendarIcon}color="text-[#185B5A]"   bg="bg-[#E8F4F3]" />,
+      <HRStatCard key="izin"   title="Izin"            value={dashboardStats?.attendance?.izin || '0'}  icon={FileCheck}   color="text-amber-600"   bg="bg-amber-50" />,
+      <HRStatCard key="sakit"  title="Sakit"           value={dashboardStats?.attendance?.sakit || '0'} icon={Activity}    color="text-rose-600"    bg="bg-rose-50" />,
+      <HRStatCard key="lembur" title="Lembur"          value={dashboardStats?.attendance?.lembur || '0'}icon={Clock}       color="text-[#185B5A]"   bg="bg-[#E8F4F3]" />,
+      <HRStatCard key="telat"  title="Izin Telat"      value={dashboardStats?.attendance?.izin_telat || '0'} icon={AlertCircle} color="text-amber-600" bg="bg-amber-50" />,
+      <HRStatCard key="pc"     title="Izin Pulang Cepat" value={dashboardStats?.attendance?.izin_pulang_cepat || '0'} icon={LogOut} color="text-[#103552]" bg="bg-[#E8F4F3]" />,
       <HRStatCard
         key="payroll"
         title={`Payroll ${dashboardStats?.finance?.month} ${dashboardStats?.finance?.year}`}
         value={`Rp ${Number(dashboardStats?.finance?.payroll || 0).toLocaleString('id-ID')}`}
-        icon={DollarSign} color="text-orange-600" bg="bg-orange-50"
+        icon={DollarSign} color="text-[#185B5A]" bg="bg-[#E8F4F3]"
       />,
       <HRStatCard
         key="kasbon"
@@ -345,7 +345,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
         key="reim"
         title={`Reimbursement ${dashboardStats?.finance?.month} ${dashboardStats?.finance?.year}`}
         value={`Rp ${Number(dashboardStats?.finance?.reimbursement || 0).toLocaleString('id-ID')}`}
-        icon={Receipt} color="text-emerald-600" bg="bg-emerald-50"
+        icon={Receipt} color="text-[#185B5A]" bg="bg-[#E8F4F3]"
       />
     ];
 
@@ -408,7 +408,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
       <motion.aside
         initial={false}
         animate={{ width: isSidebarCollapsed ? 100 : 288 }}
-        className="bg-[#103552] text-white flex flex-col sticky top-0 h-screen overflow-hidden shadow-[20px_0_40px_rgba(0,0,0,0.2)] z-50 shrink-0 border-r border-white/5"
+        className="bg-white text-slate-700 flex flex-col sticky top-0 h-screen overflow-hidden shadow-[1px_0_0_0_#e2e8f0] z-50 shrink-0 border-r border-slate-200"
       >
         {/* Fixed Header */}
         <div className={cn("p-8 flex items-center transition-all duration-300 shrink-0", isSidebarCollapsed ? "justify-center" : "gap-4")}>
@@ -425,10 +425,10 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
             >
-              <span className="text-2xl font-black tracking-tighter block bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent italic">
+              <span className="text-2xl font-black tracking-tighter block bg-gradient-to-r from-[#103552] to-[#185B5A] bg-clip-text text-transparent italic">
                 {settings?.name?.split(' ')[0] || 'HRIS'}
               </span>
-              <span className="text-[10px] font-black text-[#96D1C6]/60 uppercase tracking-[0.3em] -mt-1 block">
+              <span className="text-[10px] font-black text-[#185B5A]/60 uppercase tracking-[0.3em] -mt-1 block">
                 {settings?.name?.split(' ').slice(1).join(' ') || '---------------'}
               </span>
             </motion.div>
@@ -438,7 +438,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
         {/* Scrollable Menu */}
         <div className="px-4 py-2 flex-1 overflow-y-auto scrollbar-hide">
           <div className="mb-4 px-4">
-            {!isSidebarCollapsed && <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Main Menusss</p>}
+            {!isSidebarCollapsed && <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Main Menu</p>}
           </div>
           <nav className="space-y-1.5">
             <SidebarItem
@@ -576,24 +576,24 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 className={cn(
                   "w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden",
                   ['attendance', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage)
-                    ? "bg-white/10 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
-                    : "text-white/40 hover:text-white hover:bg-white/5",
+                    ? "bg-[#E8F4F3] text-[#103552] shadow-sm"
+                    : "text-slate-500 hover:text-[#103552] hover:bg-[#E8F4F3]",
                   isSidebarCollapsed ? "justify-center" : ""
                 )}
               >
                 {['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) && (
-                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
+                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#185B5A] rounded-r-full shadow-[0_0_8px_rgba(24,91,90,0.5)]" />
                 )}
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                    ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                    ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "bg-[#E8F4F3] shadow-inner" : "bg-slate-100 group-hover:bg-[#E8F4F3]"
                   )}>
-                    <Clock className={cn("w-4 h-4 transition-colors", ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
+                    <Clock className={cn("w-4 h-4 transition-colors", ['attendance', 'absen', 'data-attendance', 'attendance-dinas', 'data-dinas'].includes(currentPage) ? "text-[#185B5A]" : "text-slate-400 group-hover:text-[#103552]")} />
                   </div>
                   {!isSidebarCollapsed && <span>Absensi</span>}
                 </div>
-                {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-40 group-hover:opacity-100", isAbsensiOpen ? "rotate-180" : "")} />}
+                {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-50 group-hover:opacity-100", isAbsensiOpen ? "rotate-180" : "")} />}
               </button>
 
               <AnimatePresence>
@@ -602,7 +602,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-white/5"
+                    className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-slate-200"
                   >
                     <SidebarSubItem label="Absen Masuk/Pulang" onClick={() => setCurrentPage('absen')} active={currentPage === 'absen' || location.pathname === '/absen_admin'} />
 
@@ -623,24 +623,24 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 className={cn(
                   "w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden",
                   ['overtime-entry', 'overtime-data'].includes(currentPage)
-                    ? "bg-white/10 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
-                    : "text-white/40 hover:text-white hover:bg-white/5",
+                    ? "bg-[#E8F4F3] text-[#103552] shadow-sm"
+                    : "text-slate-500 hover:text-[#103552] hover:bg-[#E8F4F3]",
                   isSidebarCollapsed ? "justify-center" : ""
                 )}
               >
                 {['overtime-entry', 'overtime-data'].includes(currentPage) && (
-                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
+                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#185B5A] rounded-r-full shadow-[0_0_8px_rgba(24,91,90,0.5)]" />
                 )}
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                    ['overtime-entry', 'overtime-data'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                    ['overtime-entry', 'overtime-data'].includes(currentPage) ? "bg-[#E8F4F3] shadow-inner" : "bg-slate-100 group-hover:bg-[#E8F4F3]"
                   )}>
-                    <TrendingUp className={cn("w-4 h-4 transition-colors", ['overtime-entry', 'overtime-data'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
+                    <TrendingUp className={cn("w-4 h-4 transition-colors", ['overtime-entry', 'overtime-data'].includes(currentPage) ? "text-[#185B5A]" : "text-slate-400 group-hover:text-[#103552]")} />
                   </div>
                   {!isSidebarCollapsed && <span>Overtime</span>}
                 </div>
-                {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-40 group-hover:opacity-100", isOvertimeOpen ? "rotate-180" : "")} />}
+                {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-50 group-hover:opacity-100", isOvertimeOpen ? "rotate-180" : "")} />}
               </button>
 
               <AnimatePresence>
@@ -649,7 +649,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-white/5"
+                    className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-slate-200"
                   >
                     <SidebarSubItem label="Lembur" onClick={() => setCurrentPage('overtime-entry')} active={currentPage === 'overtime-entry'} />
                     <SidebarSubItem label="Data Lembur" onClick={() => setCurrentPage('overtime-data')} active={currentPage === 'overtime-data'} />
@@ -665,24 +665,24 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 className={cn(
                   "w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden",
                   ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage)
-                    ? "bg-white/10 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
-                    : "text-white/40 hover:text-white hover:bg-white/5",
+                    ? "bg-[#E8F4F3] text-[#103552] shadow-sm"
+                    : "text-slate-500 hover:text-[#103552] hover:bg-[#E8F4F3]",
                   isSidebarCollapsed ? "justify-center" : ""
                 )}
               >
                 {['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) && (
-                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
+                  <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#185B5A] rounded-r-full shadow-[0_0_8px_rgba(24,91,90,0.5)]" />
                 )}
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                    ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                    ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "bg-[#E8F4F3] shadow-inner" : "bg-slate-100 group-hover:bg-[#E8F4F3]"
                   )}>
-                    <Activity className={cn("w-4 h-4 transition-colors", ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
+                    <Activity className={cn("w-4 h-4 transition-colors", ['visit', 'visit-dokter', 'visit-kunjungan', 'visit-penugasan', 'visit-rapat', 'kinerja-jenis', 'kinerja-laporan', 'kinerja-pegawai', 'kinerja-laporan-kerja'].includes(currentPage) ? "text-[#185B5A]" : "text-slate-400 group-hover:text-[#103552]")} />
                   </div>
                   {!isSidebarCollapsed && <span>Visit & Kinerja</span>}
                 </div>
-                {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-40 group-hover:opacity-100", isVisitOpen ? "rotate-180" : "")} />}
+                {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-50 group-hover:opacity-100", isVisitOpen ? "rotate-180" : "")} />}
               </button>
 
               <AnimatePresence>
@@ -691,7 +691,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-white/5"
+                    className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-slate-200"
                   >
                     <SidebarSubItem label="Patroli Petugas Security" onClick={() => setCurrentPage('visit-dokter')} active={currentPage === 'visit-dokter'} />
                     <SidebarSubItem label="Kunjungan" onClick={() => setCurrentPage('visit-kunjungan')} active={currentPage === 'visit-kunjungan'} />
@@ -735,24 +735,24 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                   className={cn(
                     "w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden",
                     ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage)
-                      ? "bg-white/10 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
-                      : "text-white/40 hover:text-white hover:bg-white/5",
+                      ? "bg-[#E8F4F3] text-[#103552] shadow-sm"
+                      : "text-slate-500 hover:text-[#103552] hover:bg-[#E8F4F3]",
                     isSidebarCollapsed ? "justify-center" : ""
                   )}
                 >
                   {['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) && (
-                    <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]" />
+                    <motion.div layoutId="active-pill" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#185B5A] rounded-r-full shadow-[0_0_8px_rgba(24,91,90,0.5)]" />
                   )}
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-                      ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+                      ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "bg-[#E8F4F3] shadow-inner" : "bg-slate-100 group-hover:bg-[#E8F4F3]"
                     )}>
-                      <DollarSign className={cn("w-4 h-4 transition-colors", ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
+                      <DollarSign className={cn("w-4 h-4 transition-colors", ['finance-payroll', 'finance-pajak', 'finance-kasbon', 'finance-reimbursement', 'finance-kategori-reimbursement', 'finance-pengajuan', 'finance-status-pajak', 'finance-target-kinerja', 'finance-detail-target'].includes(currentPage) ? "text-[#185B5A]" : "text-slate-400 group-hover:text-[#103552]")} />
                     </div>
                     {!isSidebarCollapsed && <span>Keuangan & Target</span>}
                   </div>
-                  {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-40 group-hover:opacity-100", isFinanceOpen ? "rotate-180" : "")} />}
+                  {!isSidebarCollapsed && <ChevronDown className={cn("w-4 h-4 transition-transform duration-300 opacity-50 group-hover:opacity-100", isFinanceOpen ? "rotate-180" : "")} />}
                 </button>
 
                 <AnimatePresence>
@@ -761,7 +761,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-white/5"
+                      className="overflow-hidden mt-1 space-y-1 ml-4 border-l border-slate-200"
                     >
                       {hasPermission('payroll.view') && <SidebarSubItem label="Payroll" onClick={() => setCurrentPage('finance-payroll')} active={currentPage === 'finance-payroll'} />}
                       {hasPermission('pajak.view') && <SidebarSubItem label="Pajak" onClick={() => setCurrentPage('finance-pajak')} active={currentPage === 'finance-pajak'} />}
@@ -803,15 +803,15 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
         </div>
 
         {/* Fixed Footer */}
-        <div className="p-6 border-t border-white/5 shrink-0 bg-[#103552]">
+        <div className="p-6 border-t border-slate-200 shrink-0 bg-white">
           <button
             onClick={handleLogout}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold text-white/40 hover:bg-rose-500/10 hover:text-rose-400 transition-all group relative overflow-hidden",
+              "w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all group relative overflow-hidden",
               isSidebarCollapsed ? "justify-center" : ""
             )}
           >
-            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-rose-500/20 transition-colors shrink-0 border border-white/5 group-hover:border-rose-500/20">
+            <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center group-hover:bg-rose-100 transition-colors shrink-0 border border-slate-200 group-hover:border-rose-200">
               <LogOut className="w-4 h-4" />
             </div>
             {!isSidebarCollapsed && <span className="tracking-tight">Sign Out</span>}
@@ -831,7 +831,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
           <div className="flex items-center gap-6">
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-orange-600 hover:border-orange-200 hover:bg-orange-50 transition-all active:scale-90 shadow-sm"
+              className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-[#185B5A] hover:border-[#96D1C6] hover:bg-[#E8F4F3] transition-all active:scale-90 shadow-sm"
             >
               {isSidebarCollapsed ? <ChevronRightCircle className="w-6 h-6" /> : <ChevronLeftCircle className="w-6 h-6" />}
             </button>
@@ -841,7 +841,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                 className={cn(
                   "px-6 py-3 rounded-2xl text-sm font-black transition-all active:scale-95 uppercase tracking-widest",
                   currentPage === 'dashboard'
-                    ? "bg-[#E09132] text-white shadow-[0_10px_20px_rgba(224,145,50,0.3)] hover:bg-[#C97E28]"
+                    ? "bg-[#103552] text-white shadow-[0_10px_20px_rgba(16,53,82,0.25)] hover:bg-[#0D4156]"
                     : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50"
                 )}
               >
@@ -1060,7 +1060,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                       </div>
                       <button
                         onClick={() => setCalendarDate(new Date())}
-                        className="px-8 py-3.5 bg-slate-900 hover:bg-black text-white rounded-2xl text-xs font-black transition-all active:scale-95 shadow-lg shadow-slate-200"
+                        className="px-8 py-3.5 bg-[#1C1C1C] hover:bg-black text-white rounded-2xl text-xs font-black transition-all active:scale-95 shadow-lg"
                       >
                         Today
                       </button>
@@ -1131,7 +1131,7 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
                                   cells.push(
                                     <td key={j} className={cn(
                                       "h-44 p-4 border-r border-b border-slate-100 align-top transition-all relative group cursor-pointer",
-                                      isToday ? "bg-[#96D1C6]/20/30" : "hover:bg-slate-50/50"
+                                      isToday ? "bg-[#E8F4F3]" : "hover:bg-slate-50/50"
                                     )}>
                                       <div className="flex justify-between items-center mb-3">
                                         <span className={cn(
@@ -1425,23 +1425,23 @@ function SidebarItem({ icon: Icon, label, active = false, badge = undefined, col
         className={cn(
           "w-full flex items-center px-4 py-3.5 rounded-2xl text-sm font-bold transition-all group relative overflow-hidden",
           active
-            ? 'bg-white/10 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]'
-            : 'text-white/40 hover:text-white hover:bg-white/5',
+            ? 'bg-[#E8F4F3] text-[#103552] shadow-sm'
+            : 'text-slate-500 hover:text-[#103552] hover:bg-[#E8F4F3]',
           collapsed ? "justify-center" : "justify-between"
         )}
       >
         {active && (
           <motion.div
             layoutId="active-pill"
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#E09132] rounded-r-full shadow-[0_0_15px_rgba(224,145,50,0.8)]"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#185B5A] rounded-r-full shadow-[0_0_8px_rgba(24,91,90,0.5)]"
           />
         )}
         <div className="flex items-center gap-3">
           <div className={cn(
             "w-8 h-8 rounded-xl flex items-center justify-center transition-all",
-            active ? "bg-[#E09132]/20 shadow-inner" : "bg-white/5 group-hover:bg-white/10"
+            active ? "bg-[#E8F4F3] shadow-inner" : "bg-slate-100 group-hover:bg-[#E8F4F3]"
           )}>
-            <Icon className={cn("w-4 h-4 transition-colors shrink-0", active ? "text-[#E09132]" : "text-white/40 group-hover:text-white")} />
+            <Icon className={cn("w-4 h-4 transition-colors shrink-0", active ? "text-[#185B5A]" : "text-slate-400 group-hover:text-[#103552]")} />
           </div>
           {!collapsed && <span className="tracking-tight">{label}</span>}
         </div>
@@ -1466,18 +1466,18 @@ function SidebarSubItem({ label, onClick, active }: { label: string, onClick?: (
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-3 px-8 py-2.5 text-xs font-bold transition-all relative group",
-        active ? "text-[#E09132]" : "text-white/30 hover:text-white"
+        active ? "text-[#103552]" : "text-slate-400 hover:text-[#103552]"
       )}
     >
       <div className={cn(
         "w-1.5 h-1.5 rounded-full transition-all",
-        active ? "bg-[#E09132] shadow-[0_0_8px_rgba(224,145,50,0.8)] scale-125" : "bg-white/10 group-hover:bg-white/30"
+        active ? "bg-[#185B5A] scale-125" : "bg-slate-300 group-hover:bg-[#96D1C6]"
       )}></div>
       <span className="tracking-tight">{label}</span>
       {active && (
         <motion.div
           layoutId="sub-active-line"
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#E09132] rounded-l-full"
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#185B5A] rounded-l-full"
         />
       )}
     </button>
@@ -1506,7 +1506,7 @@ function CalendarEvent({ label, color }: { key?: any, label: string, color: stri
       animate={{ opacity: 1, x: 0 }}
       className={cn(
         "px-3 py-2 rounded-xl text-[10px] font-bold text-white truncate shadow-lg shadow-black/5 flex items-center gap-2",
-        color
+        color || "bg-[#185B5A]"
       )}
     >
       <div className="w-1.5 h-1.5 bg-white/40 rounded-full shrink-0"></div>

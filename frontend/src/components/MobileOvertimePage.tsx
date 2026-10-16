@@ -93,11 +93,34 @@ export function MobileOvertimePage() {
         if (json.success) {
           let result = json.data;
 
-          if (!isMasterUser) {
+          if (!isMasterUser && mDivs.length > 0) {
+            // Filter lembur berdasarkan karyawan yang jabatan_id-nya dimanage oleh user ini
+            // Cek dari data karyawan (emps) atau langsung dari field user_id di lembur
             const validEmpIds = emps
-              .filter((e: any) => mDivs.includes(e.jabatan_id?.toString()) || mDivs.includes(e.jabatan?.id?.toString()))
+              .filter((e: any) => {
+                const jabId = e.jabatan_id?.toString() || e.jabatan?.id?.toString() || '';
+                return mDivs.includes(jabId);
+              })
               .map((e: any) => e.id.toString());
-            result = result.filter((item: any) => validEmpIds.includes(item.user_id?.toString()));
+
+            // Jika validEmpIds kosong, coba fetch ulang dengan filter jabatan
+            if (validEmpIds.length === 0) {
+              // Ambil semua user yang jabatannya dimanage langsung dari API
+              const resFiltered = await fetch(`${BASE_URL}/users?limit=1000`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+              });
+              const jsonFiltered = await resFiltered.json();
+              if (jsonFiltered.success) {
+                const filteredEmps = (jsonFiltered.data || []).filter((e: any) => {
+                  const jabId = e.jabatan_id?.toString() || '';
+                  return mDivs.includes(jabId);
+                });
+                const filteredIds = filteredEmps.map((e: any) => e.id.toString());
+                result = result.filter((item: any) => filteredIds.includes(item.user_id?.toString()));
+              }
+            } else {
+              result = result.filter((item: any) => validEmpIds.includes(item.user_id?.toString()));
+            }
           }
 
           const filterUser = location.state?.userId || '';
@@ -124,10 +147,16 @@ export function MobileOvertimePage() {
         setUserData(user);
 
         if (user.id) {
-          const resUser = await fetch(`${BASE_URL}/users/${user.id}`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-          });
-          const jsonUser = await resUser.json();
+          // Fetch user info dan jabatans secara parallel untuk mempercepat loading
+          const [resUser, resJab] = await Promise.all([
+            fetch(`${BASE_URL}/users/${user.id}`, {
+              headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            }),
+            fetch(`${BASE_URL}/jabatans`, {
+              headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            })
+          ]);
+          const [jsonUser, jsonJab] = await Promise.all([resUser.json(), resJab.json()]);
           const me = jsonUser.data;
 
           const isMasterUser = me?.id?.toString() === '1' || Number(me?.id) === 1 || me?.is_admin === 'superadmin' || me?.is_admin === 'admin' || me?.role === 'superadmin' || me?.role === 'admin';
@@ -136,12 +165,6 @@ export function MobileOvertimePage() {
           let managed: string[] = [];
           let emps: any[] = [];
           let jabs: any[] = [];
-
-          // Fetch jabatans
-          const resJab = await fetch(`${BASE_URL}/jabatans`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-          });
-          const jsonJab = await resJab.json();
 
           if (jsonJab.success) {
             jabs = jsonJab.data || [];

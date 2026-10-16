@@ -1,8 +1,20 @@
 import prisma from "../config/prisma.js";
 
+// Cache agar checkExpiringContracts tidak dipanggil setiap request
+// Cukup dicek sekali per jam
+let lastContractCheck = 0;
+const CONTRACT_CHECK_INTERVAL = 60 * 60 * 1000; // 1 jam
+
 class NotificationService {
     async getAll(query = {}) {
-        await this.checkExpiringContracts();
+        // Hanya jalankan checkExpiringContracts jika sudah lebih dari 1 jam
+        const now = Date.now();
+        if (now - lastContractCheck > CONTRACT_CHECK_INTERVAL) {
+            lastContractCheck = now;
+            this.checkExpiringContracts().catch(err =>
+                console.error("checkExpiringContracts error:", err.message)
+            );
+        }
         const search = query.search || "";
         const notifiableId = query.notifiable_id;
         const where = {};

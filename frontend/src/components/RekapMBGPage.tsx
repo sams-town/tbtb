@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   UtensilsCrossed,
@@ -23,7 +23,7 @@ import * as XLSX from 'xlsx';
 
 const BASE_URL = import.meta.env.VITE_API_MEANDPAY;
 
-// ─── Types ─────────────────────────────────────────────────────────────────
+// --- Types -----------------------------------------------------------------
 interface MBGRecord {
   id: string;
   user_id: string;
@@ -49,7 +49,7 @@ interface SummaryItem {
 
 type FilterMode = 'harian' | 'mingguan' | 'bulanan' | 'custom';
 
-// ─── Helper ─────────────────────────────────────────────────────────────────
+// --- Helper -----------------------------------------------------------------
 function toDateStr(d: Date) {
   return d.toLocaleDateString('en-CA'); // YYYY-MM-DD
 }
@@ -77,7 +77,7 @@ function formatPeriodeLabel(mode: FilterMode, params: FilterParams) {
   }
   const from = new Date(params.startDate!).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
   const to   = new Date(params.endDate!).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-  return `${from} – ${to}`;
+  return `${from} � ${to}`;
 }
 
 function filenameSuffix(mode: FilterMode, params: FilterParams) {
@@ -94,13 +94,13 @@ interface FilterParams {
   endDate?: string;      // mingguan / custom
 }
 
-// ─── Main component ─────────────────────────────────────────────────────────
+// --- Main component ---------------------------------------------------------
 export function RekapMBGPage() {
   const { addToast } = useToast();
   const now = new Date();
   const todayStr = toDateStr(now);
 
-  // ── Filter state ──
+  // -- Filter state --
   const [mode, setMode] = React.useState<FilterMode>('bulanan');
 
   // harian
@@ -126,7 +126,7 @@ export function RekapMBGPage() {
   });
   const [customEnd, setCustomEnd] = React.useState(todayStr);
 
-  // ── Data state ──
+  // -- Data state --
   const [loading, setLoading] = React.useState(false);
   const [records, setRecords] = React.useState<MBGRecord[]>([]);
   const [summary, setSummary] = React.useState<SummaryItem[]>([]);
@@ -139,7 +139,7 @@ export function RekapMBGPage() {
   const [currentPage, setCurrentPage] = React.useState(1);
   const pageSize = 20;
 
-  // ── Fetch ──────────────────────────────────────────────────────────────────
+  // -- Fetch ------------------------------------------------------------------
   const fetchData = async () => {
     setLoading(true);
     setRecords([]);
@@ -179,7 +179,7 @@ export function RekapMBGPage() {
              : [];
 
       } else {
-        // custom — loop per hari seperti mingguan
+        // custom � loop per hari seperti mingguan
         const diff = diffDays(customStart, customEnd);
         if (diff < 0) {
           addToast({ type: 'error', title: 'Error', message: 'Tanggal akhir harus setelah tanggal mulai.' });
@@ -234,7 +234,7 @@ export function RekapMBGPage() {
     Authorization: `Bearer ${localStorage.getItem('token')}`,
   });
 
-  // ── Summary builder ────────────────────────────────────────────────────────
+  // -- Summary builder --------------------------------------------------------
   const buildSummary = (data: MBGRecord[]) => {
     const map: Record<string, SummaryItem> = {};
     data.forEach((rec) => {
@@ -242,8 +242,8 @@ export function RekapMBGPage() {
       if (!map[uid]) {
         map[uid] = {
           user_id: uid,
-          name: rec.user?.name || uid,
-          jabatan: rec.user?.jabatan?.nama_jabatan,
+          name: rec.users?.name || uid,
+          jabatan: rec.users?.jabatan?.nama_jabatan,
           total_hadir: 0,
           total_tidak_hadir: 0,
           total_hari: 0,
@@ -265,12 +265,12 @@ export function RekapMBGPage() {
     setSummary(result.sort((a, b) => b.total_hadir - a.total_hadir));
   };
 
-  // ── Derived ────────────────────────────────────────────────────────────────
+  // -- Derived ----------------------------------------------------------------
   const filteredSummary = summary.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase())
   );
   const filteredRecords = records.filter((r) =>
-    (r.user?.name || '').toLowerCase().includes(search.toLowerCase())
+    (r.users?.name || '').toLowerCase().includes(search.toLowerCase())
   );
   const paginatedRecords = filteredRecords.slice(
     (currentPage - 1) * pageSize,
@@ -281,7 +281,7 @@ export function RekapMBGPage() {
   const totalTidak  = records.filter((r) => r.status === 'tidak_hadir').length;
   const pctHadir    = records.length > 0 ? Math.round((totalHadir / records.length) * 100) : 0;
 
-  // ── Export ─────────────────────────────────────────────────────────────────
+  // -- Export -----------------------------------------------------------------
   const handleExportXLSX = () => {
     if (view === 'summary') {
       const header = ['Nama', 'Jabatan', 'Total Hadir', 'Total Tidak Hadir', 'Total Hari', '% Hadir'];
@@ -296,7 +296,7 @@ export function RekapMBGPage() {
     } else {
       const header = ['Nama', 'Tanggal', 'Status', 'Keterangan'];
       const data   = filteredRecords.map((r) => [
-        r.user?.name || r.user_id,
+        r.users?.name || r.user_id,
         r.tanggal.split('T')[0],
         r.status === 'hadir' ? 'Hadir' : r.status === 'tidak_hadir' ? 'Tidak Hadir' : 'Belum',
         r.keterangan || '',
@@ -309,7 +309,7 @@ export function RekapMBGPage() {
     addToast({ type: 'success', title: 'Berhasil', message: 'File Excel berhasil diunduh.' });
   };
 
-  // ── Options ────────────────────────────────────────────────────────────────
+  // -- Options ----------------------------------------------------------------
   const tahunOptions  = Array.from({ length: 4 }, (_, i) => now.getFullYear() - i);
   const bulanOptions  = [
     { value: 1, label: 'Januari' }, { value: 2, label: 'Februari' },
@@ -334,14 +334,14 @@ export function RekapMBGPage() {
   const customDiff = diffDays(customStart, customEnd);
   const customValid = customDiff >= 0;
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // -- Render -----------------------------------------------------------------
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-6xl mx-auto space-y-8 pb-20"
     >
-      {/* ── Header ── */}
+      {/* -- Header -- */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center">
@@ -364,7 +364,7 @@ export function RekapMBGPage() {
         </button>
       </div>
 
-      {/* ── Filter Card ── */}
+      {/* -- Filter Card -- */}
       <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 space-y-5">
 
         {/* Mode tabs */}
@@ -386,7 +386,7 @@ export function RekapMBGPage() {
           ))}
         </div>
 
-        {/* Filter inputs — per mode */}
+        {/* Filter inputs � per mode */}
         <AnimatePresence mode="wait">
           <motion.div
             key={mode}
@@ -500,7 +500,7 @@ export function RekapMBGPage() {
                 {customValid && customDiff >= 0 && (
                   <p className="text-[10px] font-bold text-slate-400 w-full -mt-2">
                     {customDiff + 1} hari dipilih
-                    {customDiff > 30 ? ' · Banyak hari — mungkin butuh waktu lebih lama' : ''}
+                    {customDiff > 30 ? ' � Banyak hari � mungkin butuh waktu lebih lama' : ''}
                   </p>
                 )}
               </>
@@ -519,7 +519,7 @@ export function RekapMBGPage() {
         </AnimatePresence>
       </div>
 
-      {/* ── Stats ── */}
+      {/* -- Stats -- */}
       {records.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Total Entri"  value={records.length} icon={Users}        color="text-[#103552] bg-[#96D1C6]/20" />
@@ -529,7 +529,7 @@ export function RekapMBGPage() {
         </div>
       )}
 
-      {/* ── View toggle + search ── */}
+      {/* -- View toggle + search -- */}
       {records.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200 gap-1">
@@ -560,7 +560,7 @@ export function RekapMBGPage() {
         </div>
       )}
 
-      {/* ── Empty state ── */}
+      {/* -- Empty state -- */}
       {records.length === 0 && !loading && (
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-16 text-center">
           <UtensilsCrossed className="w-16 h-16 text-slate-200 mx-auto mb-4" />
@@ -570,7 +570,7 @@ export function RekapMBGPage() {
         </div>
       )}
 
-      {/* ── Summary Table ── */}
+      {/* -- Summary Table -- */}
       {records.length > 0 && view === 'summary' && (
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
           <PeriodHeader label={periodeLabel} mode={mode} />
@@ -619,7 +619,7 @@ export function RekapMBGPage() {
         </div>
       )}
 
-      {/* ── Detail Table ── */}
+      {/* -- Detail Table -- */}
       {records.length > 0 && view === 'detail' && (
         <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
           <PeriodHeader label={periodeLabel} mode={mode} />
@@ -641,9 +641,9 @@ export function RekapMBGPage() {
                     <tr key={`${rec.id}-${i}`} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
                       <td className="px-6 py-4 text-xs font-bold text-slate-400">{(currentPage - 1) * pageSize + i + 1}</td>
                       <td className="px-6 py-4">
-                        <p className="text-sm font-black text-slate-800">{rec.user?.name || rec.user_id}</p>
-                        {rec.user?.jabatan?.nama_jabatan && (
-                          <p className="text-[10px] font-bold text-slate-400 mt-0.5">{rec.user.jabatan.nama_jabatan}</p>
+                        <p className="text-sm font-black text-slate-800">{rec.users?.name || rec.user_id}</p>
+                        {rec.users?.jabatan?.nama_jabatan && (
+                          <p className="text-[10px] font-bold text-slate-400 mt-0.5">{rec.users.jabatan.nama_jabatan}</p>
                         )}
                       </td>
                       <td className="px-6 py-4">
@@ -672,7 +672,7 @@ export function RekapMBGPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
               <p className="text-xs font-bold text-slate-400">
-                {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredRecords.length)} dari {filteredRecords.length}
+                {(currentPage - 1) * pageSize + 1}�{Math.min(currentPage * pageSize, filteredRecords.length)} dari {filteredRecords.length}
               </p>
               <div className="flex items-center gap-2">
                 <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}
@@ -693,7 +693,7 @@ export function RekapMBGPage() {
   );
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// --- Sub-components ----------------------------------------------------------
 
 function PeriodHeader({ label, mode }: { label: string; mode: FilterMode }) {
   const modeLabel: Record<FilterMode, string> = {

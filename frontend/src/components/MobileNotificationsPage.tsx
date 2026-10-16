@@ -53,6 +53,10 @@ export function MobileNotificationsPage() {
 
   React.useEffect(() => {
     fetchNotifications();
+    // Re-fetch saat halaman mendapat fokus kembali (setelah back dari detail)
+    const handleFocus = () => fetchNotifications();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, []);
 
   const fetchNotifications = async () => {
@@ -192,7 +196,8 @@ export function MobileNotificationsPage() {
   };
 
   const isPengajuan = (notif: Notification) => {
-    const msg = notif.message?.toLowerCase() || '';
+    const msg  = notif.message?.toLowerCase() || '';
+    // Cek dari field type notifikasi (dari DB: 'Pengajuan Lembur', 'Pengajuan Cuti', dll)
     const tipe = (notif.apiData?.type || '').toLowerCase();
     return tipe.includes('pengajuan') ||
            msg.includes('mengajukan') ||

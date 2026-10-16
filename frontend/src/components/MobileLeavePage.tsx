@@ -200,11 +200,29 @@ export function MobileLeavePage() {
         if (json.success) {
           let result = json.data;
           
-          if (!isMasterUser) {
-            const validEmpIds = emps
-              .filter((e: any) => mDivs.includes(e.jabatan_id?.toString()) || mDivs.includes(e.jabatan?.id?.toString()))
+          if (!isMasterUser && mDivs.length > 0) {
+            let validEmpIds = emps
+              .filter((e: any) => {
+                const jabId = e.jabatan_id?.toString() || e.jabatan?.id?.toString() || '';
+                return mDivs.includes(jabId);
+              })
               .map((e: any) => e.id.toString());
-              
+
+            // Jika kosong, fetch ulang dengan limit lebih besar
+            if (validEmpIds.length === 0) {
+              const resFiltered = await fetch(`${BASE_URL}/users?limit=1000`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+              });
+              const jsonFiltered = await resFiltered.json();
+              if (jsonFiltered.success) {
+                const filteredEmps = (jsonFiltered.data || []).filter((e: any) => {
+                  const jabId = e.jabatan_id?.toString() || '';
+                  return mDivs.includes(jabId);
+                });
+                validEmpIds = filteredEmps.map((e: any) => e.id.toString());
+              }
+            }
+
             result = result.filter((item: any) => validEmpIds.includes(item.user_id?.toString()));
           }
           

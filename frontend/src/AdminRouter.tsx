@@ -122,17 +122,14 @@ export function AdminRouter({ user, handleLogout, settingsFromApp }: { user: any
   }, [navigate]);
 
   const hasPermission = (permission: string) => {
-    if (user?.is_admin === 'admin') return true;
+    if (user?.is_admin === 'admin' || user?.is_admin === 'superadmin') return true;
     const perms = user?.permissions || [];
     return perms.includes(permission) || perms.some((p: any) => p.name === permission);
   };
 
-  const isAdmin = user?.is_admin === 'admin';
-  const isSuperAdmin = isAdmin; // Standard admin now sees everything
-
-  // Backwards compatibility for the existing isWorker logic if needed, 
-  // though App.tsx already handles the split between Mobile and Admin
-  const isWorker = user?.is_admin !== 'admin';
+  const isAdmin = user?.is_admin === 'admin' || user?.is_admin === 'superadmin';
+  const isSuperAdmin = isAdmin;
+  const isWorker = user?.is_admin !== 'admin' && user?.is_admin !== 'superadmin';
   const [isAbsensiOpen, setIsAbsensiOpen] = useState(true);
   const [isOvertimeOpen, setIsOvertimeOpen] = useState(false);
   const [isVisitOpen, setIsVisitOpen] = useState(false);

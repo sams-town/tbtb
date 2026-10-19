@@ -45,7 +45,7 @@ export default function App() {
   // Redirect to dashboard or beranda after login or on root path
   useEffect(() => {
     if (isLoggedIn && user) {
-      const isAdminUser = user.is_admin === 'admin';
+      const isAdminUser = user.is_admin === 'admin' || user.is_admin === 'superadmin';
       
       if (!isAdminUser) {
         if (location.pathname === '/' || location.pathname === '/dashboard') {
@@ -142,7 +142,7 @@ export default function App() {
     return <FinanceSalarySlipPage settings={settings} />;
   }
 
-  const isWorker = user && user.is_admin !== 'admin';
+  const isWorker = user && user.is_admin !== 'admin' && user.is_admin !== 'superadmin';
 
   if (isWorker) {
     return <MobileRouter user={user} handleLogout={handleLogout} settings={settings} />;

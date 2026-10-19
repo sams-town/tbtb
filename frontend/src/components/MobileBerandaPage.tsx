@@ -62,7 +62,18 @@ export function MobileBerandaPage({ settings }: { settings?: any }) {
 
   const getFileUrl = (path: string | null) => {
     if (!path) return null;
-    if (path.startsWith('http') || path.startsWith('blob:')) return path;
+    // Handle URL dari domain lama (HTTP) — extract path lalu rebuild dengan API baru
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      try {
+        const parsed = new URL(path);
+        const apiBase = (import.meta.env.VITE_API_MEANDPAY_DATA || '').replace(/\/$/, '');
+        // Kalau sudah domain yang benar, return as-is
+        if (path.startsWith(apiBase)) return path;
+        // Domain lain (server lama) → ambil pathname, rebuild dengan API baru
+        return `${apiBase}${parsed.pathname}`;
+      } catch (_) {}
+    }
+    if (path.startsWith('blob:')) return path;
     let cleanPath = path.replace(/^\//, '');
     if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.slice(8);
     return `${import.meta.env.VITE_API_MEANDPAY_DATA}/uploads/${cleanPath}`;

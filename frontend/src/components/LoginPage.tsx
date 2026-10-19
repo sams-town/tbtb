@@ -55,7 +55,7 @@ export function LoginPage({ onLogin, settings }: LoginPageProps) {
         console.log('Login User Data:', user); // Debug log
 
         // Strict is_admin check with safe fallback for legacy users
-        const isAdmin = user.is_admin === 'admin';
+        const isAdmin = user.is_admin === 'admin' || user.is_admin === 'superadmin';
         const isUser = user.is_admin === 'user' || !user.is_admin;
 
         if (isAdmin || isUser) {

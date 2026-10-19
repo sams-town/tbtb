@@ -11,22 +11,20 @@ export function formatPhotoUrl(url: string | null | undefined) {
   
   const apiBase = (import.meta.env.VITE_API_MEANDPAY_DATA || '').replace(/\/$/, '');
   
-  let path = url;
-  if (url.startsWith('http')) {
-    // If the URL is already from our production domain, return as is
-    if (url.includes(apiBase) && !url.includes('localhost:4000')) {
-      return url;
+  // Paksa HTTPS untuk semua URL HTTP (mixed content fix)
+  let safeUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url;
+  
+  if (safeUrl.startsWith('https://')) {
+    // Kalau sudah dari domain API kita, return as-is
+    if (safeUrl.includes(apiBase.replace('https://', '').replace('http://', ''))) {
+      return safeUrl;
     }
-    // If it's localhost or some other domain, extract the path and point to production
-    try {
-      const parsed = new URL(url);
-      path = parsed.pathname;
-    } catch (e) {
-      path = url.split('/').pop() || '';
-    }
+    // Domain lain (server lama) — coba akses via HTTPS langsung
+    // Jika file ada di server lama, browser bisa load via HTTPS
+    return safeUrl;
   }
   
-  const cleanPath = path.replace(/^\//, '');
+  const cleanPath = safeUrl.replace(/^\//, '');
   if (cleanPath.startsWith('uploads/') || cleanPath.startsWith('lemburs/') || cleanPath.startsWith('beritas/')) {
     return `${apiBase}/${cleanPath}`;
   }

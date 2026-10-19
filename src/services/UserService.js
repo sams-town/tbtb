@@ -44,6 +44,13 @@ class UserService {
         const excludedUserIdsSet = new Set(excludedUserIds);
         excludedUserIdsSet.add(1n);
 
+        // Exclude superadmin dari daftar pegawai
+        const superAdmins = await prisma.users.findMany({
+            where: { is_admin: { in: ['superadmin', 'super admin', 'super_admin'] } },
+            select: { id: true }
+        });
+        superAdmins.forEach(u => excludedUserIdsSet.add(u.id));
+
         if (query.exclude_role) {
             const roleUsers = await prisma.model_has_roles.findMany({
                 where: { roles: { name: query.exclude_role } },
@@ -266,6 +273,13 @@ class UserService {
 
         const excludedUserIdsSet = new Set(excludedUserIds);
         excludedUserIdsSet.add(1n);
+
+        // Exclude superadmin dari daftar pegawai
+        const superAdmins2 = await prisma.users.findMany({
+            where: { is_admin: { in: ['superadmin', 'super admin', 'super_admin'] } },
+            select: { id: true }
+        });
+        superAdmins2.forEach(u => excludedUserIdsSet.add(u.id));
 
         if (query.exclude_role) {
             const roleUsers = await prisma.model_has_roles.findMany({

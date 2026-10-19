@@ -1004,12 +1004,30 @@ class UserService {
      * Serialize a single user — convert BigInt to string for JSON
      */
     serialize(user) {
+        const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+
+        // Normalisasi URL foto — ganti domain lama dengan BASE_URL saat ini
+        const normalizePhotoUrl = (url) => {
+            if (!url) return url;
+            // Kalau sudah pakai BASE_URL atau path relatif, langsung return
+            if (url.startsWith(baseUrl)) return url;
+            // Kalau domain lama (HTTP lama), ambil path-nya saja lalu rebuild dengan BASE_URL
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+                try {
+                    const parsed = new URL(url);
+                    // Ambil path dari URL lama, rebuild dengan BASE_URL baru
+                    return `${baseUrl}${parsed.pathname}`;
+                } catch (_) {}
+            }
+            // Path relatif
+            return url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/uploads/profile/${url}`;
+        };
+
         const serialized = {};
         for (const [key, value] of Object.entries(user)) {
             if (typeof value === "bigint") {
                 serialized[key] = value.toString();
             } else if (value !== null && typeof value === "object" && !(value instanceof Date)) {
-                // Handle nested relation objects (e.g. jabatan)
                 const nested = {};
                 for (const [k, v] of Object.entries(value)) {
                     nested[k] = typeof v === "bigint" ? v.toString() : v;
@@ -1018,6 +1036,14 @@ class UserService {
             } else {
                 serialized[key] = value;
             }
+        }
+
+        // Normalisasi URL foto agar selalu HTTPS via BASE_URL
+        if (serialized.foto_karyawan) {
+            serialized.foto_karyawan = normalizePhotoUrl(serialized.foto_karyawan);
+        }
+        if (serialized.foto_face_recognition) {
+            serialized.foto_face_recognition = normalizePhotoUrl(serialized.foto_face_recognition);
         }
         if (!serialized.foto_karyawan && serialized.foto_face_recognition) {
             serialized.foto_karyawan = serialized.foto_face_recognition;

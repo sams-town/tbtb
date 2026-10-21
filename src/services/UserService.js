@@ -44,14 +44,55 @@ class UserService {
         const excludedUserIdsSet = new Set(excludedUserIds);
         excludedUserIdsSet.add(1n);
 
-        // Exclude superadmin dari daftar pegawai
+        // Exclude superadmin & admin dari daftar pegawai
         const superAdmins = await prisma.users.findMany({
-            where: { is_admin: { in: ['superadmin', 'super admin', 'super_admin'] } },
+            where: {
+                OR: [
+                    { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { username: 'admin' },
+                    { email: 'admin@admin.com' }
+                ]
+            },
             select: { id: true }
         });
         superAdmins.forEach(u => excludedUserIdsSet.add(u.id));
 
-        if (query.exclude_role) {
+        const superAdminRoles = await prisma.model_has_roles.findMany({
+            where: {
+                roles: {
+                    name: { in: ['superadmin', 'super admin', 'super_admin', 'Super Admin', 'Superadmin', 'admin', 'Admin', 'ADMIN'] }
+                }
+            },
+            select: { model_id: true }
+        });
+        superAdminRoles.forEach(ru => excludedUserIdsSet.add(ru.model_id));
+
+        if (query.exclude_role && String(query.exclude_role).toLowerCase() === 'dokter') {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        OR: [
+                            { name: { contains: 'dokter' } },
+                            { name: { in: ['dokter', 'Dokter', 'DOKTER'] } }
+                        ]
+                    }
+                },
+                select: { model_id: true }
+            });
+            roleUsers.forEach(ru => excludedUserIdsSet.add(ru.model_id));
+
+            const docJabs = await prisma.jabatans.findMany({
+                where: { nama_jabatan: { contains: 'dokter' } },
+                select: { id: true }
+            });
+            if (docJabs.length > 0) {
+                const docUsers = await prisma.users.findMany({
+                    where: { jabatan_id: { in: docJabs.map(j => j.id) } },
+                    select: { id: true }
+                });
+                docUsers.forEach(du => excludedUserIdsSet.add(du.id));
+            }
+        } else if (query.exclude_role) {
             const roleUsers = await prisma.model_has_roles.findMany({
                 where: { roles: { name: query.exclude_role } },
                 select: { model_id: true }
@@ -60,7 +101,13 @@ class UserService {
         }
 
         const andConditions = [
-            { id: { notIn: Array.from(excludedUserIdsSet) } }
+            { id: { notIn: Array.from(excludedUserIdsSet) } },
+            {
+                OR: [
+                    { is_admin: { notIn: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { is_admin: null }
+                ]
+            }
         ];
 
         if (query.status_kerja === "pkwt") {
@@ -110,20 +157,45 @@ class UserService {
         const where = { AND: andConditions };
 
         // ── MULTI-ROLE FILTER ─────────────────────────────────────────
-        // Mendukung ?role=karyawan (single) ATAU ?roles[]=karyawan&roles[]=hr (multi)
-        const roleFilter = query.roles
-            ? (Array.isArray(query.roles) ? query.roles : [query.roles])
-            : query.role
-                ? [query.role]
+        const roleParam = query.roles || query['roles[]'] || query.role;
+        const roleFilter = Array.isArray(roleParam)
+            ? roleParam
+            : roleParam
+                ? [roleParam]
                 : [];
 
-        if (roleFilter.length > 0) {
+        if (roleFilter.some(r => String(r).toLowerCase() === 'dokter')) {
+            const docRoles = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        OR: [
+                            { name: { contains: 'dokter' } },
+                            { name: { in: ['dokter', 'Dokter', 'DOKTER'] } }
+                        ]
+                    }
+                },
+                select: { model_id: true }
+            });
+            const docJabs = await prisma.jabatans.findMany({
+                where: { nama_jabatan: { contains: 'dokter' } },
+                select: { id: true }
+            });
+            let docJabUserIds = [];
+            if (docJabs.length > 0) {
+                const docJabUsers = await prisma.users.findMany({
+                    where: { jabatan_id: { in: docJabs.map(j => j.id) } },
+                    select: { id: true }
+                });
+                docJabUserIds = docJabUsers.map(u => u.id);
+            }
+            const allDocIds = Array.from(new Set([...docRoles.map(r => r.model_id), ...docJabUserIds]));
+            andConditions.push({ id: { in: allDocIds } });
+        } else if (roleFilter.length > 0) {
             const roleUsers = await prisma.model_has_roles.findMany({
                 where: { roles: { name: { in: roleFilter } } },
                 select: { model_id: true }
             });
             const roleUserIds = roleUsers.map(ru => ru.model_id);
-            // Kombinasikan dengan notIn yang sudah ada
             andConditions.push({ id: { in: roleUserIds } });
         }
 
@@ -274,14 +346,55 @@ class UserService {
         const excludedUserIdsSet = new Set(excludedUserIds);
         excludedUserIdsSet.add(1n);
 
-        // Exclude superadmin dari daftar pegawai
+        // Exclude superadmin & admin dari daftar pegawai
         const superAdmins2 = await prisma.users.findMany({
-            where: { is_admin: { in: ['superadmin', 'super admin', 'super_admin'] } },
+            where: {
+                OR: [
+                    { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { username: 'admin' },
+                    { email: 'admin@admin.com' }
+                ]
+            },
             select: { id: true }
         });
         superAdmins2.forEach(u => excludedUserIdsSet.add(u.id));
 
-        if (query.exclude_role) {
+        const superAdminRoles2 = await prisma.model_has_roles.findMany({
+            where: {
+                roles: {
+                    name: { in: ['superadmin', 'super admin', 'super_admin', 'Super Admin', 'Superadmin', 'admin', 'Admin', 'ADMIN'] }
+                }
+            },
+            select: { model_id: true }
+        });
+        superAdminRoles2.forEach(ru => excludedUserIdsSet.add(ru.model_id));
+
+        if (query.exclude_role && String(query.exclude_role).toLowerCase() === 'dokter') {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        OR: [
+                            { name: { contains: 'dokter' } },
+                            { name: { in: ['dokter', 'Dokter', 'DOKTER'] } }
+                        ]
+                    }
+                },
+                select: { model_id: true }
+            });
+            roleUsers.forEach(ru => excludedUserIdsSet.add(ru.model_id));
+
+            const docJabs = await prisma.jabatans.findMany({
+                where: { nama_jabatan: { contains: 'dokter' } },
+                select: { id: true }
+            });
+            if (docJabs.length > 0) {
+                const docUsers = await prisma.users.findMany({
+                    where: { jabatan_id: { in: docJabs.map(j => j.id) } },
+                    select: { id: true }
+                });
+                docUsers.forEach(du => excludedUserIdsSet.add(du.id));
+            }
+        } else if (query.exclude_role) {
             const roleUsers = await prisma.model_has_roles.findMany({
                 where: {
                     roles: {
@@ -294,7 +407,13 @@ class UserService {
         }
 
         const andConditions = [
-            { id: { notIn: Array.from(excludedUserIdsSet) } }
+            { id: { notIn: Array.from(excludedUserIdsSet) } },
+            {
+                OR: [
+                    { is_admin: { notIn: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { is_admin: null }
+                ]
+            }
         ];
 
         if (query.status_kerja === "pkwt") {
@@ -354,21 +473,47 @@ class UserService {
 
         const where = { AND: andConditions };
 
-        if (query.role) {
-            const roleUsers = await prisma.model_has_roles.findMany({
+        // ── MULTI-ROLE & DOKTER FILTER ─────────────────────────────────
+        const roleParam = query.roles || query['roles[]'] || query.role;
+        const roleFilter = Array.isArray(roleParam)
+            ? roleParam
+            : roleParam
+                ? [roleParam]
+                : [];
+
+        if (roleFilter.some(r => String(r).toLowerCase() === 'dokter')) {
+            const docRoles = await prisma.model_has_roles.findMany({
                 where: {
                     roles: {
-                        name: query.role
+                        OR: [
+                            { name: { contains: 'dokter' } },
+                            { name: { in: ['dokter', 'Dokter', 'DOKTER'] } }
+                        ]
                     }
                 },
                 select: { model_id: true }
             });
-            const roleUserIds = roleUsers.map(ru => ru.model_id);
-            if (where.id) {
-                where.id = { ...where.id, in: roleUserIds };
-            } else {
-                where.id = { in: roleUserIds };
+            const docJabs = await prisma.jabatans.findMany({
+                where: { nama_jabatan: { contains: 'dokter' } },
+                select: { id: true }
+            });
+            let docJabUserIds = [];
+            if (docJabs.length > 0) {
+                const docJabUsers = await prisma.users.findMany({
+                    where: { jabatan_id: { in: docJabs.map(j => j.id) } },
+                    select: { id: true }
+                });
+                docJabUserIds = docJabUsers.map(u => u.id);
             }
+            const allDocIds = Array.from(new Set([...docRoles.map(r => r.model_id), ...docJabUserIds]));
+            andConditions.push({ id: { in: allDocIds } });
+        } else if (roleFilter.length > 0) {
+            const roleUsers = await prisma.model_has_roles.findMany({
+                where: { roles: { name: { in: roleFilter } } },
+                select: { model_id: true }
+            });
+            const roleUserIds = roleUsers.map(ru => ru.model_id);
+            andConditions.push({ id: { in: roleUserIds } });
         }
 
 

@@ -4,15 +4,73 @@ import notificationService from "./NotificationService.js";
 class CutiService {
     async getAll(query = {}) {
         const search = query.search || "";
-        const where = search
-            ? {
+
+        let excludeUserIds = [];
+        if (query.include_dokter !== 'true') {
+            const doctors = await prisma.model_has_roles.findMany({
+                where: {
+                    roles: {
+                        OR: [
+                            { name: { contains: 'dokter' } },
+                            { name: { in: ['dokter', 'Dokter', 'DOKTER'] } }
+                        ]
+                    }
+                },
+                select: { model_id: true }
+            });
+            const doctorJabatans = await prisma.jabatans.findMany({
+                where: { nama_jabatan: { contains: 'dokter' } },
+                select: { id: true }
+            });
+            let doctorJabatanUserIds = [];
+            if (doctorJabatans.length > 0) {
+                const doctorJabatanUsers = await prisma.users.findMany({
+                    where: { jabatan_id: { in: doctorJabatans.map(j => j.id) } },
+                    select: { id: true }
+                });
+                doctorJabatanUserIds = doctorJabatanUsers.map(u => u.id);
+            }
+            const superAdmins = await prisma.users.findMany({
+                where: {
+                    OR: [
+                        { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'ADMIN', 'SUPERADMIN'] } },
+                        { username: 'admin' },
+                        { email: 'admin@admin.com' }
+                    ]
+                },
+                select: { id: true }
+            });
+            const superAdminRoles = await prisma.model_has_roles.findMany({
+                where: { roles: { name: { in: ['superadmin', 'super admin', 'super_admin', 'Super Admin', 'admin', 'Admin'] } } },
+                select: { model_id: true }
+            });
+
+            excludeUserIds = Array.from(new Set([
+                1n,
+                ...doctors.map(d => d.model_id),
+                ...doctorJabatanUserIds,
+                ...superAdmins.map(u => u.id),
+                ...superAdminRoles.map(u => u.model_id)
+            ]));
+        }
+
+        const where = {};
+        const andList = [];
+        if (excludeUserIds.length > 0) {
+            andList.push({ user_id: { notIn: excludeUserIds } });
+        }
+        if (search) {
+            andList.push({
                 OR: [
                     { nama_cuti: { contains: search } },
                     { alasan_cuti: { contains: search } },
                     { status_cuti: { contains: search } },
-                ],
-            }
-            : {};
+                ]
+            });
+        }
+        if (andList.length > 0) {
+            where.AND = andList;
+        }
         const data = await prisma.cutis.findMany({
             where,
             orderBy: { id: "desc" },

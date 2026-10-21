@@ -22,6 +22,11 @@ import {
   MapPin,
   X,
   FileSpreadsheet,
+  Settings,
+  SlidersHorizontal,
+  History,
+  Save,
+  Check,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useToast } from './Toast';
@@ -70,6 +75,15 @@ interface SummaryItem {
   records: MBGRecord[];
 }
 
+interface MBGSettingItem {
+  id: string;
+  harga: string;
+  keterangan?: string | null;
+  aktif: number | boolean;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
 type FilterMode = 'harian' | 'mingguan' | 'bulanan' | 'custom';
 
 // --- Helper Functions -------------------------------------------------------
@@ -104,7 +118,7 @@ function getJabatanLabel(userObj: any): string {
 }
 
 function isHadirClaim(status: string | null | undefined): boolean {
-  if (!status) return true; // Data klaim default-nya klaim hadir makan
+  if (!status) return true; // Data di tabel mbg_klaims default-nya klaim hadir makan
   const s = status.toLowerCase();
   return !['tidak_hadir', 'tidak hadir', 'batal', 'rejected', 'gagal', 'cancel'].includes(s);
 }
@@ -194,6 +208,15 @@ export function RekapMBGPage() {
   const [periodeLabel, setPeriodeLabel] = React.useState('');
   const [activeSuffix, setActiveSuffix] = React.useState('');
 
+  // -- Setting Biaya Makan (MBG) State --
+  const [activeHarga, setActiveHarga] = React.useState<number>(10000); // Default 10.000 per 1x makan
+  const [isSettingOpen, setIsSettingOpen] = React.useState(false);
+  const [settingLoading, setSettingLoading] = React.useState(false);
+  const [savingSetting, setSavingSetting] = React.useState(false);
+  const [inputHarga, setInputHarga] = React.useState<string>('10000');
+  const [inputKeterangan, setInputKeterangan] = React.useState<string>('Biaya makan siang bergizi 1x makan');
+  const [settingHistory, setSettingHistory] = React.useState<MBGSettingItem[]>([]);
+
   // Modal State untuk detail riwayat makan pegawai
   const [selectedUserSummary, setSelectedUserSummary] = React.useState<SummaryItem | null>(null);
 
@@ -203,10 +226,98 @@ export function RekapMBGPage() {
 
   const authHeader = () => ({
     Authorization: `Bearer ${localStorage.getItem('token')}`,
+    'Content-Type': 'application/json',
   });
 
+  // -- Fetch Setting Biaya MBG dari Backend --
+  const fetchActiveSetting = async () => {
+    setSettingLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}/mbg/settings`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        const h = Number(json.data.harga || 10000);
+        setActiveHarga(h);
+        setInputHarga(String(h));
+        if (json.data.keterangan) {
+          setInputKeterangan(json.data.keterangan);
+        }
+      } else {
+        setActiveHarga(10000);
+        setInputHarga('10000');
+      }
+    } catch (_) {
+      setActiveHarga(10000);
+      setInputHarga('10000');
+    } finally {
+      setSettingLoading(false);
+    }
+  };
+
+  const fetchSettingHistory = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/mbg/settings/all`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        setSettingHistory(json.data);
+      }
+    } catch (_) {}
+  };
+
+  // Muat setting saat pertama kali dibuka
+  React.useEffect(() => {
+    fetchActiveSetting();
+  }, []);
+
+  // -- Simpan Pengaturan Biaya Makan Baru --
+  const handleSaveSetting = async () => {
+    const numHarga = parseInt(inputHarga.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(numHarga) || numHarga <= 0) {
+      addToast({ type: 'error', title: 'Error', message: 'Nominal harga makan harus berupa angka lebih dari 0.' });
+      return;
+    }
+
+    setSavingSetting(true);
+    try {
+      const res = await fetch(`${BASE_URL}/mbg/settings`, {
+        method: 'POST',
+        headers: authHeader(),
+        body: JSON.stringify({
+          harga: numHarga,
+          keterangan: inputKeterangan.trim() || `Tarif Rp ${numHarga.toLocaleString('id-ID')} / 1x makan`,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+
+      setActiveHarga(numHarga);
+      addToast({
+        type: 'success',
+        title: 'Berhasil',
+        message: `Pengaturan biaya makan per 1x makan berhasil diperbarui menjadi ${formatRupiah(numHarga)}.`,
+      });
+
+      // Refresh riwayat & tutup modal
+      fetchSettingHistory();
+      setIsSettingOpen(false);
+
+      // Re-build summary dengan harga baru jika sudah ada data terambil
+      if (records.length > 0) {
+        buildSummary(records, numHarga);
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', title: 'Gagal', message: err.message || 'Gagal menyimpan pengaturan harga.' });
+    } finally {
+      setSavingSetting(false);
+    }
+  };
+
   // -- Summary Builder --
-  const buildSummary = (data: MBGRecord[]) => {
+  const buildSummary = (data: MBGRecord[], currentHarga = activeHarga) => {
     const map: Record<string, SummaryItem> = {};
 
     data.forEach((rec) => {
@@ -214,7 +325,9 @@ export function RekapMBGPage() {
       const uObj = rec.users || rec.user;
       const userName = uObj?.name || `Pegawai #${uid}`;
       const userJabatan = getJabatanLabel(uObj);
-      const hargaVal = Number(rec.harga || 0);
+
+      // Jika di record harga masih 0 atau null, gunakan tarif aktif (default 10.000)
+      const recordHarga = Number(rec.harga) > 0 ? Number(rec.harga) : currentHarga;
 
       if (!map[uid]) {
         map[uid] = {
@@ -232,13 +345,16 @@ export function RekapMBGPage() {
       }
 
       // Simpan record klaim untuk modal detail riwayat
-      map[uid].records.push(rec);
-      map[uid].total_biaya += hargaVal;
+      map[uid].records.push({
+        ...rec,
+        harga: recordHarga,
+      });
 
       const hadir = isHadirClaim(rec.status);
       if (hadir) {
         map[uid].total_makan += 1;
         map[uid].total_hadir += 1;
+        map[uid].total_biaya += recordHarga;
       } else {
         map[uid].total_tidak_hadir += 1;
       }
@@ -259,7 +375,7 @@ export function RekapMBGPage() {
     setSummary(result.sort((a, b) => b.total_makan - a.total_makan));
   };
 
-  // -- Fetch Data --
+  // -- Fetch Data Rekap --
   const fetchData = async () => {
     setLoading(true);
     setRecords([]);
@@ -309,7 +425,7 @@ export function RekapMBGPage() {
       setPeriodeLabel(formatPeriodeLabel(mode, params));
       setActiveSuffix(filenameSuffix(mode, params));
       setRecords(data);
-      buildSummary(data);
+      buildSummary(data, activeHarga);
 
       if (data.length === 0) {
         addToast({ type: 'info', title: 'Informasi', message: 'Tidak ada data klaim MBG pada periode ini.' });
@@ -367,7 +483,13 @@ export function RekapMBGPage() {
   // Statistik Ringkasan Atas
   const totalHadirMakan = records.filter((r) => isHadirClaim(r.status)).length;
   const totalTidakHadir = records.filter((r) => !isHadirClaim(r.status)).length;
-  const totalBiayaMBG = records.reduce((acc, r) => acc + Number(r.harga || 0), 0);
+  // Total biaya: hitung dari nominal record atau fallback ke activeHarga
+  const totalBiayaMBG = records.reduce((acc, r) => {
+    if (!isHadirClaim(r.status)) return acc;
+    const h = Number(r.harga) > 0 ? Number(r.harga) : activeHarga;
+    return acc + h;
+  }, 0);
+
   const totalPegawaiUnik = summary.length;
   const avgPctHadir = summary.length > 0
     ? Math.round(summary.reduce((acc, s) => acc + s.persentase, 0) / summary.length)
@@ -421,7 +543,7 @@ export function RekapMBGPage() {
         r.tanggal ? r.tanggal.split('T')[0] : '-',
         r.jam_klaim ? `${r.jam_klaim} WIB` : '-',
         isHadirClaim(r.status) ? 'Hadir Makan' : 'Tidak Hadir',
-        Number(r.harga || 0),
+        Number(r.harga) > 0 ? Number(r.harga) : activeHarga,
         r.jarak ? `${r.jarak} m` : '-',
         r.keterangan || '-',
       ]);
@@ -432,6 +554,9 @@ export function RekapMBGPage() {
     }
     addToast({ type: 'success', title: 'Berhasil', message: 'File Excel berhasil diunduh.' });
   };
+
+  // Preset Pilihan Harga Cepat
+  const quickPrices = [10000, 12000, 15000, 20000];
 
   // -- Options --
   const tahunOptions = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i);
@@ -468,27 +593,48 @@ export function RekapMBGPage() {
       className="max-w-7xl mx-auto space-y-8 pb-24"
     >
       {/* -- Header -- */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
             <UtensilsCrossed className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Rekap MBG</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Rekap MBG</h1>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200/80 rounded-xl text-xs font-black shadow-sm">
+                <Coins className="w-3.5 h-3.5 text-amber-600" />
+                <span>{formatRupiah(activeHarga)} / 1x makan</span>
+              </span>
+            </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
               Makan Bersama / Makan Siang Bergizi Karyawan
             </p>
           </div>
         </div>
 
-        <button
-          onClick={handleExportXLSX}
-          disabled={records.length === 0}
-          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 shadow-sm"
-        >
-          <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-          Export Excel ({view === 'summary' ? 'Ringkasan' : 'Detail'})
-        </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Tombol Pengaturan Biaya Makan */}
+          <button
+            onClick={() => {
+              setIsSettingOpen(true);
+              fetchSettingHistory();
+            }}
+            className="flex items-center gap-2 px-5 py-3.5 bg-amber-50 hover:bg-amber-100/80 border border-amber-200 text-amber-800 rounded-2xl text-sm font-black transition-all shadow-sm"
+          >
+            <Settings className="w-4 h-4 text-amber-600" />
+            <span>Pengaturan Biaya Makan</span>
+          </button>
+
+          {/* Tombol Export Excel */}
+          <button
+            onClick={handleExportXLSX}
+            disabled={records.length === 0}
+            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 shadow-sm"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+            <span>Export Excel</span>
+          </button>
+        </div>
       </div>
 
       {/* -- Filter Card -- */}
@@ -887,6 +1033,7 @@ export function RekapMBGPage() {
                   const jabName = getJabatanLabel(uObj);
                   const userName = uObj?.name || `Pegawai #${rec.user_id}`;
                   const rowIdx = (currentPage - 1) * pageSize + i + 1;
+                  const itemHarga = Number(rec.harga) > 0 ? Number(rec.harga) : activeHarga;
 
                   return (
                     <tr
@@ -931,7 +1078,7 @@ export function RekapMBGPage() {
                       </td>
                       <td className="px-5 py-4 text-right">
                         <span className="text-xs font-black text-slate-800 font-mono">
-                          {formatRupiah(rec.harga)}
+                          {formatRupiah(itemHarga)}
                         </span>
                       </td>
                       <td className="px-5 py-4">
@@ -1003,7 +1150,7 @@ export function RekapMBGPage() {
                   </div>
                   <div>
                     <h3 className="text-base font-black text-slate-800">{selectedUserSummary.name}</h3>
-                    <p className="text-xs font-bold text-slate-400">{selectedUserSummary.jabatan} ? ID: #{selectedUserSummary.user_id}</p>
+                    <p className="text-xs font-bold text-slate-400">{selectedUserSummary.jabatan} • ID: #{selectedUserSummary.user_id}</p>
                   </div>
                 </div>
                 <button
@@ -1086,6 +1233,177 @@ export function RekapMBGPage() {
                   className="px-6 py-2.5 bg-[#103552] text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-[#0c2940] transition-all"
                 >
                   Tutup
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* -- Modal Pengaturan Biaya Makan (MBG) -- */}
+      <AnimatePresence>
+        {isSettingOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl border border-slate-100 shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-amber-50/40">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <Coins className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-800">Pengaturan Biaya Makan (MBG)</h3>
+                    <p className="text-xs font-bold text-slate-400">Atur nominal biaya makan per 1x kehadiran klaim</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsSettingOpen(false)}
+                  className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-700 flex items-center justify-center transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 overflow-y-auto space-y-6 flex-1">
+                {/* Info Tarif Aktif */}
+                <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent border border-amber-200/80 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest block mb-0.5">
+                      Tarif Aktif Saat Ini
+                    </span>
+                    <p className="text-2xl font-black text-amber-600 font-mono">
+                      {formatRupiah(activeHarga)} <span className="text-xs font-bold text-slate-500 normal-case">/ 1x makan</span>
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-sm">
+                    <Check className="w-5 h-5" />
+                  </div>
+                </div>
+
+                {/* Preset Cepat */}
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">
+                    Pilihan Tarif Cepat
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {quickPrices.map((qp) => (
+                      <button
+                        key={qp}
+                        type="button"
+                        onClick={() => setInputHarga(String(qp))}
+                        className={cn(
+                          'py-2.5 px-3 rounded-2xl text-xs font-black transition-all border text-center',
+                          inputHarga === String(qp)
+                            ? 'bg-[#103552] text-white border-[#103552] shadow-sm'
+                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                        )}
+                      >
+                        {formatRupiah(qp)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Input Nominal Biaya */}
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">
+                    Nominal Biaya Per 1x Makan (Rp)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400">
+                      Rp
+                    </span>
+                    <input
+                      type="number"
+                      step="500"
+                      min="1000"
+                      value={inputHarga}
+                      onChange={(e) => setInputHarga(e.target.value)}
+                      placeholder="10000"
+                      className="w-full pl-12 pr-4 py-3.5 text-base font-black text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#103552] focus:ring-2 focus:ring-[#96D1C6]/30 transition-all font-mono"
+                    />
+                  </div>
+                  <p className="text-[11px] font-bold text-slate-400">
+                    Contoh: 10000 = Rp 10.000 per 1x kehadiran makan siang.
+                  </p>
+                </div>
+
+                {/* Input Keterangan */}
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">
+                    Catatan / Keterangan
+                  </label>
+                  <input
+                    type="text"
+                    value={inputKeterangan}
+                    onChange={(e) => setInputKeterangan(e.target.value)}
+                    placeholder="Contoh: Biaya makan siang MBG 10.000"
+                    className={inputCls}
+                  />
+                </div>
+
+                {/* Riwayat Pengaturan Biaya */}
+                {settingHistory.length > 0 && (
+                  <div className="space-y-3 pt-3 border-t border-slate-100">
+                    <div className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-widest">
+                      <History className="w-4 h-4 text-slate-400" />
+                      <span>Riwayat Perubahan Biaya</span>
+                    </div>
+                    <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                      {settingHistory.map((sh, idx) => (
+                        <div
+                          key={sh.id || idx}
+                          className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs"
+                        >
+                          <div>
+                            <p className="font-black text-slate-800">{formatRupiah(sh.harga)}</p>
+                            <p className="text-[10px] font-bold text-slate-400">{sh.keterangan || '-'}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className={cn(
+                              'text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider',
+                              (sh.aktif === 1 || sh.aktif === true)
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-slate-200 text-slate-500'
+                            )}>
+                              {(sh.aktif === 1 || sh.aktif === true) ? 'Aktif' : 'Riwayat'}
+                            </span>
+                            {sh.created_at && (
+                              <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                {new Date(sh.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsSettingOpen(false)}
+                  className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-100 transition-all"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveSetting}
+                  disabled={savingSetting}
+                  className="px-6 py-2.5 bg-[#103552] text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-[#0c2940] transition-all flex items-center gap-2 shadow-sm disabled:opacity-40"
+                >
+                  {savingSetting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  <span>{savingSetting ? 'Menyimpan...' : 'Simpan Pengaturan'}</span>
                 </button>
               </div>
             </motion.div>

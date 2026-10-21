@@ -93,7 +93,15 @@ class MbgService {
             where:   { aktif: 1 },
             orderBy: { id: 'desc' }
         });
-        return row ? serializeSetting(row) : null;
+        if (row) return serializeSetting(row);
+        return {
+            id:         '0',
+            harga:      '10000',
+            keterangan: 'Tarif default MBG (1x Makan)',
+            aktif:      1,
+            created_at: null,
+            updated_at: null,
+        };
     }
 
     /** Riwayat semua setting (untuk admin) */
@@ -218,7 +226,7 @@ class MbgService {
             where:   { aktif: 1 },
             orderBy: { id: 'desc' }
         });
-        const harga = setting ? setting.harga : 0n;
+        const harga = setting ? setting.harga : 10000n;
 
         // 7. Simpan klaim
         const klaim = await prisma.mbg_klaims.create({

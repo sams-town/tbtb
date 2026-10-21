@@ -23,6 +23,7 @@ import { cn, formatPhotoUrl } from '../lib/utils';
 import { useToast } from './Toast';
 import { AddLeave } from './AddLeave';
 import { EditLeave } from './EditLeave';
+import { EditLeave } from './EditLeave';
 
 interface Leave {
   id: string;
@@ -72,8 +73,6 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
   const [filterEmployeeId, setFilterEmployeeId] = useState(initialFilters?.userId || '');
   const [filterStartDate, setFilterStartDate] = useState(initialFilters?.startDate || '');
   const [filterEndDate, setFilterEndDate] = useState(initialFilters?.endDate || '');
-  const [empSearch, setEmpSearch] = useState('');
-  const [showEmpDropdown, setShowEmpDropdown] = useState(false);
   const [displayedLeaves, setDisplayedLeaves] = useState<Leave[]>([]);
 
   useEffect(() => {
@@ -91,7 +90,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
       const isMaster = activeUser?.id?.toString() === '1' || Number(activeUser?.id) === 1 || activeUser?.is_admin === 'superadmin' || activeUser?.is_admin === 'admin' || activeUser?.role === 'superadmin' || activeUser?.role === 'admin';
 
       const [empRes, cutisRes, jabRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000`, {
+        fetch(`${import.meta.env.VITE_API_MEANDPAY}/users`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }),
         fetch(`${import.meta.env.VITE_API_MEANDPAY}/cutis`, {
@@ -355,39 +354,15 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Pilih Pegawai</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={empSearch}
-                  onChange={(e) => { setEmpSearch(e.target.value); setShowEmpDropdown(true); }}
-                  onFocus={() => setShowEmpDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowEmpDropdown(false), 200)}
-                  placeholder={filterEmployeeId ? employees.find(e => e.id === filterEmployeeId)?.name || 'Cari pegawai...' : 'Semua Pegawai'}
-                  className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
-                />
-                {showEmpDropdown && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-60 overflow-y-auto">
-                    <div
-                      className="px-4 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 cursor-pointer"
-                      onMouseDown={() => { setFilterEmployeeId(''); setEmpSearch(''); setShowEmpDropdown(false); }}
-                    >
-                      Semua Pegawai
-                    </div>
-                    {employees
-                      .filter(e => e.name.toLowerCase().includes(empSearch.toLowerCase()))
-                      .map((emp) => (
-                        <div
-                          key={emp.id}
-                          className="px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-[#E8F4F3] hover:text-[#103552] cursor-pointer"
-                          onMouseDown={() => { setFilterEmployeeId(emp.id); setEmpSearch(emp.name); setShowEmpDropdown(false); }}
-                        >
-                          {emp.name}
-                        </div>
-                      ))
-                    }
-                  </div>
-                )}
-              </div>
+              <select
+                value={filterEmployeeId}
+                onChange={(e) => setFilterEmployeeId(e.target.value)}
+                className="w-full px-6 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all cursor-pointer appearance-none">
+                <option value="">Semua Pegawai</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>{emp.name}</option>
+                ))}
+              </select>
             </div>
             <div className="md:col-span-1">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Tanggal Mulai</label>

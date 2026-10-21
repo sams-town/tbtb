@@ -66,7 +66,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
     const fetchEmployees = async () => {
         try {
             setLoadingEmployees(true);
-            const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users`, {
+            const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             const data = await res.json();

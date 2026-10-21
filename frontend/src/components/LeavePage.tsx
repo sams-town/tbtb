@@ -23,7 +23,6 @@ import { cn, formatPhotoUrl } from '../lib/utils';
 import { useToast } from './Toast';
 import { AddLeave } from './AddLeave';
 import { EditLeave } from './EditLeave';
-import { EditLeave } from './EditLeave';
 
 interface Leave {
   id: string;

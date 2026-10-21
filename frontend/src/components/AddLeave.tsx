@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Save, X, Calendar, User, FileText, ImageIcon, Loader2, Download } from 'lucide-react';
+import { ArrowLeft, Save, X, Calendar, User, FileText, Image as ImageIcon, Loader2, Download } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Card, SectionTitle, FormInput, FormSelect, Field, Toast } from './common/FormUI';
 

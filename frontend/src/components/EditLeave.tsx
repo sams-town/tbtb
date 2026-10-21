@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Save, X, Calendar, User, FileText, ImageIcon, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, X, Calendar, User, FileText, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { cn, formatPhotoUrl } from '../lib/utils';
 import { useToast } from './Toast';
 

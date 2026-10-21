@@ -1347,21 +1347,32 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
           ))}
         </div>
 
-        {/* Table */}
+        {/* Table Container */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3 flex-1">
-              <div className="relative flex-1 min-w-[240px] max-w-md">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Cari nama, email, atau username..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
-                  value={searchInput}
-                  onChange={(e) => handleSearchInput(e.target.value)}
-                />
-              </div>
+          <div className="px-6 pt-5 pb-3 border-b border-slate-100 space-y-3">
+            {/* Search Bar — full width & prominenT */}
+            <div className="relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Cari nama, email, username, KTP, atau nomor telepon pegawai..."
+                className="w-full pl-12 pr-12 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
+                value={searchInput}
+                onChange={(e) => handleSearchInput(e.target.value)}
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => { setSearchInput(''); setSearch(''); setPage(1); }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
+            {/* Filter Dropdowns Row */}
+            <div className="flex flex-wrap items-center gap-3">
               <div className="relative">
                 <select 
                   value={selectedLokasi}
@@ -1469,6 +1480,7 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
             </div>
           </div>
 
+          {/* Table Content */}
           <div className="overflow-x-auto">
             {error ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">

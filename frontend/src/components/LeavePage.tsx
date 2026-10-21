@@ -123,17 +123,18 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
         activeUser?.is_supervisor === true ||
         activeUser?.is_admin === 'manager';
 
-      // 1. Ambil seluruh data pegawai (users/all dengan fallback limit 1000)
+      // 1. Ambil seluruh data pegawai — exclude dokter & superadmin
       let empData: any[] = [];
       try {
-        const empRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users/all`, {
+        // Gunakan /users/all?exclude_role=dokter agar dokter tidak muncul di daftar pegawai cuti
+        const empRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users/all?exclude_role=dokter`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const empJson = await empRes.json();
         if (empJson.success && Array.isArray(empJson.data) && empJson.data.length > 0) {
           empData = empJson.data;
         } else {
-          const fallbackRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000`, {
+          const fallbackRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000&exclude_role=dokter`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           });
           const fallbackJson = await fallbackRes.json();
@@ -142,14 +143,27 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
           }
         }
       } catch (_) {
-        const fallbackRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-        const fallbackJson = await fallbackRes.json();
-        if (fallbackJson.success && Array.isArray(fallbackJson.data)) {
-          empData = fallbackJson.data;
-        }
+        try {
+          const fallbackRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000&exclude_role=dokter`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          });
+          const fallbackJson = await fallbackRes.json();
+          if (fallbackJson.success && Array.isArray(fallbackJson.data)) {
+            empData = fallbackJson.data;
+          }
+        } catch (_2) {}
       }
+
+      // Filter sisi-klien: buang superadmin/admin & dokter jika lolos dari backend
+      empData = empData.filter((e: any) => {
+        const adminVal = (e.is_admin || '').toLowerCase();
+        if (['superadmin', 'super admin', 'super_admin', 'admin'].includes(adminVal)) return false;
+        const roleNames = Array.isArray(e.roles) ? e.roles.map((r: any) => (typeof r === 'string' ? r : r.name || '').toLowerCase()) : [];
+        if (roleNames.some((r: string) => r.includes('dokter'))) return false;
+        const jabName = (e.jabatan?.nama_jabatan || '').toLowerCase();
+        if (jabName.includes('dokter')) return false;
+        return true;
+      });
 
       setEmployees(empData);
 
@@ -176,6 +190,18 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
 
       if (cutisJson.success && Array.isArray(cutisJson.data)) {
         let result = cutisJson.data;
+
+        // Exclude cuti dokter & superadmin di sisi klien sebagai safety net
+        result = result.filter((item: any) => {
+          const userObj = item.pemohon || item.users;
+          if (userObj) {
+            const adminVal = (userObj.is_admin || '').toLowerCase();
+            if (['superadmin', 'super admin', 'super_admin', 'admin'].includes(adminVal)) return false;
+            const jabName = (userObj.jabatan?.nama_jabatan || '').toLowerCase();
+            if (jabName.includes('dokter')) return false;
+          }
+          return true;
+        });
 
         // Jika bukan master dan bukan role manager/supervisor, tapi punya divisi yang dimanage, filter sesuai divisi
         if (!isMaster && !isManagerRole && managedDivisions.length > 0) {

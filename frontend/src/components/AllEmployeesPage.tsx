@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -10,7 +10,7 @@ import {
   Eye, EyeOff, Lock, ScrollText, AlertTriangle, FileSpreadsheet,
   CheckCircle2, ImageIcon, Briefcase, ShieldCheck, ShieldAlert
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn, formatPhotoUrl } from '../lib/utils';
 import QRCode from 'react-qr-code';
 import Swal from 'sweetalert2';
 import { AddEmployeeForm } from './Addemployeeform';
@@ -134,10 +134,7 @@ function formatDate(iso: string | null) {
 }
 
 function getPhotoUrl(path: string | null) {
-  if (!path) return null;
-  if (path.startsWith('http')) return path;
-  const filename = path.includes('/') ? path.split('/').pop() : path;
-  return `${BASE_URL.replace('/api', '')}/uploads/${filename}`;
+  return formatPhotoUrl(path);
 }
 
 /* ─── Template Generator ─────────────────────────────────── */

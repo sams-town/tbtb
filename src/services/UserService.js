@@ -1018,7 +1018,7 @@ class UserService {
      * Serialize a single user — convert BigInt to string for JSON
      */
     serialize(user) {
-        const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+        const baseUrl = process.env.BASE_URL || 'https://api-absen.hris-thb.id';
 
         // Normalisasi URL foto — ganti domain lama dengan BASE_URL saat ini
         const normalizePhotoUrl = (url) => {
@@ -1097,7 +1097,7 @@ class UserService {
 
         if (!user) return null;
 
-        const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
+        const baseUrl = process.env.BASE_URL || 'https://api-absen.hris-thb.id';
         const fotoUrl = user.foto_karyawan
             ? (user.foto_karyawan.startsWith('http')
                 ? user.foto_karyawan

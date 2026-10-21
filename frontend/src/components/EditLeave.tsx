@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Save, X, Calendar, User, FileText, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { cn, formatPhotoUrl } from '../lib/utils';
@@ -26,35 +26,41 @@ interface Employee {
     izin_lainnya_total: string;
     izin_lainnya_terpakai: string;
     izin_lainnya_sisa: string;
-    cuti_melahirkan? : string;
+    cuti_melahirkan?: string;
+    cuti_melahirkan_total?: string;
+    cuti_melahirkan_terpakai?: string;
+    cuti_melahirkan_sisa?: string;
     cuti_kematian?: string;
+    cuti_kematian_total?: string;
+    cuti_kematian_terpakai?: string;
+    cuti_kematian_sisa?: string;
 }
 
 export function EditLeave({ onBack, leave }: EditLeaveProps) {
     const { addToast } = useToast();
 
-    const initialStart = leave?.tanggal?.split(' - ')[0] || '';
-    const initialEnd = leave?.tanggal?.split(' - ')[1] || initialStart;
+    const initialStart = (leave?.tanggal?.split(' - ')[0] || '').trim().split('T')[0];
+    const initialEnd = (leave?.tanggal?.split(' - ')[1] || initialStart).trim().split('T')[0];
 
     // State for form data
     const [formData, setFormData] = useState({
-        user_id: leave.user_id?.toString() || leave.pemohon?.id?.toString() || '',
-        nama_cuti: leave.nama_cuti || '',
+        user_id: leave?.user_id?.toString() || leave?.pemohon?.id?.toString() || leave?.users?.id?.toString() || '',
+        nama_cuti: leave?.nama_cuti || '',
         tanggal_mulai: initialStart,
         tanggal_akhir: initialEnd,
-        alasan_cuti: leave.alasan_cuti || ''
+        alasan_cuti: leave?.alasan_cuti || ''
     });
 
     // State for file upload
     const [photoFile, setPhotoFile] = useState<File | null>(null);
-    const [photoPreview, setPhotoPreview] = useState<string | null>(formatPhotoUrl(leave.foto_cuti) || null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(formatPhotoUrl(leave?.foto_cuti) || null);
 
     // State for options
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loadingEmployees, setLoadingEmployees] = useState(false);
 
     // Derived selected employee
-    const selectedEmp = employees.find(e => e.id.toString() === formData.user_id.toString());
+    const selectedEmp = employees.find(e => String(e?.id ?? '') === String(formData.user_id ?? ''));
 
     // UI states
     const [loading, setLoading] = useState(false);
@@ -72,13 +78,14 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
             const data = await res.json();
             if (data.success && data.data) {
                 let fetched = data.data;
-                const existing = fetched.find((e: Employee) => e.id.toString() === formData.user_id.toString());
-                if (!existing && leave.pemohon) {
+                const existing = fetched.find((e: Employee) => String(e?.id ?? '') === String(formData.user_id ?? ''));
+                const pemohon = leave?.pemohon || leave?.users;
+                if (!existing && pemohon) {
                     fetched.unshift({
-                        id: leave.pemohon.id,
-                        name: leave.pemohon.name,
-                        username: leave.pemohon.name,
-                        lokasi_id: leave.lokasi_id || '',
+                        id: pemohon.id,
+                        name: pemohon.name,
+                        username: pemohon.name,
+                        lokasi_id: leave?.lokasi_id || '',
                         izin_cuti_total: '-',
                         izin_cuti_terpakai: '-',
                         izin_cuti_sisa: '-',
@@ -144,7 +151,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                 fd.append('foto_cuti', photoFile);
             }
 
-            const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/cutis/${leave.id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/cutis/${leave?.id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -205,7 +212,7 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
                             >
                                 <option value="">{loadingEmployees ? 'Memuat...' : 'Pilih Pegawai'}</option>
                                 {employees.map(emp => (
-                                    <option key={emp.id} value={emp.id.toString()}>{emp.name || emp.username}</option>
+                                    <option key={emp.id} value={String(emp.id)}>{emp.name || emp.username}</option>
                                 ))}
                             </select>
                         </div>

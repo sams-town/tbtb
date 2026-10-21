@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Calendar,
@@ -73,6 +73,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
   const [filterStartDate, setFilterStartDate] = useState(initialFilters?.startDate || '');
   const [filterEndDate, setFilterEndDate] = useState(initialFilters?.endDate || '');
   const [displayedLeaves, setDisplayedLeaves] = useState<Leave[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -244,14 +245,6 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
     }
   };
 
-  if (isAdding) {
-    return <AddLeave onBack={() => { setIsAdding(false); fetchData(); }} />;
-  }
-
-  if (isEditing) {
-    return <EditLeave leave={isEditing} onBack={() => { setIsEditing(null); fetchData(); }} />;
-  }
-
   const handleSearch = () => {
     let result = [...leaves];
     if (filterEmployeeId) {
@@ -272,8 +265,6 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
     }
     setDisplayedLeaves(result);
   };
-
-  const [isExporting, setIsExporting] = React.useState(false);
 
   const handleExportCSV = async () => {
     setIsExporting(true);
@@ -315,6 +306,14 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
       setIsExporting(false);
     }
   };
+
+  if (isAdding) {
+    return <AddLeave onBack={() => { setIsAdding(false); fetchData(); }} />;
+  }
+
+  if (isEditing) {
+    return <EditLeave leave={isEditing} onBack={() => { setIsEditing(null); fetchData(); }} />;
+  }
 
   return (
     <motion.div

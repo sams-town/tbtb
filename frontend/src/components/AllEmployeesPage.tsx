@@ -1098,7 +1098,9 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
       let queryString = new URLSearchParams(baseParamsObj).toString();
       const rolesArr = Array.isArray(roleOrRoles) ? roleOrRoles : (roleOrRoles ? [roleOrRoles] : []);
       if (rolesArr.length > 0) {
-        rolesArr.forEach(r => { queryString += `&roles[]=${encodeURIComponent(r)}`; });
+        rolesArr.forEach(r => {
+          queryString += `&roles[]=${encodeURIComponent(r)}&role=${encodeURIComponent(r)}&roles=${encodeURIComponent(r)}`;
+        });
       } else {
         queryString += `&exclude_role=dokter`;
       }
@@ -1111,18 +1113,50 @@ export function AllEmployeesPage({ initialRole }: { initialRole?: string; key?: 
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
 
-      setEmployees(json.data);
-      if (json.meta) {
-        setMeta(json.meta);
-      } else {
-        setMeta({ total: json.data.length, page: 1, limit: 100, totalPages: 1 });
+      let empData: any[] = Array.isArray(json.data) ? json.data : [];
+
+      // Filter sisi-klien: Data Dokter vs Pegawai
+      const isDoctorView = initialRole === 'dokter' || rolesArr.some(r => String(r).toLowerCase() === 'dokter');
+
+      if (isDoctorView) {
+        // Halaman Data Dokter: HANYA tampilkan dokter
+        empData = empData.filter((e: any) => {
+          const userRoles = Array.isArray(e.roles) ? e.roles.map((r: any) => String(typeof r === 'string' ? r : r.name || '').toLowerCase()) : [];
+          const isDocRole = userRoles.some((r: string) => r.includes('dokter'));
+          const jabName = String(e.jabatan?.nama_jabatan || '').toLowerCase();
+          const isDocJab = jabName.includes('dokter') || jabName.includes('spesialis') || jabName.includes('sp.') || jabName.includes('dr.');
+          return isDocRole || isDocJab;
+        });
+      } else if (!initialRole && rolesArr.length === 0) {
+        // Halaman Semua Pegawai: Exclude dokter
+        empData = empData.filter((e: any) => {
+          const userRoles = Array.isArray(e.roles) ? e.roles.map((r: any) => String(typeof r === 'string' ? r : r.name || '').toLowerCase()) : [];
+          const isDocRole = userRoles.some((r: string) => r.includes('dokter'));
+          const jabName = String(e.jabatan?.nama_jabatan || '').toLowerCase();
+          const isDocJab = jabName.includes('dokter') || jabName.includes('spesialis') || jabName.includes('sp.') || jabName.includes('dr.');
+          return !isDocRole && !isDocJab;
+        });
       }
+
+      // Exclude superadmin & admin
+      empData = empData.filter((e: any) => {
+        const adminVal = String(e.is_admin || '').toLowerCase();
+        return !['superadmin', 'super admin', 'super_admin', 'admin'].includes(adminVal);
+      });
+
+      setEmployees(empData);
+      setMeta({
+        total: empData.length,
+        page: currentPage,
+        limit: 100,
+        totalPages: Math.ceil(empData.length / 100) || 1
+      });
     } catch (err: any) {
       setError(err.message || 'Gagal memuat data pegawai');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [initialRole]);
 
   useEffect(() => {
     fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja);

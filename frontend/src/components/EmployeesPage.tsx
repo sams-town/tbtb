@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -1310,7 +1310,9 @@ export function EmployeesPage() {
 
       const rolesArr = Array.isArray(roleOrRoles) ? roleOrRoles : (roleOrRoles ? [roleOrRoles] : []);
       if (rolesArr.length > 0) {
-        rolesArr.forEach(r => { queryString += `&roles[]=${encodeURIComponent(r)}`; });
+        rolesArr.forEach(r => {
+          queryString += `&roles[]=${encodeURIComponent(r)}&role=${encodeURIComponent(r)}&roles=${encodeURIComponent(r)}`;
+        });
       } else {
         queryString += `&exclude_role=dokter`;
       }
@@ -1323,12 +1325,32 @@ export function EmployeesPage() {
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
 
-      setEmployees(json.data);
-      if (json.meta) {
-        setMeta(json.meta);
-      } else {
-        setMeta({ total: json.data.length, page: 1, limit: json.data.length, totalPages: 1 });
+      let empData: any[] = Array.isArray(json.data) ? json.data : [];
+
+      // Di halaman Pegawai, exclude dokter jika tidak ada filter role dokter
+      if (!rolesArr.some(r => String(r).toLowerCase() === 'dokter')) {
+        empData = empData.filter((e: any) => {
+          const userRoles = Array.isArray(e.roles) ? e.roles.map((r: any) => String(typeof r === 'string' ? r : r.name || '').toLowerCase()) : [];
+          const isDocRole = userRoles.some((r: string) => r.includes('dokter'));
+          const jabName = String(e.jabatan?.nama_jabatan || '').toLowerCase();
+          const isDocJab = jabName.includes('dokter') || jabName.includes('spesialis') || jabName.includes('sp.') || jabName.includes('dr.');
+          return !isDocRole && !isDocJab;
+        });
       }
+
+      // Exclude superadmin & admin
+      empData = empData.filter((e: any) => {
+        const adminVal = String(e.is_admin || '').toLowerCase();
+        return !['superadmin', 'super admin', 'super_admin', 'admin'].includes(adminVal);
+      });
+
+      setEmployees(empData);
+      setMeta({
+        total: json.meta?.total !== undefined ? json.meta.total : empData.length,
+        page: currentPage,
+        limit: json.meta?.limit || empData.length,
+        totalPages: json.meta?.totalPages || 1
+      });
     } catch (err: any) {
       setError(err.message || 'Gagal memuat data pegawai');
     } finally {
@@ -1668,18 +1690,30 @@ export function EmployeesPage() {
 
         {/* Table */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-4">
-            <div className="relative w-80">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input type="text" value={searchInput} onChange={e => handleSearchInput(e.target.value)} placeholder="Cari nama, username, email..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-[#103552]/60 focus:ring-4 focus:ring-[#96D1C6]/20 transition-all" />
+          <div className="px-6 pt-5 pb-4 border-b border-slate-100 space-y-3.5">
+            {/* Search Bar — full width & prominent */}
+            <div className="relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchInput}
+                onChange={e => handleSearchInput(e.target.value)}
+                placeholder="Cari nama, email, username, KTP, atau nomor telepon pegawai..."
+                className="w-full pl-12 pr-12 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#103552]/10 focus:border-[#103552] transition-all"
+              />
               {searchInput && (
-                <button onClick={() => { setSearchInput(''); setSearch(''); setPage(1); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                  <X className="w-3.5 h-3.5" />
+                <button
+                  type="button"
+                  onClick={() => { setSearchInput(''); setSearch(''); setPage(1); }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-all"
+                >
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
-            <div className="flex items-center gap-3">
+
+            {/* Filter Dropdowns Row */}
+            <div className="flex flex-wrap items-center gap-3">
               <button onClick={() => fetchEmployees(page, search, selectedLokasi, selectedJabatan, selectedRoles, selectedStatusKerja)} className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">
                 <RefreshCw className={cn('w-3.5 h-3.5', loading && 'animate-spin')} />
               </button>
@@ -1795,7 +1829,7 @@ export function EmployeesPage() {
                 <ScrollText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               </div>
-              <span className="text-xs text-slate-400">Menampilkan {employees.length} dari {meta.total} pegawai</span>
+              <span className="text-xs text-slate-400 ml-auto">Menampilkan {employees.length} dari {meta.total} pegawai</span>
             </div>
           </div>
 

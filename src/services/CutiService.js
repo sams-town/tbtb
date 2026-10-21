@@ -7,19 +7,35 @@ class CutiService {
 
         let excludeUserIds = [];
         if (query.include_dokter !== 'true') {
-            const doctors = await prisma.model_has_roles.findMany({
+            const docRoles = await prisma.roles.findMany({
                 where: {
-                    roles: {
-                        OR: [
-                            { name: { contains: 'dokter' } },
-                            { name: { in: ['dokter', 'Dokter', 'DOKTER'] } }
-                        ]
-                    }
+                    OR: [
+                        { name: { contains: 'dokter' } },
+                        { name: { in: ['dokter', 'Dokter', 'DOKTER', 'doctor', 'Doctor'] } }
+                    ]
                 },
-                select: { model_id: true }
+                select: { id: true }
             });
+            const docRoleIds = docRoles.map(r => r.id);
+            let roleDoctorUserIds = [];
+            if (docRoleIds.length > 0) {
+                const roleUsers = await prisma.model_has_roles.findMany({
+                    where: { role_id: { in: docRoleIds } },
+                    select: { model_id: true }
+                });
+                roleDoctorUserIds = roleUsers.map(ru => ru.model_id);
+            }
             const doctorJabatans = await prisma.jabatans.findMany({
-                where: { nama_jabatan: { contains: 'dokter' } },
+                where: {
+                    OR: [
+                        { nama_jabatan: { contains: 'dokter' } },
+                        { nama_jabatan: { contains: 'Dokter' } },
+                        { nama_jabatan: { contains: 'spesialis' } },
+                        { nama_jabatan: { contains: 'Spesialis' } },
+                        { nama_jabatan: { contains: 'Sp.' } },
+                        { nama_jabatan: { contains: 'dr.' } },
+                    ]
+                },
                 select: { id: true }
             });
             let doctorJabatanUserIds = [];

@@ -72,12 +72,17 @@ export function EditLeave({ onBack, leave }: EditLeaveProps) {
     const fetchEmployees = async () => {
         try {
             setLoadingEmployees(true);
-            const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000`, {
+            let res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users/all`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
+            if (!res.ok) {
+                res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+            }
             const data = await res.json();
             if (data.success && data.data) {
-                let fetched = data.data;
+                let fetched = Array.isArray(data.data) ? data.data : (data.data?.users || []);
                 const existing = fetched.find((e: Employee) => String(e?.id ?? '') === String(formData.user_id ?? ''));
                 const pemohon = leave?.pemohon || leave?.users;
                 if (!existing && pemohon) {

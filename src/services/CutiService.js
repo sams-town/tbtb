@@ -16,18 +16,49 @@ class CutiService {
         const data = await prisma.cutis.findMany({
             where,
             orderBy: { id: "desc" },
-            include: { users: { select: { id: true, name: true } } },
+            include: {
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        jabatan_id: true,
+                        lokasi_id: true,
+                        foto_karyawan: true,
+                        jabatan: true,
+                        lokasi: true,
+                    }
+                }
+            },
         });
         const ids = Array.from(new Set(data.map(d => d.user_id).filter(Boolean)));
         let usersMap = {};
         if (ids.length) {
             const users = await prisma.users.findMany({
                 where: { id: { in: ids } },
-                select: { id: true, name: true },
+                select: {
+                    id: true,
+                    name: true,
+                    jabatan_id: true,
+                    lokasi_id: true,
+                    foto_karyawan: true,
+                    jabatan: true,
+                    lokasi: true,
+                },
             });
-            usersMap = Object.fromEntries(users.map(u => [u.id, u]));
+            usersMap = Object.fromEntries(users.map(u => [String(u.id), u]));
         }
-        const enriched = data.map(d => ({ ...d, pemohon: usersMap[String(d.user_id)] || null }));
+        const enriched = data.map(d => ({
+            ...d,
+            pemohon: usersMap[String(d.user_id)] || (d.users ? {
+                id: d.users.id,
+                name: d.users.name,
+                jabatan_id: d.users.jabatan_id,
+                lokasi_id: d.users.lokasi_id,
+                foto_karyawan: d.users.foto_karyawan,
+                jabatan: d.users.jabatan,
+                lokasi: d.users.lokasi,
+            } : null)
+        }));
         return { data: this.serializeList(enriched) };
     }
 
@@ -160,16 +191,43 @@ class CutiService {
             }
 
             const approverUser = await tx.users.findUnique({
-                where: { id: approver }
+                where: { id: approver },
+                include: { managed_jabatans: true }
             });
 
-            const isManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
-            const isAdmin = approverUser?.is_admin === 'admin' || approverUser?.is_admin === 'superadmin' || approver === 1n;
+            if (!approverUser) {
+                throw new Error("Approver user tidak ditemukan");
+            }
 
+            const approverRolesRecords = await tx.model_has_roles.findMany({
+                where: { model_id: approver },
+                include: { roles: true }
+            });
+            const approverRoles = approverRolesRecords.map(r => (r.roles?.name || "").toLowerCase());
+
+            const isAdmin = approver === 1n ||
+                ['admin', 'superadmin', 'super admin', 'super_admin'].includes(String(approverUser.is_admin || '').toLowerCase()) ||
+                approverRoles.includes('admin') ||
+                approverRoles.includes('superadmin');
+
+            const isDirectManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
+            const managesPemohonJabatan = pemohon.jabatan_id && approverUser.managed_jabatans && approverUser.managed_jabatans.some(j => j.id === pemohon.jabatan_id);
+            const hasManagerRole = approverRoles.includes('manager') || approverRoles.includes('supervisor') || approverUser.is_supervisor === 1 || String(approverUser.is_admin || '').toLowerCase() === 'manager';
+
+            const isManager = isDirectManager || managesPemohonJabatan || hasManagerRole;
+
+            const isRejection = body.status === "Ditolak" || body.status === "Rejected";
             let newStatus = existing.status_cuti;
             let shouldFinalize = false;
 
-            if (isManager && (existing.status_cuti === "Pending" || existing.status_cuti === "Menunggu")) {
+            if (isRejection) {
+                if (isManager || isAdmin) {
+                    newStatus = "Ditolak";
+                    shouldFinalize = true;
+                } else {
+                    throw new Error("Anda tidak memiliki wewenang untuk menolak pengajuan ini.");
+                }
+            } else if (isManager && (existing.status_cuti === "Pending" || existing.status_cuti === "Menunggu")) {
                 newStatus = "Disetujui Manager";
             } else if (isAdmin) {
                 if (existing.status_cuti === "Disetujui Manager" || existing.status_cuti === "Pending" || existing.status_cuti === "Menunggu") {

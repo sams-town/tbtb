@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import {
   Bell,
@@ -220,31 +220,31 @@ export function NotificationsPage({ onNavigate, onRefreshCount }: NotificationsP
       if (entity === 'lembur') {
         if (action === 'approve') {
           url  = `${BASE_URL}/lemburs/${entityId}/approve`;
-          body = { approved_by: managerId };
+          body = { approved_by: managerId, status: 'Approved' };
         } else {
           url  = `${BASE_URL}/lemburs/${entityId}/reject`;
-          body = { rejected_by: managerId };
+          body = { approved_by: managerId, status: 'Rejected' };
         }
       } else if (entity === 'cuti') {
         if (action === 'approve') {
           url  = `${BASE_URL}/cutis/${entityId}/approve`;
-          body = { user_approval: managerId };
+          body = { user_approval: managerId, status: 'Diterima' };
         } else {
           url  = `${BASE_URL}/cutis/${entityId}/reject`;
-          body = { user_approval: managerId };
+          body = { user_approval: managerId, status: 'Ditolak' };
         }
       } else if (entity === 'kasbon') {
         url  = `${BASE_URL}/kasbons/${entityId}`;
         body = { status: action === 'approve' ? 'APPROVED' : 'REJECTED' };
       }
 
-      const fd = new FormData();
-      Object.entries(body).forEach(([k, v]) => fd.append(k, v));
-
       const res  = await fetch(url, {
         method,
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-        body: fd,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        },
+        body: JSON.stringify(body),
       });
       const json = await res.json();
 

@@ -1,10 +1,10 @@
-﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import {
   Search, Download, Edit2, Trash2, Eye, ChevronLeft, ChevronRight,
   MapPin, Clock, CheckCircle2, XCircle, AlertCircle, AlertTriangle,
-  ArrowUpDown, Filter, Loader2, Play, FileText
+  ArrowUpDown, Filter, Loader2, Play, FileText, ExternalLink, X
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import L from 'leaflet';
@@ -91,6 +91,7 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
   const [mapParams, setMapParams] = useState<{ isOpen: boolean, lat: string, lng: string, title: string }>({ isOpen: false, lat: '', lng: '', title: '' });
   const [deleteData, setDeleteData] = useState<OvertimeData | null>(null);
   const [approveData, setApproveData] = useState<OvertimeData | null>(null);
+  const [detailData, setDetailData] = useState<OvertimeData | null>(null);
   const [editData, setEditData] = useState<OvertimeData | null>(null);
   const [photoModal, setPhotoModal] = useState<{ isOpen: boolean, url: string, title: string }>({ isOpen: false, url: '', title: '' });
 
@@ -101,18 +102,33 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
 
   const fetchDropdowns = async () => {
     try {
-      const [uRes, jRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_MEANDPAY}/users`, {
+      let uData: any[] = [];
+      try {
+        const uRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users/all`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        }),
-        fetch(`${import.meta.env.VITE_API_MEANDPAY}/jabatans`, {
+        });
+        const uJson = await uRes.json();
+        if (uJson.success && Array.isArray(uJson.data) && uJson.data.length > 0) {
+          uData = uJson.data;
+        }
+      } catch (_) {}
+
+      if (uData.length === 0) {
+        const uRes2 = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/users?limit=1000`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        })
-      ]);
-      const uJson = await uRes.json();
+        });
+        const uJson2 = await uRes2.json();
+        if (uJson2.success && Array.isArray(uJson2.data)) {
+          uData = uJson2.data;
+        }
+      }
+      if (uData.length > 0) setEmployees(uData);
+
+      const jRes = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/jabatans`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       const jJson = await jRes.json();
-      if (uJson.success) setEmployees(uJson.data);
-      if (jJson.success) setJabatans(jJson.data);
+      if (jJson.success && Array.isArray(jJson.data)) setJabatans(jJson.data);
     } catch (err) {
       console.error('Error fetching dropdowns:', err);
     }
@@ -128,18 +144,37 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
       if (json.success) {
         let result = json.data;
         const activeUser = currentUser || JSON.parse(localStorage.getItem('user') || '{}');
-        const isMaster = activeUser?.id?.toString() === '1' || Number(activeUser?.id) === 1 || activeUser?.is_admin === 'superadmin' || activeUser?.is_admin === 'admin' || activeUser?.role === 'superadmin' || activeUser?.role === 'admin';
+        const roles: string[] = Array.isArray(activeUser?.roles)
+          ? activeUser.roles.map((r: any) => String(r).toLowerCase())
+          : activeUser?.role ? [String(activeUser.role).toLowerCase()] : [];
 
-        if (!isMaster) {
+        const isMaster =
+          activeUser?.id?.toString() === '1' ||
+          Number(activeUser?.id) === 1 ||
+          activeUser?.is_admin === 'superadmin' ||
+          activeUser?.is_admin === 'admin' ||
+          roles.includes('superadmin') ||
+          roles.includes('admin');
+
+        const isManagerRole =
+          roles.includes('manager') ||
+          roles.includes('supervisor') ||
+          activeUser?.is_supervisor === 1 ||
+          activeUser?.is_supervisor === true ||
+          activeUser?.is_admin === 'manager';
+
+        if (!isMaster && !isManagerRole) {
           const managedDivisions = jabatans
             .filter((j: any) => j.manager?.toString() === activeUser?.id?.toString())
             .map((j: any) => j.id.toString());
           
-          result = result.filter((item: any) => {
-            const pemohon = employees.find(e => e.id?.toString() === item.user_id?.toString());
-            const empDivId = pemohon?.jabatan_id || pemohon?.jabatan?.id;
-            return managedDivisions.includes(empDivId?.toString());
-          });
+          if (managedDivisions.length > 0) {
+            result = result.filter((item: any) => {
+              const pemohon = employees.find(e => e.id?.toString() === item.user_id?.toString());
+              const empDivId = pemohon?.jabatan_id || pemohon?.jabatan?.id;
+              return managedDivisions.includes(empDivId?.toString());
+            });
+          }
         }
         setData(result);
       }
@@ -161,12 +196,31 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
   const canApprove = (row: OvertimeData) => {
     if (!currentUser) return false;
 
-    const isCurrentUserAdmin = currentUser.is_admin === 'admin' || currentUser.is_admin === 'superadmin' || currentUser.id?.toString() === '1' || currentUser.role === 'admin' || currentUser.role === 'superadmin';
+    const roles: string[] = Array.isArray(currentUser.roles)
+      ? currentUser.roles.map((r: any) => String(r).toLowerCase())
+      : currentUser.role ? [String(currentUser.role).toLowerCase()] : [];
+
+    const isCurrentUserAdmin =
+      currentUser.is_admin === 'admin' ||
+      currentUser.is_admin === 'superadmin' ||
+      currentUser.id?.toString() === '1' ||
+      roles.includes('admin') ||
+      roles.includes('superadmin');
+
     const pemohon = employees.find(e => e.id?.toString() === row.user_id?.toString());
-    const managerId = pemohon && pemohon.jabatan_id 
-      ? jabatans.find(j => j.id?.toString() === pemohon.jabatan_id?.toString())?.manager 
+    const jabId = pemohon?.jabatan_id || pemohon?.jabatan?.id;
+    const managerId = jabId 
+      ? jabatans.find(j => j.id?.toString() === jabId?.toString())?.manager 
       : null;
-    const isCurrentUserManager = managerId?.toString() === currentUser.id?.toString();
+
+    const isCurrentUserManager =
+      roles.includes('manager') ||
+      roles.includes('supervisor') ||
+      currentUser.is_supervisor === 1 ||
+      currentUser.is_supervisor === true ||
+      currentUser.is_admin === 'manager' ||
+      (managerId && managerId?.toString() === currentUser.id?.toString());
+
     const status = row.status?.toLowerCase();
 
     if (isCurrentUserManager) {
@@ -199,8 +253,35 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
       if (json.success) {
         updateToast(toastId, { type: 'success', title: 'Berhasil', message: json.message || 'Lembur berhasil di-approve' });
         fetchData();
+        setDetailData(null);
       } else {
         updateToast(toastId, { type: 'error', title: 'Gagal', message: json.message || 'Gagal memproses approval' });
+      }
+    } catch (err: any) {
+      updateToast(toastId, { type: 'error', title: 'Error', message: err.message || 'Terjadi kesalahan sistem' });
+    }
+  };
+
+  const handleReject = async (id: string, notes: string = '') => {
+    const toastId = addToast({ type: 'loading', title: 'Menolak', message: 'Sedang memproses penolakan...' });
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const approverId = user.id ? String(user.id) : '1';
+      const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/lemburs/${id}/reject`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ notes, approved_by: approverId, status: 'Rejected' })
+      });
+      const json = await res.json();
+      if (json.success) {
+        updateToast(toastId, { type: 'success', title: 'Berhasil', message: json.message || 'Lembur berhasil ditolak' });
+        fetchData();
+        setDetailData(null);
+      } else {
+        updateToast(toastId, { type: 'error', title: 'Gagal', message: json.message || 'Gagal memproses penolakan' });
       }
     } catch (err: any) {
       updateToast(toastId, { type: 'error', title: 'Error', message: err.message || 'Terjadi kesalahan sistem' });
@@ -477,7 +558,14 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
                     {item.approver?.name || '-'}
                   </td>
                   <td className="py-5 px-6 pr-10">
-                    <div className="flex items-center justify-end gap-1  transition-all translate-x-2 group-hover:translate-x-0">
+                    <div className="flex items-center justify-end gap-1.5 transition-all translate-x-2 group-hover:translate-x-0">
+                      <button
+                        onClick={() => setDetailData(item)}
+                        className="p-2 rounded-xl text-slate-400 hover:text-[#103552] hover:bg-[#96D1C6]/15 transition-all border border-transparent hover:border-[#96D1C6]/30"
+                        title="Lihat Detail & Lampiran"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
                       {canApprove(item) && (
                         <button
                           onClick={() => setApproveData(item)}
@@ -540,6 +628,23 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
               setApproveData(null);
             }}
             onCancel={() => setApproveData(null)}
+          />
+        )}
+        {detailData && (
+          <DetailOvertimeModal
+            data={detailData}
+            onClose={() => setDetailData(null)}
+            onApprove={() => {
+              handleApprove(detailData.id, detailData.notes || '');
+              setDetailData(null);
+            }}
+            onReject={() => {
+              handleReject(detailData.id, detailData.notes || '');
+              setDetailData(null);
+            }}
+            canApprove={canApprove(detailData)}
+            onViewPhoto={(url, title) => setPhotoModal({ isOpen: true, url, title })}
+            onViewMap={(lat, lng, title) => setMapParams({ isOpen: true, lat, lng, title })}
           />
         )}
         {editData && (
@@ -784,6 +889,213 @@ function PhotoModal({ url, title, onClose }: { url: string, title: string, onClo
               </div>
             )}
           </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function DetailOvertimeModal({
+  data,
+  onClose,
+  onApprove,
+  onReject,
+  canApprove,
+  onViewPhoto,
+  onViewMap
+}: {
+  data: OvertimeData;
+  onClose: () => void;
+  onApprove: () => void;
+  onReject: () => void;
+  canApprove: boolean;
+  onViewPhoto: (url: string, title: string) => void;
+  onViewMap: (lat: string, lng: string, title: string) => void;
+}) {
+  const isPdf = data.file_lembur?.toLowerCase().includes('.pdf');
+  const fileUrl = data.file_lembur ? formatPhotoUrl(data.file_lembur) : null;
+  const masukPhoto = data.foto_jam_masuk ? formatPhotoUrl(data.foto_jam_masuk) : null;
+  const keluarPhoto = data.foto_jam_keluar ? formatPhotoUrl(data.foto_jam_keluar) : null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+      <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col border border-slate-100 max-h-[90vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex items-center gap-3">
+            {data.karyawan?.foto_karyawan ? (
+              <img src={formatPhotoUrl(data.karyawan.foto_karyawan)} className="w-12 h-12 rounded-2xl object-cover border border-slate-200" alt="" />
+            ) : (
+              <div className="w-12 h-12 rounded-2xl bg-[#96D1C6]/20 flex items-center justify-center text-sm font-black text-[#103552]">
+                {getInitials(data.karyawan?.name || '')}
+              </div>
+            )}
+            <div>
+              <h3 className="text-lg font-black text-slate-900">{data.karyawan?.name || '-'}</h3>
+              <p className="text-xs font-bold text-slate-400">Pengajuan Lembur • {data.tanggal}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <StatusBadge value={data.status} />
+            <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-600 transition-all">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto space-y-6">
+          {/* Overtime times & duration */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-emerald-500" /> Jam Masuk
+              </p>
+              <p className="text-sm font-black text-slate-900">{data.jam_masuk?.split(' ')[1] || data.jam_masuk || '-'}</p>
+              {data.lat_masuk && data.long_masuk && (
+                <button
+                  type="button"
+                  onClick={() => onViewMap(data.lat_masuk!, data.long_masuk!, `Lembur Masuk - ${data.karyawan?.name}`)}
+                  className="mt-2 text-[10px] font-bold text-slate-500 hover:text-[#103552] flex items-center gap-1"
+                >
+                  <MapPin className="w-3 h-3 text-rose-500" /> Lihat Lokasi
+                </button>
+              )}
+            </div>
+
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-rose-500" /> Jam Keluar
+              </p>
+              <p className="text-sm font-black text-slate-900">{data.jam_keluar?.split(' ')[1] || data.jam_keluar || '-'}</p>
+              {data.lat_keluar && data.long_keluar && (
+                <button
+                  type="button"
+                  onClick={() => onViewMap(data.lat_keluar!, data.long_keluar!, `Lembur Keluar - ${data.karyawan?.name}`)}
+                  className="mt-2 text-[10px] font-bold text-slate-500 hover:text-[#103552] flex items-center gap-1"
+                >
+                  <MapPin className="w-3 h-3 text-rose-500" /> Lihat Lokasi
+                </button>
+              )}
+            </div>
+
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Durasi</p>
+              <p className="text-sm font-black text-[#103552]">{formatDuration(data.total_lembur)}</p>
+              <p className="text-[10px] font-medium text-slate-400 mt-1">{data.lokasi?.nama_lokasi || 'Kantor'}</p>
+            </div>
+          </div>
+
+          {/* Catatan / Alasan */}
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Catatan / Alasan Lembur</p>
+            <p className="text-sm font-medium text-slate-700 leading-relaxed">{data.notes || 'Tidak ada catatan tambahan'}</p>
+          </div>
+
+          {/* Foto & Lampiran */}
+          <div>
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Bukti Foto & Lampiran Berkas</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Foto Jam Masuk */}
+              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Foto Jam Masuk</p>
+                {masukPhoto ? (
+                  <div
+                    onClick={() => onViewPhoto(masukPhoto, `Foto Masuk - ${data.karyawan?.name}`)}
+                    className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 cursor-pointer group shadow-sm bg-white"
+                  >
+                    <img src={masukPhoto} className="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Masuk" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1">
+                      <Eye className="w-4 h-4" /> Perbesar
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-32 rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-300">
+                    <AlertCircle className="w-6 h-6 mb-1" />
+                    <span className="text-[10px] font-bold">Tidak ada foto</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Foto Jam Keluar */}
+              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Foto Jam Keluar</p>
+                {keluarPhoto ? (
+                  <div
+                    onClick={() => onViewPhoto(keluarPhoto, `Foto Keluar - ${data.karyawan?.name}`)}
+                    className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-200 cursor-pointer group shadow-sm bg-white"
+                  >
+                    <img src={keluarPhoto} className="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Keluar" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1">
+                      <Eye className="w-4 h-4" /> Perbesar
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-32 rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-300">
+                    <AlertCircle className="w-6 h-6 mb-1" />
+                    <span className="text-[10px] font-bold">Tidak ada foto</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Berkas Lampiran Lembur */}
+              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Berkas Lampiran</p>
+                {fileUrl ? (
+                  <div className="w-full h-32 rounded-xl border border-slate-200 bg-white flex flex-col items-center justify-center p-3 text-center shadow-sm">
+                    <FileText className="w-8 h-8 text-[#103552] mb-1" />
+                    <span className="text-[10px] font-bold text-slate-600 line-clamp-1 mb-2">
+                      {isPdf ? 'Dokumen PDF' : 'Berkas Lembur'}
+                    </span>
+                    <a
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-[#103552] text-white rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-[#103552]/90 shadow-sm"
+                    >
+                      <ExternalLink className="w-3 h-3" /> Buka File
+                    </a>
+                  </div>
+                ) : (
+                  <div className="w-full h-32 rounded-xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-300">
+                    <FileText className="w-6 h-6 mb-1" />
+                    <span className="text-[10px] font-bold">Tidak ada berkas</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+          >
+            Tutup
+          </button>
+
+          {canApprove && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onReject}
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md active:scale-95"
+              >
+                <XCircle className="w-3.5 h-3.5" /> Tolak
+              </button>
+              <button
+                type="button"
+                onClick={onApprove}
+                className="flex items-center gap-1.5 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-emerald-500/20 active:scale-95"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" /> Setujui
+              </button>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

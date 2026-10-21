@@ -121,7 +121,18 @@ router.get("/cutis/user/:userId", (req, res) => cutiController.showByUserId(req,
 const cutiUpload = createUploadMiddleware("cuti", "cuti");
 router.post("/cutis", authMiddleware, cutiUpload.single("foto_cuti"), (req, res) => cutiController.store(req, res));
 router.put("/cutis/:id", cutiUpload.single("foto_cuti"), (req, res) => cutiController.update(req, res));
-router.put("/cutis/:id/approve", upload.none(), (req, res) => cutiController.approve(req, res));
+router.put("/cutis/:id/approve", authMiddleware, upload.none(), (req, res) => cutiController.approve(req, res));
+router.post("/cutis/:id/approve", authMiddleware, upload.none(), (req, res) => cutiController.approve(req, res));
+router.put("/cutis/:id/reject", authMiddleware, upload.none(), (req, res) => {
+    req.body = req.body || {};
+    req.body.status = "Ditolak";
+    return cutiController.approve(req, res);
+});
+router.post("/cutis/:id/reject", authMiddleware, upload.none(), (req, res) => {
+    req.body = req.body || {};
+    req.body.status = "Ditolak";
+    return cutiController.approve(req, res);
+});
 router.delete("/cutis/:id", (req, res) => cutiController.destroy(req, res));
 
 // ========================
@@ -225,8 +236,18 @@ router.get("/lemburs-user/:user_id", (req, res) => lemburController.showUser(req
 router.post("/lemburs", lemburUpload.fields([{ name: "foto_jam_masuk", maxCount: 1 }, { name: "foto_jam_keluar", maxCount: 1 }, { name: "file_lembur", maxCount: 1 }]), (req, res) => lemburController.store(req, res));
 router.put("/lemburs/:id", lemburUpload.fields([{ name: "foto_jam_masuk", maxCount: 1 }, { name: "foto_jam_keluar", maxCount: 1 }, { name: "file_lembur", maxCount: 1 }]), (req, res) => lemburController.update(req, res));
 router.post("/lemburs/:id", lemburUpload.fields([{ name: "foto_jam_masuk", maxCount: 1 }, { name: "foto_jam_keluar", maxCount: 1 }, { name: "file_lembur", maxCount: 1 }]), (req, res) => lemburController.update(req, res)); // Fallback
-router.put("/lemburs/:id/approve", upload.none(), (req, res) => lemburController.approve(req, res));
-router.post("/lemburs/:id/approve", upload.none(), (req, res) => lemburController.approve(req, res)); // Fallback
+router.put("/lemburs/:id/approve", authMiddleware, upload.none(), (req, res) => lemburController.approve(req, res));
+router.post("/lemburs/:id/approve", authMiddleware, upload.none(), (req, res) => lemburController.approve(req, res)); // Fallback
+router.put("/lemburs/:id/reject", authMiddleware, upload.none(), (req, res) => {
+    req.body = req.body || {};
+    req.body.status = "Rejected";
+    return lemburController.approve(req, res);
+});
+router.post("/lemburs/:id/reject", authMiddleware, upload.none(), (req, res) => {
+    req.body = req.body || {};
+    req.body.status = "Rejected";
+    return lemburController.approve(req, res);
+});
 router.delete("/lemburs/:id", (req, res) => lemburController.destroy(req, res));
 
 // ========================

@@ -220,23 +220,44 @@ class LemburService {
             }
 
             const approverUser = await tx.users.findUnique({
-                where: { id: approver }
+                where: { id: approver },
+                include: { managed_jabatans: true }
             });
 
-            const isManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
-            const isAdmin = approverUser?.is_admin === 'admin' || approverUser?.is_admin === 'superadmin' || approver === 1n;
+            if (!approverUser) {
+                throw new Error("Approver user tidak ditemukan");
+            }
+
+            const approverRolesRecords = await tx.model_has_roles.findMany({
+                where: { model_id: approver },
+                include: { roles: true }
+            });
+            const approverRoles = approverRolesRecords.map(r => (r.roles?.name || "").toLowerCase());
+
+            const isAdmin = approver === 1n ||
+                ['admin', 'superadmin', 'super admin', 'super_admin'].includes(String(approverUser.is_admin || '').toLowerCase()) ||
+                approverRoles.includes('admin') ||
+                approverRoles.includes('superadmin');
+
+            const isDirectManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
+            const managesPemohonJabatan = pemohon.jabatan_id && approverUser.managed_jabatans && approverUser.managed_jabatans.some(j => j.id === pemohon.jabatan_id);
+            const hasManagerRole = approverRoles.includes('manager') || approverRoles.includes('supervisor') || approverUser.is_supervisor === 1 || String(approverUser.is_admin || '').toLowerCase() === 'manager';
+
+            const isManager = isDirectManager || managesPemohonJabatan || hasManagerRole;
 
             const isRejection = body.status === "Rejected" || body.status === "Ditolak";
             let newStatus = existing.status;
             let shouldFinalize = false;
 
-            if (isManager && (existing.status === "Pending" || existing.status === "Menunggu")) {
-                if (isRejection) {
+            if (isRejection) {
+                if (isManager || isAdmin) {
                     newStatus = body.status;
                     shouldFinalize = true;
                 } else {
-                    newStatus = "Disetujui Manager";
+                    throw new Error("Anda tidak memiliki wewenang untuk menolak pengajuan lembur ini.");
                 }
+            } else if (isManager && (existing.status === "Pending" || existing.status === "Menunggu")) {
+                newStatus = "Disetujui Manager";
             } else if (isAdmin) {
                 if (existing.status === "Disetujui Manager" || existing.status === "Pending" || existing.status === "Menunggu") {
                     newStatus = body.status || "Approved";

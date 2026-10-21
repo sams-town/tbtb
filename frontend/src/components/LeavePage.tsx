@@ -21,7 +21,6 @@ import {
 } from 'lucide-react';
 import { cn, formatPhotoUrl } from '../lib/utils';
 import { useToast } from './Toast';
-import { AnimatePresence } from 'motion/react';
 import { AddLeave } from './AddLeave';
 import { EditLeave } from './EditLeave';
 

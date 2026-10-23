@@ -266,21 +266,22 @@ class LemburService {
             let shouldFinalize = false;
 
             if (isRejection) {
+                // Penolakan bisa dilakukan manager (tahap 1) atau admin (tahap final)
                 if (isManager || isAdmin) {
                     newStatus = body.status;
                     shouldFinalize = true;
                 } else {
                     throw new Error(`Anda tidak memiliki wewenang untuk menolak. Role: [${approverRoles.join(', ')}], Jabatan: ${approverJabatanName || '-'}, is_admin: ${approverUser.is_admin || '-'}`);
                 }
-            } else if (isAdmin && (isPending || isAlreadyManagerApproved)) {
-                // Admin bisa langsung approve ke final
-                newStatus = body.status || "Approved";
-                shouldFinalize = true;
             } else if (isManager && isPending) {
-                // Manager approve tahap 1
+                // ✅ Tahap 1: Manager setujui → status "Disetujui Manager" → notif dikirim ke Admin
                 newStatus = "Disetujui Manager";
+                // shouldFinalize = false → akan kirim notif ke admin
             } else if (isManager && isAlreadyManagerApproved) {
-                // Manager approve tahap 2 (jika tidak ada admin terpisah)
+                // ❌ Manager tidak bisa finalisasi — harus Admin yang approve tahap 2
+                throw new Error("Pengajuan ini sudah Anda setujui. Menunggu persetujuan Admin untuk finalisasi.");
+            } else if (isAdmin && (isPending || isAlreadyManagerApproved)) {
+                // ✅ Tahap 2: Admin finalisasi → status "Approved" → notif dikirim ke pegawai
                 newStatus = body.status || "Approved";
                 shouldFinalize = true;
             } else {

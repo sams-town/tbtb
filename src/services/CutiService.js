@@ -310,18 +310,22 @@ class CutiService {
             let shouldFinalize = false;
 
             if (isRejection) {
+                // Penolakan bisa dilakukan manager (tahap 1) atau admin (tahap final)
                 if (isManager || isAdmin) {
                     newStatus = "Ditolak";
                     shouldFinalize = true;
                 } else {
                     throw new Error(`Anda tidak memiliki wewenang untuk menolak. Role: [${approverRoles.join(', ')}], Jabatan: ${approverJabatanName || '-'}, is_admin: ${approverUser.is_admin || '-'}`);
                 }
-            } else if (isAdmin && (isPending || isAlreadyManagerApproved)) {
-                newStatus = "Diterima";
-                shouldFinalize = true;
             } else if (isManager && isPending) {
+                // ✅ Tahap 1: Manager setujui → status "Disetujui Manager" → notif dikirim ke Admin
                 newStatus = "Disetujui Manager";
+                // shouldFinalize = false → notif dikirim ke admin
             } else if (isManager && isAlreadyManagerApproved) {
+                // ❌ Manager tidak bisa finalisasi — harus Admin yang approve tahap 2
+                throw new Error("Pengajuan ini sudah Anda setujui. Menunggu persetujuan Admin untuk finalisasi.");
+            } else if (isAdmin && (isPending || isAlreadyManagerApproved)) {
+                // ✅ Tahap 2: Admin finalisasi → status "Diterima" → notif dikirim ke pegawai
                 newStatus = "Diterima";
                 shouldFinalize = true;
             } else {

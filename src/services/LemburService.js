@@ -221,7 +221,7 @@ class LemburService {
 
             const approverUser = await tx.users.findUnique({
                 where: { id: approver },
-                include: { managed_jabatans: true }
+                include: { managed_jabatans: true, jabatan: true }
             });
 
             if (!approverUser) {
@@ -234,16 +234,32 @@ class LemburService {
             });
             const approverRoles = approverRolesRecords.map(r => (r.roles?.name || "").toLowerCase());
 
+            // ── Admin detection ──────────────────────────────────────────────
             const isAdmin = approver === 1n ||
                 ['admin', 'superadmin', 'super admin', 'super_admin'].includes(String(approverUser.is_admin || '').toLowerCase()) ||
                 approverRoles.includes('admin') ||
                 approverRoles.includes('superadmin');
 
-            const isDirectManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
-            const managesPemohonJabatan = pemohon.jabatan_id && approverUser.managed_jabatans && approverUser.managed_jabatans.some(j => j.id === pemohon.jabatan_id);
-            const hasManagerRole = approverRoles.includes('manager') || approverRoles.includes('supervisor') || approverUser.is_supervisor === 1 || String(approverUser.is_admin || '').toLowerCase() === 'manager';
+            // ── Manager detection (expanded to cover Indonesian hospital roles) ──
+            const MANAGER_JABATAN_KEYWORDS = ['manager', 'supervisor', 'spv', 'kepala', 'kabid', 'koordinator', 'head', 'direktur', 'kasubag', 'kadept', 'kasi'];
+            const approverJabatanName = (approverUser.jabatan?.nama_jabatan || '').toLowerCase();
+            const hasManagerJabatan = MANAGER_JABATAN_KEYWORDS.some(kw => approverJabatanName.includes(kw));
 
-            const isManager = isDirectManager || managesPemohonJabatan || hasManagerRole;
+            const MANAGER_ROLE_KEYWORDS = ['manager', 'supervisor', 'spv', 'kepala', 'kabid', 'koordinator', 'head', 'direktur', 'kasubag'];
+            const hasManagerRole = approverRoles.some(r => MANAGER_ROLE_KEYWORDS.some(kw => r.includes(kw))) ||
+                approverUser.is_supervisor === 1 ||
+                String(approverUser.is_admin || '').toLowerCase() === 'manager';
+
+            const isDirectManager = pemohon.jabatan && pemohon.jabatan.manager != null && BigInt(pemohon.jabatan.manager) === approver;
+            const managesPemohonJabatan = pemohon.jabatan_id && approverUser.managed_jabatans &&
+                approverUser.managed_jabatans.some(j => j.id === pemohon.jabatan_id);
+
+            const isManager = isDirectManager || managesPemohonJabatan || hasManagerRole || hasManagerJabatan;
+
+            // ── Normalize status (case-insensitive comparison) ───────────────
+            const existingStatusNorm = String(existing.status || '').toLowerCase().trim();
+            const isPending = ['pending', 'menunggu', 'diajukan', 'menunggu persetujuan'].includes(existingStatusNorm);
+            const isAlreadyManagerApproved = existingStatusNorm === 'disetujui manager';
 
             const isRejection = body.status === "Rejected" || body.status === "Ditolak";
             let newStatus = existing.status;
@@ -254,21 +270,26 @@ class LemburService {
                     newStatus = body.status;
                     shouldFinalize = true;
                 } else {
-                    throw new Error("Anda tidak memiliki wewenang untuk menolak pengajuan lembur ini.");
+                    throw new Error(`Anda tidak memiliki wewenang untuk menolak. Role: [${approverRoles.join(', ')}], Jabatan: ${approverJabatanName || '-'}, is_admin: ${approverUser.is_admin || '-'}`);
                 }
-            } else if (isManager && (existing.status === "Pending" || existing.status === "Menunggu")) {
+            } else if (isAdmin && (isPending || isAlreadyManagerApproved)) {
+                // Admin bisa langsung approve ke final
+                newStatus = body.status || "Approved";
+                shouldFinalize = true;
+            } else if (isManager && isPending) {
+                // Manager approve tahap 1
                 newStatus = "Disetujui Manager";
-            } else if (isAdmin) {
-                if (existing.status === "Disetujui Manager" || existing.status === "Pending" || existing.status === "Menunggu") {
-                    newStatus = body.status || "Approved";
-                    shouldFinalize = true;
-                }
+            } else if (isManager && isAlreadyManagerApproved) {
+                // Manager approve tahap 2 (jika tidak ada admin terpisah)
+                newStatus = body.status || "Approved";
+                shouldFinalize = true;
             } else {
-                throw new Error("Anda tidak memiliki wewenang untuk menyetujui pengajuan ini pada tahap ini.");
+                const debugInfo = `Status DB: '${existing.status}', Role: [${approverRoles.join(', ')}], Jabatan: '${approverJabatanName || '-'}', is_admin: '${approverUser.is_admin || '-'}', is_supervisor: ${approverUser.is_supervisor}`;
+                throw new Error(`Anda tidak memiliki wewenang untuk menyetujui lembur ini. (${debugInfo})`);
             }
 
             if (newStatus === existing.status) {
-                throw new Error("Status pengajuan lembur tidak berubah atau Anda tidak berwenang pada tahap ini.");
+                throw new Error(`Status tidak berubah. Status saat ini: '${existing.status}'. Kemungkinan sudah diproses sebelumnya.`);
             }
 
             const record = await tx.lemburs.update({

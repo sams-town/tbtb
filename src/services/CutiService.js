@@ -266,7 +266,7 @@ class CutiService {
 
             const approverUser = await tx.users.findUnique({
                 where: { id: approver },
-                include: { managed_jabatans: true }
+                include: { managed_jabatans: true, jabatan: true }
             });
 
             if (!approverUser) {
@@ -284,11 +284,26 @@ class CutiService {
                 approverRoles.includes('admin') ||
                 approverRoles.includes('superadmin');
 
-            const isDirectManager = pemohon.jabatan && pemohon.jabatan.manager && pemohon.jabatan.manager === approver;
-            const managesPemohonJabatan = pemohon.jabatan_id && approverUser.managed_jabatans && approverUser.managed_jabatans.some(j => j.id === pemohon.jabatan_id);
-            const hasManagerRole = approverRoles.includes('manager') || approverRoles.includes('supervisor') || approverUser.is_supervisor === 1 || String(approverUser.is_admin || '').toLowerCase() === 'manager';
+            // ── Manager detection (expanded to cover Indonesian hospital roles) ──
+            const MANAGER_JABATAN_KEYWORDS = ['manager', 'supervisor', 'spv', 'kepala', 'kabid', 'koordinator', 'head', 'direktur', 'kasubag', 'kadept', 'kasi'];
+            const approverJabatanName = (approverUser.jabatan?.nama_jabatan || '').toLowerCase();
+            const hasManagerJabatan = MANAGER_JABATAN_KEYWORDS.some(kw => approverJabatanName.includes(kw));
 
-            const isManager = isDirectManager || managesPemohonJabatan || hasManagerRole;
+            const MANAGER_ROLE_KEYWORDS = ['manager', 'supervisor', 'spv', 'kepala', 'kabid', 'koordinator', 'head', 'direktur', 'kasubag'];
+            const hasManagerRole = approverRoles.some(r => MANAGER_ROLE_KEYWORDS.some(kw => r.includes(kw))) ||
+                approverUser.is_supervisor === 1 ||
+                String(approverUser.is_admin || '').toLowerCase() === 'manager';
+
+            const isDirectManager = pemohon.jabatan && pemohon.jabatan.manager != null && BigInt(pemohon.jabatan.manager) === approver;
+            const managesPemohonJabatan = pemohon.jabatan_id && approverUser.managed_jabatans &&
+                approverUser.managed_jabatans.some(j => j.id === pemohon.jabatan_id);
+
+            const isManager = isDirectManager || managesPemohonJabatan || hasManagerRole || hasManagerJabatan;
+
+            // ── Normalize status (case-insensitive comparison) ───────────────
+            const existingStatusNorm = String(existing.status_cuti || '').toLowerCase().trim();
+            const isPending = ['pending', 'menunggu', 'diajukan', 'menunggu persetujuan'].includes(existingStatusNorm);
+            const isAlreadyManagerApproved = existingStatusNorm === 'disetujui manager';
 
             const isRejection = body.status === "Ditolak" || body.status === "Rejected";
             let newStatus = existing.status_cuti;
@@ -299,21 +314,23 @@ class CutiService {
                     newStatus = "Ditolak";
                     shouldFinalize = true;
                 } else {
-                    throw new Error("Anda tidak memiliki wewenang untuk menolak pengajuan ini.");
+                    throw new Error(`Anda tidak memiliki wewenang untuk menolak. Role: [${approverRoles.join(', ')}], Jabatan: ${approverJabatanName || '-'}, is_admin: ${approverUser.is_admin || '-'}`);
                 }
-            } else if (isManager && (existing.status_cuti === "Pending" || existing.status_cuti === "Menunggu")) {
+            } else if (isAdmin && (isPending || isAlreadyManagerApproved)) {
+                newStatus = "Diterima";
+                shouldFinalize = true;
+            } else if (isManager && isPending) {
                 newStatus = "Disetujui Manager";
-            } else if (isAdmin) {
-                if (existing.status_cuti === "Disetujui Manager" || existing.status_cuti === "Pending" || existing.status_cuti === "Menunggu") {
-                    newStatus = "Diterima";
-                    shouldFinalize = true;
-                }
+            } else if (isManager && isAlreadyManagerApproved) {
+                newStatus = "Diterima";
+                shouldFinalize = true;
             } else {
-                throw new Error("Anda tidak memiliki wewenang untuk menyetujui pengajuan ini pada tahap ini.");
+                const debugInfo = `Status DB: '${existing.status_cuti}', Role: [${approverRoles.join(', ')}], Jabatan: '${approverJabatanName || '-'}', is_admin: '${approverUser.is_admin || '-'}', is_supervisor: ${approverUser.is_supervisor}`;
+                throw new Error(`Anda tidak memiliki wewenang untuk menyetujui cuti ini. (${debugInfo})`);
             }
 
             if (newStatus === existing.status_cuti) {
-                throw new Error("Status pengajuan cuti tidak berubah atau Anda tidak berwenang pada tahap ini.");
+                throw new Error(`Status tidak berubah. Status saat ini: '${existing.status_cuti}'. Kemungkinan sudah diproses sebelumnya.`);
             }
 
             // 2. Update status cuti ke status baru

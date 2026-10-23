@@ -195,9 +195,17 @@ class LemburController {
             });
         } catch (error) {
             console.error("LemburController.approve error:", error);
-            return res.status(500).json({
+            // Bedakan validation error (4xx) vs server error (5xx)
+            const isValidation = error.message && (
+                error.message.includes("wewenang") ||
+                error.message.includes("tidak ditemukan") ||
+                error.message.includes("wajib diisi") ||
+                error.message.includes("Status tidak berubah") ||
+                error.message.includes("harus berupa angka")
+            );
+            return res.status(isValidation ? 400 : 500).json({
                 success: false,
-                message: "Gagal memproses approval lembur",
+                message: error.message || "Gagal memproses approval lembur",
                 error: error.message,
             });
         }

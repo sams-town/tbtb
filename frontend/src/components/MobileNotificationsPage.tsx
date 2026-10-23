@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -240,7 +240,7 @@ export function MobileNotificationsPage() {
         handleMarkAsRead(notif.id);
         fetchNotifications();
       } else {
-        addToast({ type: 'error', title: 'Gagal', message: json.message || 'Gagal menyetujui.' });
+        addToast({ type: 'error', title: 'Gagal', message: json.error || json.message || 'Gagal menyetujui.' });
       }
     } catch (e: any) {
       addToast({ type: 'error', title: 'Error', message: e.message });

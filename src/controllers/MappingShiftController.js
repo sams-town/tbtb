@@ -43,6 +43,48 @@ class MappingShiftController {
 
     async bulkStore(req, res) {
         try {
+            // Support batch array import (digunakan oleh Supervisor & Admin Import)
+            if (Array.isArray(req.body)) {
+                let successCount = 0;
+                let failCount = 0;
+                const errors = [];
+
+                for (const item of req.body) {
+                    try {
+                        const uid = item.user_id || item.id_user || item.id_karyawan;
+                        const sDate = item.start_date || item.tanggal_mulai || item.tanggal;
+                        const eDate = item.end_date || item.tanggal_akhir || item.tanggal;
+                        const sId = item.shift_id || item.id_shift;
+                        const lLoc = item.lock_location;
+
+                        if (!uid || !sDate || !eDate) {
+                            failCount++;
+                            errors.push(`Baris user_id ${uid || '-'}: user_id, start_date, dan end_date wajib diisi`);
+                            continue;
+                        }
+
+                        await mappingShiftService.bulkCreateRange({
+                            user_id: uid,
+                            shift_id: sId,
+                            start_date: sDate,
+                            end_date: eDate,
+                            lock_location: lLoc
+                        });
+                        successCount++;
+                    } catch (err) {
+                        failCount++;
+                        errors.push(`Karyawan ${item.user_id || '-'}: ${err.message}`);
+                    }
+                }
+
+                return res.status(201).json({
+                    success: true,
+                    message: `${successCount} jadwal shift berhasil diimport dan disinkronkan (${failCount} gagal)`,
+                    data: { successCount, failCount, errors }
+                });
+            }
+
+            // Single item request
             const { user_id, shift_id, start_date, end_date, lock_location } = req.body;
 
             if (!user_id || !start_date || !end_date) {

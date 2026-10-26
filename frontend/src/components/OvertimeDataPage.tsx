@@ -343,11 +343,11 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
 
   const filteredData = data.filter(item => {
     let valid = true;
-    if (filterEmployeeId && item.user_id !== filterEmployeeId) valid = false;
+    if (filterEmployeeId && item.user_id?.toString() !== filterEmployeeId.toString()) valid = false;
     if (filterStartDate || filterEndDate) {
-      const date = new Date(item.tanggal).getTime();
-      if (filterStartDate && date < new Date(filterStartDate).getTime()) valid = false;
-      if (filterEndDate && date > new Date(filterEndDate).getTime()) valid = false;
+      const itemDateStr = item.tanggal ? item.tanggal.slice(0, 10) : '';
+      if (filterStartDate && itemDateStr < filterStartDate) valid = false;
+      if (filterEndDate && itemDateStr > filterEndDate) valid = false;
     }
     return valid;
   });
@@ -358,14 +358,71 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
   const handleExportExcel = async () => {
     const toastId = addToast({ type: 'loading', title: 'Export Excel', message: 'Sedang menyiapkan data...' });
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/lemburs?limit=100000`, {
+      const params = new URLSearchParams();
+      params.append('limit', '100000');
+      if (filterEmployeeId) params.append('user_id', filterEmployeeId);
+      if (filterStartDate) params.append('start_date', filterStartDate);
+      if (filterEndDate) params.append('end_date', filterEndDate);
+
+      const res = await fetch(`${import.meta.env.VITE_API_MEANDPAY}/lemburs?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
 
-      const allData: OvertimeData[] = json.data;
-      const exportData = allData.map((item, index) => ({
+      let targetData: OvertimeData[] = json.data || [];
+
+      // Filter hak akses divisi jika bukan master / admin
+      const activeUser = currentUser || JSON.parse(localStorage.getItem('user') || '{}');
+      const roles: string[] = Array.isArray(activeUser?.roles)
+        ? activeUser.roles.map((r: any) => String(r).toLowerCase())
+        : activeUser?.role ? [String(activeUser.role).toLowerCase()] : [];
+
+      const isMaster =
+        activeUser?.id?.toString() === '1' ||
+        Number(activeUser?.id) === 1 ||
+        activeUser?.is_admin === 'superadmin' ||
+        activeUser?.is_admin === 'admin' ||
+        roles.includes('superadmin') ||
+        roles.includes('admin');
+
+      const isManagerRole =
+        roles.includes('manager') ||
+        roles.includes('supervisor') ||
+        activeUser?.is_supervisor === 1 ||
+        activeUser?.is_supervisor === true ||
+        activeUser?.is_admin === 'manager';
+
+      if (!isMaster && !isManagerRole) {
+        const managedDivisions = jabatans
+          .filter((j: any) => j.manager?.toString() === activeUser?.id?.toString())
+          .map((j: any) => j.id.toString());
+        
+        if (managedDivisions.length > 0) {
+          targetData = targetData.filter((item: any) => {
+            const pemohon = employees.find(e => e.id?.toString() === item.user_id?.toString());
+            const empDivId = pemohon?.jabatan_id || pemohon?.jabatan?.id;
+            return managedDivisions.includes(empDivId?.toString());
+          });
+        }
+      }
+
+      // Filter rentang tanggal & pegawai secara ketat di client
+      targetData = targetData.filter(item => {
+        let valid = true;
+        if (filterEmployeeId && item.user_id?.toString() !== filterEmployeeId.toString()) valid = false;
+        const itemDateStr = item.tanggal ? item.tanggal.slice(0, 10) : '';
+        if (filterStartDate && itemDateStr < filterStartDate) valid = false;
+        if (filterEndDate && itemDateStr > filterEndDate) valid = false;
+        return valid;
+      });
+
+      if (targetData.length === 0) {
+        updateToast(toastId, { type: 'error', title: 'Export Kosong', message: 'Tidak ada data lembur pada rentang tanggal/filter yang dipilih' });
+        return;
+      }
+
+      const exportData = targetData.map((item, index) => ({
         'No': index + 1,
         'Nama Pegawai': item.karyawan?.name || 'Unknown',
         'Username': item.karyawan?.username || '-',
@@ -388,8 +445,16 @@ export function OvertimeDataPage({ initialFilters }: { initialFilters?: { userId
         { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 30 }, { wch: 12 }, { wch: 20 }
       ];
 
-      XLSX.writeFile(wb, `Data_Lembur_${new Date().toISOString().split('T')[0]}.xlsx`);
-      updateToast(toastId, { type: 'success', title: 'Berhasil', message: 'Data berhasil di-export ke Excel' });
+      const dateSuffix = filterStartDate && filterEndDate
+        ? `${filterStartDate}_sd_${filterEndDate}`
+        : filterStartDate
+        ? `dari_${filterStartDate}`
+        : filterEndDate
+        ? `sampai_${filterEndDate}`
+        : new Date().toISOString().split('T')[0];
+
+      XLSX.writeFile(wb, `Data_Lembur_${dateSuffix}.xlsx`);
+      updateToast(toastId, { type: 'success', title: 'Berhasil', message: `${targetData.length} data lembur berhasil di-export ke Excel` });
     } catch (err: any) {
       console.error('Export error:', err);
       updateToast(toastId, { type: 'error', title: 'Gagal', message: err.message || 'Gagal mengekspor data' });

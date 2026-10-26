@@ -7,11 +7,10 @@ class LemburService {
         const where = {};
         if (query.user_id) where.user_id = BigInt(query.user_id);
         if (query.status) where.status = query.status;
-        if (query.start_date && query.end_date) {
-            where.tanggal = {
-                gte: query.start_date,
-                lte: query.end_date
-            };
+        if (query.start_date || query.end_date) {
+            where.tanggal = {};
+            if (query.start_date) where.tanggal.gte = query.start_date;
+            if (query.end_date) where.tanggal.lte = query.end_date;
         }
 
         const data = await prisma.lemburs.findMany({

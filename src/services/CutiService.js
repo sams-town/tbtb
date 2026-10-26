@@ -63,7 +63,7 @@ class CutiService {
 
             excludeUserIds = Array.from(new Set([
                 1n,
-                ...doctors.map(d => d.model_id),
+                ...roleDoctorUserIds,
                 ...doctorJabatanUserIds,
                 ...superAdmins.map(u => u.id),
                 ...superAdminRoles.map(u => u.model_id)

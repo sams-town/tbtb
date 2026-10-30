@@ -49,7 +49,7 @@ class CutiService {
             const superAdmins = await prisma.users.findMany({
                 where: {
                     OR: [
-                        { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'ADMIN', 'SUPERADMIN'] } },
+                        { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'Superadmin', 'Super Admin', 'SUPERADMIN'] } },
                         { username: 'admin' },
                         { email: 'admin@admin.com' }
                     ]
@@ -57,7 +57,7 @@ class CutiService {
                 select: { id: true }
             });
             const superAdminRoles = await prisma.model_has_roles.findMany({
-                where: { roles: { name: { in: ['superadmin', 'super admin', 'super_admin', 'Super Admin', 'admin', 'Admin'] } } },
+                where: { roles: { name: { in: ['superadmin', 'super admin', 'super_admin', 'Super Admin', 'SUPERADMIN'] } } },
                 select: { model_id: true }
             });
 

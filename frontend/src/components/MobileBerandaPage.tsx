@@ -44,7 +44,6 @@ import {
   TrendingUp,
   X,
   UtensilsCrossed,
-  ClipboardList,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 

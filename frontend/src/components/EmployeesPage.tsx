@@ -1331,17 +1331,24 @@ export function EmployeesPage() {
       if (!rolesArr.some(r => String(r).toLowerCase() === 'dokter')) {
         empData = empData.filter((e: any) => {
           const userRoles = Array.isArray(e.roles) ? e.roles.map((r: any) => String(typeof r === 'string' ? r : r.name || '').toLowerCase()) : [];
-          const isDocRole = userRoles.some((r: string) => r.includes('dokter'));
+          const isDocRole = userRoles.some((r: string) => r.includes('dokter') || r.includes('doctor'));
           const jabName = String(e.jabatan?.nama_jabatan || '').toLowerCase();
-          const isDocJab = jabName.includes('dokter') || jabName.includes('spesialis') || jabName.includes('sp.') || jabName.includes('dr.');
-          return !isDocRole && !isDocJab;
+          const isDocJab = jabName.includes('dokter') || jabName.includes('spesialis') || jabName.includes('sp.') || jabName.includes('dr.') || jabName.includes('drg.');
+          const nameLower = String(e.name || '').toLowerCase();
+          const isDocName = nameLower.startsWith('dr.') || nameLower.startsWith('drg.');
+          return !isDocRole && !isDocJab && !isDocName;
         });
       }
 
       // Exclude superadmin & admin
       empData = empData.filter((e: any) => {
         const adminVal = String(e.is_admin || '').toLowerCase();
-        return !['superadmin', 'super admin', 'super_admin', 'admin'].includes(adminVal);
+        if (e.id?.toString() === '1' || Number(e.id) === 1) return false;
+        if (e.username?.toLowerCase() === 'admin' || e.email?.toLowerCase() === 'admin@admin.com') return false;
+        if (['superadmin', 'super admin', 'super_admin'].includes(adminVal)) return false;
+        const userRoles = Array.isArray(e.roles) ? e.roles.map((r: any) => String(typeof r === 'string' ? r : r.name || '').toLowerCase()) : [];
+        if (userRoles.includes('superadmin') || userRoles.includes('super admin') || userRoles.includes('super_admin')) return false;
+        return true;
       });
 
       setEmployees(empData);

@@ -193,7 +193,7 @@ class PayrollService {
             const allUsers = await tx.users.findMany({
                 where: {
                     OR: [
-                        { is_admin: { notIn: ['admin', 'superadmin', 'super_admin', 'super admin'] } },
+                        { is_admin: { notIn: ['superadmin', 'super_admin', 'super admin', 'SUPERADMIN'] } },
                         { is_admin: null }
                     ]
                 },

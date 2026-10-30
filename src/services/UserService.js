@@ -48,7 +48,7 @@ class UserService {
         const superAdmins = await prisma.users.findMany({
             where: {
                 OR: [
-                    { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'Superadmin', 'Super Admin', 'SUPERADMIN'] } },
                     { username: 'admin' },
                     { email: 'admin@admin.com' }
                 ]
@@ -118,7 +118,7 @@ class UserService {
             { id: { notIn: Array.from(excludedUserIdsSet) } },
             {
                 OR: [
-                    { is_admin: { notIn: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { is_admin: { notIn: ['superadmin', 'super admin', 'super_admin', 'Superadmin', 'Super Admin', 'SUPERADMIN'] } },
                     { is_admin: null }
                 ]
             }
@@ -219,7 +219,21 @@ class UserService {
                 });
                 docJabUserIds = docJabUsers.map(u => u.id);
             }
-            const allDocIds = Array.from(new Set([...roleDoctorUserIds, ...docJabUserIds]));
+            const docUsersByName = await prisma.users.findMany({
+                where: {
+                    OR: [
+                        { name: { startsWith: 'dr.' } },
+                        { name: { startsWith: 'Dr.' } },
+                        { name: { startsWith: 'drg.' } },
+                        { name: { startsWith: 'Drg.' } },
+                        { name: { contains: 'Dokter' } },
+                        { name: { contains: 'dokter' } },
+                    ]
+                },
+                select: { id: true }
+            });
+            const docNameUserIds = docUsersByName.map(u => u.id);
+            const allDocIds = Array.from(new Set([...roleDoctorUserIds, ...docJabUserIds, ...docNameUserIds]));
             if (allDocIds.length > 0) {
                 andConditions.push({ id: { in: allDocIds } });
             } else {
@@ -385,7 +399,7 @@ class UserService {
         const superAdmins2 = await prisma.users.findMany({
             where: {
                 OR: [
-                    { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { is_admin: { in: ['superadmin', 'super admin', 'super_admin', 'Superadmin', 'Super Admin', 'SUPERADMIN'] } },
                     { username: 'admin' },
                     { email: 'admin@admin.com' }
                 ]
@@ -459,7 +473,7 @@ class UserService {
             { id: { notIn: Array.from(excludedUserIdsSet) } },
             {
                 OR: [
-                    { is_admin: { notIn: ['superadmin', 'super admin', 'super_admin', 'admin', 'Superadmin', 'Super Admin', 'Super_Admin', 'ADMIN', 'SUPERADMIN'] } },
+                    { is_admin: { notIn: ['superadmin', 'super admin', 'super_admin', 'Superadmin', 'Super Admin', 'SUPERADMIN'] } },
                     { is_admin: null }
                 ]
             }
@@ -571,7 +585,21 @@ class UserService {
                 });
                 docJabUserIds = docJabUsers.map(u => u.id);
             }
-            const allDocIds = Array.from(new Set([...roleDoctorUserIds, ...docJabUserIds]));
+            const docUsersByName = await prisma.users.findMany({
+                where: {
+                    OR: [
+                        { name: { startsWith: 'dr.' } },
+                        { name: { startsWith: 'Dr.' } },
+                        { name: { startsWith: 'drg.' } },
+                        { name: { startsWith: 'Drg.' } },
+                        { name: { contains: 'Dokter' } },
+                        { name: { contains: 'dokter' } },
+                    ]
+                },
+                select: { id: true }
+            });
+            const docNameUserIds = docUsersByName.map(u => u.id);
+            const allDocIds = Array.from(new Set([...roleDoctorUserIds, ...docJabUserIds, ...docNameUserIds]));
             if (allDocIds.length > 0) {
                 andConditions.push({ id: { in: allDocIds } });
             } else {

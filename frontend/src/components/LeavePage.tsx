@@ -157,7 +157,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
       // Filter sisi-klien: buang superadmin/admin & dokter jika lolos dari backend
       empData = empData.filter((e: any) => {
         const adminVal = (e.is_admin || '').toLowerCase();
-        if (['superadmin', 'super admin', 'super_admin', 'admin'].includes(adminVal)) return false;
+        if (['superadmin', 'super admin', 'super_admin'].includes(adminVal) || (e.id?.toString() === '1' || Number(e.id) === 1)) return false;
         const roleNames = Array.isArray(e.roles) ? e.roles.map((r: any) => (typeof r === 'string' ? r : r.name || '').toLowerCase()) : [];
         if (roleNames.some((r: string) => r.includes('dokter'))) return false;
         const jabName = (e.jabatan?.nama_jabatan || '').toLowerCase();
@@ -196,7 +196,7 @@ export function LeavePage({ initialFilters }: LeavePageProps = {}) {
           const userObj = item.pemohon || item.users;
           if (userObj) {
             const adminVal = (userObj.is_admin || '').toLowerCase();
-            if (['superadmin', 'super admin', 'super_admin', 'admin'].includes(adminVal)) return false;
+            if (['superadmin', 'super admin', 'super_admin'].includes(adminVal) || (userObj?.id?.toString() === '1' || Number(userObj?.id) === 1)) return false;
             const jabName = (userObj.jabatan?.nama_jabatan || '').toLowerCase();
             if (jabName.includes('dokter')) return false;
           }
